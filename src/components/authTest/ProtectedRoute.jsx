@@ -8,15 +8,15 @@ const ProtectedRoute = () => {
   const { _id, username, token } = user;
   console.log(_id, username, token);
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!_id) {
-      return navigate("/login", { replace: true });
-    }
-    const getUser = async()=>{
-      const response = await fetchUser(_id,username,token)
-    }
-    getUser()
-  }, []);
+  // useEffect(() => {
+  //   if (!_id) {
+  //     return navigate("/login", { replace: true });
+  //   }
+  //   const getUser = async()=>{
+  //     const response = await fetchUser(_id,username,token)
+  //   }
+  //   getUser()
+  // }, []);
 
   return (
     <div>

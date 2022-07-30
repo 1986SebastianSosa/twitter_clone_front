@@ -6,6 +6,7 @@ import Success from "./components/Success";
 import Failure from "./components/Failure";
 import FreeRoute from "./components/authTest/FreeRoute";
 import ProtectedRoute from "./components/authTest/ProtectedRoute";
+import Access from "./components/access/Access";
 
 const MyRoutes = () => {
   return (
@@ -17,7 +18,7 @@ const MyRoutes = () => {
         <Route path="/success" element={<Success />} />
         <Route path="/free" element={<FreeRoute />} />
         <Route path="/protected" element={<ProtectedRoute />} />
-        {/* <Route path="/" element={<Home />} /> */}
+        <Route path="/" element={<Access />} />
       </Routes>
     </>
   );

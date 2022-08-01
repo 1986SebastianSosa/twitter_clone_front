@@ -121,7 +121,7 @@
     flex-direction: row;
   }
   .accessImgDiv {
-    height: 100%;
+    height: 100vh;
   }
   .accessImgDiv .twitterLogo {
     font-size: 20rem;

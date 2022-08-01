@@ -1,17 +1,42 @@
-import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import React, { useEffect, useRef, useState } from "react";
+import { Container, Row, Col, Modal } from "react-bootstrap";
 import accessImg from "../../img/lohp_en_1302x955.png";
 import "./access.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { faApple } from "@fortawesome/free-brands-svg-icons";
-import { Button } from "react-bootstrap";
+import { faTwitter, faApple } from "@fortawesome/free-brands-svg-icons";
+import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import GoogleIcon from "../../img/google_icon.png";
+import ReactTooltip from "react-tooltip";
+import RegisterModal from "./RegisterModal";
+import LoginModal from "./LoginModal";
 
 const Access = () => {
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const handleCloseRegisterModal = () => setShowRegisterModal(false);
+  const handleShowRegisterModal = () => setShowRegisterModal(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const handleCloseLoginModal = () => setShowLoginModal(false);
+  const handleShowLoginModal = () => setShowLoginModal(true);
+
   return (
     <Container fluid className="m-0 p-0">
-      <Row className="accessMain">
+      <ReactTooltip
+        id="google"
+        getContent={() => {
+          return;
+        }}
+      >
+        <FontAwesomeIcon icon={faCircleInfo} /> Comming soon!
+      </ReactTooltip>
+      <ReactTooltip
+        id="apple"
+        getContent={() => {
+          return;
+        }}
+      >
+        <FontAwesomeIcon icon={faCircleInfo} /> Comming soon!
+      </ReactTooltip>
+      <Row className="accessMain m-0">
         <Col xs={12} lg={7} className="m-0 p-0">
           <div className="accessImgDiv">
             <img src={accessImg} alt="" />
@@ -30,13 +55,13 @@ const Access = () => {
               <h3>Join Twitter today</h3>
             </Col>
             <Col className="btnContainer mb-2">
-              <button className="button">
+              <button className="button" data-tip="" data-for="google">
                 <img src={GoogleIcon} alt="" className="btnImg" />
                 Sign up with Google
               </button>
             </Col>
             <Col className="mb-2">
-              <button className="button">
+              <button className="button" data-for="apple" data-tip="">
                 {" "}
                 <FontAwesomeIcon icon={faApple} className="appleLogo fa-xl" />
                 Sign up with Apple
@@ -52,9 +77,16 @@ const Access = () => {
               </div>
             </Col>
             <Col className="mb-2">
-              <button className="button phoneOrEmail">
+              <button
+                className="button phoneOrEmail"
+                onClick={handleShowRegisterModal}
+              >
                 Sign up with phone or email
               </button>
+              <RegisterModal
+                showRegisterModal={showRegisterModal}
+                handleCloseRegisterModal={handleCloseRegisterModal}
+              />
             </Col>
             <Col className="mb-5">
               <p className="disclaimer">
@@ -67,8 +99,17 @@ const Access = () => {
               <h5>Already have an account?</h5>
             </Col>
             <Col>
-              <button className="button signInBtn">Sign in</button>
+              <button
+                className="button signInBtn"
+                onClick={handleShowLoginModal}
+              >
+                Sign in
+              </button>
             </Col>
+            <LoginModal
+              showLoginModal={showLoginModal}
+              handleCloseLoginModal={handleCloseLoginModal}
+            />
           </Row>
         </Col>
       </Row>

@@ -10,6 +10,7 @@ import {
 import { useFormik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import * as Yup from "yup";
 import { loginUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
@@ -30,13 +31,12 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     },
     validationSchema: LoginSchema,
     onSubmit: async (values) => {
-      console.log(values);
-      const result = await loginUser(values);
-      console.log(result);
-      // if (Object.entries(result).length > 0) {
-      //   handleCloseLoginModal();
-      //   navigate("/home");
-      // }
+      const response = await loginUser(values);
+      console.log(response);
+      if (Object.entries(response).length > 0) {
+        handleCloseLoginModal();
+        navigate("/home");
+      }
     },
   });
 
@@ -89,7 +89,15 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
                       onChange={formik.handleChange}
                     />
                     {formik.errors[field.name] && formik.touched[field.name] ? (
-                      <div>{formik.errors[field.name]}</div>
+                      <div>
+                        <p className="text-danger">
+                          <FontAwesomeIcon
+                            icon={faCircleExclamation}
+                            className="me-1"
+                          />
+                          {formik.errors[field.name]}
+                        </p>
+                      </div>
                     ) : null}
                   </FormGroup>
                 );

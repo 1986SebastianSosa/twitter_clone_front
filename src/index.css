@@ -1,7 +1,10 @@
-body {
+* {
   margin: 0;
   padding: 0;
-  box-sizing: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: "Roboto", sans-serif;
   --primary-color: rgb(29, 155, 240);
 }
@@ -16,4 +19,8 @@ code {
   flex-direction: column;
   background-color: rgb(239, 243, 244);
   height: 1px;
+}
+
+.logo {
+  color: rgb(29, 155, 240);
 }

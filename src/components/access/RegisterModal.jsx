@@ -1,6 +1,7 @@
 import { useFormik } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import {
   Form,
   Button,
@@ -133,7 +134,15 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
                     onChange={formik.handleChange}
                   />
                   {formik.errors[field.name] && formik.touched[field.name] ? (
-                    <div>{formik.errors[field.name]}</div>
+                    <div>
+                      <p className="text-danger">
+                        <FontAwesomeIcon
+                          icon={faCircleExclamation}
+                          className="me-1"
+                        />
+                        {formik.errors[field.name]}
+                      </p>
+                    </div>
                   ) : null}
                 </FormGroup>
               );

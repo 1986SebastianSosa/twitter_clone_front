@@ -1,0 +1,11 @@
+.trending {
+  background-color: rgb(239, 239, 239);
+}
+.trend:hover {
+  background-color: rgb(212, 212, 212);
+  cursor: pointer;
+}
+
+.trend .trendIcon:hover {
+  color: var(--primary-color);
+}

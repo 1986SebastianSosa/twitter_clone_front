@@ -1,0 +1,51 @@
+.sidenav {
+  max-width: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.sidenav .logo {
+  padding: 1rem;
+
+  margin-bottom: 8px;
+}
+
+.sidenav .navItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  margin-bottom: 8px;
+  border-radius: 50px;
+  transition: 0.2s;
+}
+.sidenav div:hover {
+  background-color: rgb(238, 233, 233);
+  cursor: pointer;
+}
+
+.sidenav .navItem .iconDiv {
+  width: 3rem;
+}
+
+.sidenav .navItem h5 {
+  margin: 0 !important;
+  font-weight: 500;
+  font-size: 18px;
+}
+
+.sidenav button {
+  margin: auto;
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+  width: 100%;
+  transition: 0.2s;
+}
+
+.sidenav button:hover {
+  background-color: rgb(23, 139, 215);
+}

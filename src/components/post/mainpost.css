@@ -1,0 +1,27 @@
+.user-icon {
+  width: 5rem;
+  height: 5rem;
+}
+
+.icon-list li {
+  list-style: none;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary-color);
+}
+.icon-list li img {
+  width: 18px;
+  filter: invert(40%) sepia(100%) saturate(541%) hue-rotate(165deg)
+    brightness(106%) contrast(96%);
+}
+
+.main-input:focus {
+  outline: none;
+}
+
+.reply-btn:hover {
+  background-color: rgba(29, 155, 240, 0.1) !important;
+}

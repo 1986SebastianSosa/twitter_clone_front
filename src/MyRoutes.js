@@ -4,8 +4,9 @@ import Success from "./components/Success";
 import Failure from "./components/Failure";
 import FreeRoute from "./components/authTest/FreeRoute";
 import ProtectedRoute from "./components/authTest/ProtectedRoute";
-import Access from "./components/access/Access";
-import Home from "./components/Home";
+
+import Home from "./routes/home/Home";
+import Access from "./routes/auth/Access";
 
 const MyRoutes = () => {
   return (

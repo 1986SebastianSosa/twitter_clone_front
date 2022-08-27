@@ -1,17 +1,13 @@
-.searchbar {
-  background-color: rgb(239, 239, 239);
-}
-
 .searchbar input {
-  background-color: rgb(239, 239, 239);
+  background-color: rgb(236, 240, 240);
 }
 .searchbar input:focus {
   outline: none;
-  background-color: white;
+  background-color: rgb(236, 240, 240);
 }
 
 .searchbarFocus {
-  background-color: white;
+  background-color: rgb(236, 240, 240);
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
 }

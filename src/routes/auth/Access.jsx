@@ -44,7 +44,7 @@ const Access = () => {
           </div>
         </Col>
         <Col xs={12} lg={5} className="m-0 p-0">
-          <Row flex-column className="accessRegisterLogin">
+          <Row className="accessRegisterLogin flex-column">
             <Col className="mb-5">
               <FontAwesomeIcon icon={faTwitter} className="twitterLogo fa-3x" />
             </Col>
@@ -110,7 +110,6 @@ const Access = () => {
               showLoginModal={showLoginModal}
               handleCloseLoginModal={handleCloseLoginModal}
             />
-            
           </Row>
         </Col>
       </Row>

@@ -1,4 +1,3 @@
-import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import {
@@ -68,7 +67,9 @@ const Sidenav = () => {
           </div>
           <h5>More</h5>
         </div>
-        <button>Tweet</button>
+        <Button className="rounded-pill text-white fw-bold py-3 fs-5 ">
+          Tweet
+        </Button>
       </nav>
     </>
   );

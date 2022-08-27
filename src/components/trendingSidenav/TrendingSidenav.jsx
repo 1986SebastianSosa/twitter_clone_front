@@ -36,8 +36,8 @@ const trending = [
     tweets: "1,114 Tweets",
   },
   {
-    topic: "dRAMA tv - tRENDING",
-    title: "pEAKY bLINDERS",
+    topic: "Drama TV - Trending",
+    title: "Peaky Blinders",
     tweets: "2,285 Tweets",
   },
   {
@@ -62,11 +62,11 @@ const TrendingSidenav = () => {
     <>
       <Container>
         <Row className="flex-column">
-          <Col className="mb-3 rounded-4 trending p-0">
+          <Col className="mb-3 rounded-4 bg-light p-0">
             <h4 className="fw-bold p-3">Trends for you</h4>
-            {trending.map((trend) => {
+            {trending.map((trend, index) => {
               return (
-                <div className="trend ">
+                <div className="trend" key={index}>
                   <div className="px-3 py-2 d-flex justify-content-between">
                     <div>
                       <span className="d-block text-muted">{trend.topic}</span>

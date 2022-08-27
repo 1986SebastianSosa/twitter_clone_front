@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Modal,
   FormGroup,
@@ -13,9 +12,12 @@ import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import * as Yup from "yup";
 import { loginUser } from "../../services/authServices";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { loginUserReducer } from "../../redux/userSlice";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const LoginSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
@@ -35,6 +37,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       console.log(response);
       if (Object.entries(response).length > 0) {
         handleCloseLoginModal();
+        dispatch(loginUserReducer(response));
         navigate("/home");
       }
     },

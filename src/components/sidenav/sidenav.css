@@ -21,7 +21,7 @@
   transition: 0.2s;
 }
 .sidenav div:hover {
-  background-color: rgb(238, 233, 233);
+  background-color: rgb(236, 240, 240);
   cursor: pointer;
 }
 
@@ -36,16 +36,10 @@
 }
 
 .sidenav button {
-  margin: auto;
-  padding: 1rem 2rem;
-  border-radius: 30px;
-  background-color: var(--primary-color);
-  border: none;
-  color: white;
   width: 100%;
   transition: 0.2s;
 }
 
-.sidenav button:hover {
+/* .sidenav button:hover {
   background-color: rgb(23, 139, 215);
-}
+} */

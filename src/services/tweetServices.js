@@ -16,10 +16,11 @@ export const postTweet = async (user, tweetInput) => {
   return response;
 };
 
-export const getAllTweets = async () => {
+export const getAllTweets = async (user) => {
   const response = await axios({
     method: "get",
     url: apiUrl + "/tweet/",
+    headers: { userId: user.user._id },
   });
   return response;
 };

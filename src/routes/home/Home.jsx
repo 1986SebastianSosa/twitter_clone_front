@@ -13,11 +13,12 @@ import { getAllTweets } from "../../services/tweetServices";
 
 const Home = () => {
   const user = useSelector((state) => state);
+  console.log(user);
   const [allTweets, setAllTweets] = useState([]);
 
   useEffect(() => {
     const getTweets = async () => {
-      const response = await getAllTweets();
+      const response = await getAllTweets(user);
       setAllTweets(response.data);
     };
     getTweets();

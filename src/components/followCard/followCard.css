@@ -1,0 +1,23 @@
+.follow-suggestion {
+  transition: 0.2s;
+  background-color: white;
+}
+
+.follow-suggestion:hover {
+  cursor: pointer;
+  background-color: rgb(236, 240, 240);
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+}
+
+.follow-btn span {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.follow-btn:hover {
+  background-color: rgb(56, 56, 56) !important;
+}

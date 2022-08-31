@@ -13,16 +13,21 @@ import { getAllTweets } from "../../services/tweetServices";
 
 const Home = () => {
   const user = useSelector((state) => state);
-  console.log(user);
   const [allTweets, setAllTweets] = useState([]);
 
   useEffect(() => {
-    const getTweets = async () => {
+    (async function () {
       const response = await getAllTweets(user);
-      setAllTweets(response.data);
-    };
-    getTweets();
+      const sortedData = response.data.sort(
+        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+      );
+      setAllTweets(sortedData);
+    })();
   }, []);
+
+  useEffect(() => {
+    console.log("allTweets: ", allTweets);
+  }, [allTweets]);
 
   return (
     <>

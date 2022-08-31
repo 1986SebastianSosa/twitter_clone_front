@@ -1,4 +1,4 @@
-import React from "react";
+import React, { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { BrowserRouter } from "react-router-dom";
@@ -12,11 +12,13 @@ import "./theme.scss";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <Provider store={store}>
-    <PersistGate persistor={persistor}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </PersistGate>
-  </Provider>
+  <StrictMode>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
+  </StrictMode>
 );

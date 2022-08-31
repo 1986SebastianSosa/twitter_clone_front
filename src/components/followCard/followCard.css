@@ -13,11 +13,23 @@
   height: 3rem;
 }
 
-.follow-btn span {
+.follow-btn:focus,
+.unfollow-btn:focus {
+  box-shadow: none !important;
+}
+
+.follow-btn,
+.unfollow-btn span {
   font-size: 14px;
   font-weight: 700;
 }
 
 .follow-btn:hover {
   background-color: rgb(56, 56, 56) !important;
+}
+
+.unfollow-btn:hover {
+  background-color: rgba(220, 53, 69, 0.1) !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
 }

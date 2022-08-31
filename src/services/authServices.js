@@ -13,7 +13,6 @@ export const registerUser = async (values) => {
 
 export const loginUser = async (values) => {
   const body = values;
-  console.log(body);
   try {
     const response = await axios.post(`${apiUrl}/user/login`, body);
     return response.data;

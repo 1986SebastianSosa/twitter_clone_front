@@ -1,14 +1,16 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import {
-  faHouseUser,
-  faHashtag,
   faBell,
   faEnvelope,
   faBookmark,
   faFileLines,
   faCircleUser,
+} from "@fortawesome/free-regular-svg-icons";
+import {
+  faHouse,
   faEllipsis,
+  faHashtag,
 } from "@fortawesome/free-solid-svg-icons";
 import "./sidenav.css";
 import { Button } from "react-bootstrap";
@@ -21,7 +23,7 @@ const Sidenav = () => {
 
         <div className="navItem">
           <div className="iconDiv">
-            <FontAwesomeIcon icon={faHouseUser} className="me-3 fa-xl" />
+            <FontAwesomeIcon icon={faHouse} className="me-3 fa-xl" />
           </div>
           <h5>Home</h5>
         </div>

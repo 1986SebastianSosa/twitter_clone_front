@@ -3,13 +3,49 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./followCard.css";
 import { useSelector } from "react-redux";
-import { followUser } from "../../services/followServices";
+import { followUser, unfollowUser } from "../../services/followServices";
+import { useState } from "react";
 
 const FollowCard = ({ suggestion }) => {
   const loggedUser = useSelector((state) => state.user);
+  const [isFollowed, setIsFollowed] = useState(false);
+  const [isMouseOver, setIsMouseOver] = useState(false);
+
   const followHandler = async () => {
+    setIsFollowed(true);
     const response = await followUser(loggedUser, suggestion);
     console.log(response.data);
+  };
+
+  const unfollowHandler = async () => {
+    setIsFollowed(false);
+    const response = await unfollowUser(loggedUser, suggestion);
+    console.log(response.data);
+  };
+
+  const setFollowBtn = (following) => {
+    switch (following) {
+      case false:
+        return (
+          <Button
+            className="follow-btn bg-dark text-white rounded-pill px-3 py-1"
+            onClick={followHandler}
+          >
+            <span>Follow</span>
+          </Button>
+        );
+      case true:
+        return (
+          <Button
+            className="unfollow-btn bg-light text-dark rounded-pill px-3 py-1"
+            onClick={unfollowHandler}
+            onMouseOver={handleMouseOver}
+            onMouseOut={handleMouseOut}
+          >
+            <span>{isMouseOver ? "Unfollow" : "Following"}</span>
+          </Button>
+        );
+    }
   };
 
   return (
@@ -28,17 +64,21 @@ const FollowCard = ({ suggestion }) => {
             <span className="text-muted">{"@" + suggestion.username}</span>
           </div>
         </Col>
-        <Col xs={2}>
-          <Button
-            className="follow-btn bg-dark text-white rounded-pill px-3 py-1"
-            onClick={followHandler}
-          >
-            <span>Follow</span>
-          </Button>
+        <Col xs={3}>
+          <div className="d-flex justify-content-end">
+            {setFollowBtn(isFollowed)}
+          </div>
         </Col>
       </Row>
     </>
   );
+  function handleMouseOver() {
+    setIsMouseOver(true);
+  }
+
+  function handleMouseOut() {
+    setIsMouseOver(false);
+  }
 };
 
 export default FollowCard;

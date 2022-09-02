@@ -1,15 +1,14 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMessage, faHeart } from "@fortawesome/free-regular-svg-icons";
 import {
   faUser,
-  faMessage,
   faRepeat,
-  faHeart,
   faArrowUpFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import "./tweet.css";
 
-const Tweet = ({ username, fullName, createdOn, content }) => {
+const Tweet = ({ tweet }) => {
   return (
     <>
       <Row className="p-2">
@@ -23,17 +22,21 @@ const Tweet = ({ username, fullName, createdOn, content }) => {
             <Col className="d-flex justify-content-between tweetHead">
               <div>
                 <div>
-                  <b>{fullName}</b> {" @" + username}
+                  <b>{tweet.author.firstname + " " + tweet.author.lastname}</b>{" "}
+                  {" @" + tweet.username}
                 </div>
               </div>
-              <div className="tweetHead">{createdOn.split("T")[0]}</div>
+              <div className="tweetHead">{getTimeElapsed(tweet.createdOn)}</div>
             </Col>
-            <Col>{content}</Col>
+            <Col>{tweet.content}</Col>
             <Col>
-              <Row>
+              <Row className="text-muted">
                 <Col>
-                  <div className="rounded-circle tweetIcon">
-                    <FontAwesomeIcon icon={faMessage} />
+                  <div className="d-flex align-items-center">
+                    <div className="rounded-circle tweetIcon me-3">
+                      <FontAwesomeIcon icon={faMessage} />
+                    </div>
+                    <span>{tweet.comments.length}</span>
                   </div>
                 </Col>
                 <Col>
@@ -42,8 +45,11 @@ const Tweet = ({ username, fullName, createdOn, content }) => {
                   </div>
                 </Col>
                 <Col>
-                  <div className="rounded-circle tweetIcon">
-                    <FontAwesomeIcon icon={faHeart} />
+                  <div className="d-flex align-items-center">
+                    <div className="rounded-circle tweetIcon me-3">
+                      <FontAwesomeIcon icon={faHeart} />
+                    </div>
+                    <span>{tweet.likes.length}</span>
                   </div>
                 </Col>
                 <Col>
@@ -58,6 +64,40 @@ const Tweet = ({ username, fullName, createdOn, content }) => {
       </Row>
     </>
   );
+
+  function getTimeElapsed(date) {
+    const second = 1000;
+    const minute = 1000 * 60;
+    const hour = 1000 * 60 * 60;
+    const day = 1000 * 60 * 60 * 24;
+    const month = 1000 * 60 * 60 * 24 * 30;
+    const year = 1000 * 60 * 60 * 24 * 30 * 12;
+    let difference = Date.now() - Date.parse(new Date(date));
+    // console.log("difference: ", difference);
+
+    // console.log("difference < second: ", difference < second);
+    // console.log("difference < minute: ", difference < minute);
+    // console.log("difference < hour: ", difference < hour);
+    // console.log("difference < month: ", difference < month);
+    // console.log("difference < year: ", difference < year);
+
+    switch (difference) {
+      case difference < second:
+        return "Now";
+      case difference < minute:
+        return `${Math.floor(difference / second)} seconds ago`;
+      case difference < hour:
+        return `${Math.floor(difference / minute)} minutes ago`;
+      case difference < day:
+        return `${Math.floor(difference / hour)} hours ago`;
+      case difference < month:
+        return `${Math.floor(difference / day)} days ago`;
+      case difference < year:
+        return `${Math.floor(difference / month)} months ago`;
+      default:
+        return `${Math.floor(difference / year)} years ago`;
+    }
+  }
 };
 
 export default Tweet;

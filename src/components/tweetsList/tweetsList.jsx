@@ -4,15 +4,7 @@ const TweetsList = ({ allTweets }) => {
   return (
     <>
       {allTweets.map((tweet) => {
-        return (
-          <Tweet
-            key={tweet._id}
-            fullName={tweet.author.firstname + " " + tweet.author.lastname}
-            username={tweet.author.username}
-            createdOn={tweet.createdOn}
-            content={tweet.content}
-          />
-        );
+        return <Tweet key={tweet._id} tweet={tweet} />;
       })}
     </>
   );

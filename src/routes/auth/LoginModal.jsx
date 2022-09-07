@@ -111,7 +111,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
               <Button variant="secondary" onClick={handleCloseLoginModal}>
                 Close
               </Button>
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" className="text-white">
                 Login
               </Button>
             </Modal.Footer>

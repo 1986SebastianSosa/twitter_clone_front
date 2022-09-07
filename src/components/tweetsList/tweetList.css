@@ -1,0 +1,4 @@
+.tweet:hover {
+  cursor: pointer;
+  background-color: rgb(236, 240, 240);
+}

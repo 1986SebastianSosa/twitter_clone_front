@@ -9,6 +9,10 @@ body {
   --primary-color: #1d9bf0;
 }
 
+a:link {
+  text-decoration: none;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;

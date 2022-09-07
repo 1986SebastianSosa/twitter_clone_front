@@ -1,13 +1,13 @@
 import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
-const Topnav = () => {
+const Topnav = ({ title }) => {
   return (
     <Container className="position-sticky w-100 top-0">
       <Row>
         <Col>
           <div className="d-flex justify-content-between py-3">
             <div>
-              <h5 className="py-1 fw-bold">Home</h5>
+              <h5 className="py-1 fw-bold">{title}</h5>
             </div>
             <div>
               <svg viewBox="0 0 24 24" aria-hidden="true" width="20px">

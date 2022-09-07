@@ -12,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import "./mainpost.css";
 import { getAllTweets, postTweet } from "./../../services/tweetServices";
+import { useSelector } from "react-redux";
 
 const MainPost = ({ user, setAllTweets }) => {
   const [focused, setFocused] = useState(false);
@@ -33,8 +34,11 @@ const MainPost = ({ user, setAllTweets }) => {
     e.preventDefault();
     await postTweet(user, tweetInput);
     const getTweets = async () => {
-      const response = await getAllTweets();
-      setAllTweets(response.data);
+      const response = await getAllTweets(user);
+      const sortedData = response.data.sort(
+        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+      );
+      setAllTweets(sortedData);
     };
     getTweets();
     setTweetInput("");

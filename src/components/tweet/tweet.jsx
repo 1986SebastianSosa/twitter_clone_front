@@ -4,11 +4,52 @@ import {
   faUser,
   faRepeat,
   faArrowUpFromBracket,
+  faCircle,
+  faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { deleteTweet, getAllTweets } from "../../services/tweetServices";
+import { useSelector } from "react-redux";
+import DeleteModal from "./../deleteModal/DeleteModal";
+import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import "./tweet.css";
 
-const Tweet = ({ tweet }) => {
+const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
+  const user = useSelector((state) => state.user);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [tweetLikes, setTweetLikes] = useState([]);
+
+  const handleShowDeleteModal = () => setShowDeleteModal(true);
+  const handleCloseDeleteModal = () => setShowDeleteModal(false);
+
+  const handleDeleteTweet = async () => {
+    const deleteResponse = await deleteTweet(tweet._id);
+    console.log("deleteTweet response: ", deleteResponse.data);
+    const getResponse = await getAllTweets(user);
+    const sortedData = await getResponse.data.sort(
+      (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+    );
+    setAllTweets(sortedData);
+    setShowDeleteModal(false);
+    setShowDeleteToast(true);
+  };
+
+  const handleLike = async () => {
+    await likeTweet(tweet._id, user._id);
+    const response = await fetchTweetLikes(tweet._id);
+    setTweetLikes(response.data);
+  };
+
+  useEffect(() => {
+    const fetch = async () => {
+      const response = await fetchTweetLikes(tweet._id);
+      setTweetLikes(response.data);
+    };
+    fetch();
+  }, []);
+
   return (
     <>
       <Row className="p-2">
@@ -18,15 +59,33 @@ const Tweet = ({ tweet }) => {
           </div>
         </Col>
         <Col xs={10}>
-          <Row className="d-felx flex-column">
+          <Row className="d-flex flex-column">
             <Col className="d-flex justify-content-between tweetHead">
               <div>
                 <div>
                   <b>{tweet.author.firstname + " " + tweet.author.lastname}</b>{" "}
-                  {" @" + tweet.username}
+                  {" @" + tweet.author.username + " "}
+                  <FontAwesomeIcon
+                    icon={faCircle}
+                    className="dot text-muted mx-1"
+                  />
+                  <span>{getTimeElapsed(tweet.createdOn)}</span>
                 </div>
               </div>
-              <div className="tweetHead">{getTimeElapsed(tweet.createdOn)}</div>
+              {tweet.author._id === user._id ? (
+                <div className="deleteIcon">
+                  <FontAwesomeIcon
+                    icon={faTrashCan}
+                    onClick={handleShowDeleteModal}
+                  />
+                </div>
+              ) : null}
+
+              <DeleteModal
+                showDeleteModal={showDeleteModal}
+                handleCloseDeleteModal={handleCloseDeleteModal}
+                handleDeleteTweet={handleDeleteTweet}
+              />
             </Col>
             <Col>{tweet.content}</Col>
             <Col>
@@ -46,10 +105,20 @@ const Tweet = ({ tweet }) => {
                 </Col>
                 <Col>
                   <div className="d-flex align-items-center">
-                    <div className="rounded-circle tweetIcon me-3">
-                      <FontAwesomeIcon icon={faHeart} />
+                    <div
+                      className="rounded-circle tweetIcon me-3"
+                      onClick={handleLike}
+                    >
+                      {userLiked() ? (
+                        <FontAwesomeIcon
+                          icon={faSolidHeart}
+                          className="text-danger"
+                        />
+                      ) : (
+                        <FontAwesomeIcon icon={faHeart} />
+                      )}
                     </div>
-                    <span>{tweet.likes.length}</span>
+                    <span>{tweetLikes.length}</span>
                   </div>
                 </Col>
                 <Col>
@@ -97,6 +166,10 @@ const Tweet = ({ tweet }) => {
       default:
         return `${Math.floor(difference / year)} years ago`;
     }
+  }
+
+  function userLiked() {
+    return tweetLikes.filter((el) => el._id === user._id).length;
   }
 };
 

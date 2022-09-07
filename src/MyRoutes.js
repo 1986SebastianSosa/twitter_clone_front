@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Success from "./components/Success";
 import Failure from "./components/Failure";
@@ -8,6 +7,7 @@ import ProtectedRoute from "./components/authTest/ProtectedRoute";
 import Home from "./routes/home/Home";
 import Access from "./routes/auth/Access";
 import Follow from "./routes/follow/Follow";
+import TweetPage from "./routes/tweetPage/TweetPage";
 
 const MyRoutes = () => {
   return (
@@ -15,6 +15,7 @@ const MyRoutes = () => {
       <Routes>
         <Route path="/" element={<Access />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/tweet/:id" element={<TweetPage />} />
         <Route path="/follow" element={<Follow />} />
         <Route path="/failure" element={<Failure />} />
         <Route path="/success" element={<Success />} />

@@ -8,7 +8,7 @@ export const postTweet = async (user, tweetInput) => {
     method: "post",
     url: apiUrl + "/tweet/",
     data: {
-      author: user.user._id,
+      author: user._id,
       content: tweetInput,
       createdOn: new Date(),
     },
@@ -20,7 +20,23 @@ export const getAllTweets = async (user) => {
   const response = await axios({
     method: "get",
     url: apiUrl + "/tweet/",
-    headers: { userId: user.user._id },
+    headers: { userId: user._id },
+  });
+  return response;
+};
+
+export const getOneTweet = async (tweetId) => {
+  const response = await axios({
+    method: "get",
+    url: apiUrl + `/tweet/${tweetId}`,
+  });
+  return response;
+};
+
+export const deleteTweet = async (tweetId) => {
+  const response = await axios({
+    method: "delete",
+    url: apiUrl + `/tweet/${tweetId}`,
   });
   return response;
 };

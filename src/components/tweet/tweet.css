@@ -1,3 +1,8 @@
+.tweet:hover {
+  cursor: pointer;
+  background-color: rgb(236, 240, 240);
+}
+
 .tweetIcon {
   width: 2rem;
   height: 2rem;

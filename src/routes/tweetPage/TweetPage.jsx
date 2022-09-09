@@ -9,9 +9,11 @@ import { useEffect } from "react";
 import { getOneTweet } from "../../services/tweetServices";
 import { useState } from "react";
 import Comment from "../../components/comment/Comment";
+import { PuffLoader } from "react-spinners";
 
 const TweetPage = () => {
   const [tweet, setTweet] = useState({});
+  const [comments, setComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   let { id } = useParams();
@@ -26,9 +28,14 @@ const TweetPage = () => {
     fetch();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(tweet);
-  // }, [tweet]);
+  useEffect(() => {
+    if (tweet.comments) {
+      const sortedCommentsArr = tweet.comments.sort((a, b) => {
+        return Date.parse(b.createdOn) - Date.parse(a.createdOn);
+      });
+      setComments(sortedCommentsArr);
+    }
+  }, [tweet]);
 
   return (
     <>
@@ -39,14 +46,21 @@ const TweetPage = () => {
           </Col>
           <Col xs={6} className="border-start border-end border-light p-0">
             <Topnav title="Tweet" />
-            {isLoading ? <div>Loading...</div> : <Tweet tweet={tweet} />}
             {isLoading ? (
-              <div>Loading...</div>
+              <PuffLoader color="#1d9bf0" />
             ) : (
-              tweet.comments.map((comment) => (
+              <Tweet tweet={tweet} />
+            )}
+            {isLoading ? (
+              <PuffLoader color="#1d9bf0" />
+            ) : (
+              comments.map((comment) => (
                 <Comment
+                  tweet={tweet}
+                  setTweet={setTweet}
                   key={comment._id}
                   comment={comment}
+                  setComments={setComments}
                   setShowDeleteToast={setShowDeleteToast}
                 />
               ))

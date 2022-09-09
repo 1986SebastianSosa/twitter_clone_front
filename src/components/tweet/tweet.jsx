@@ -12,125 +12,197 @@ import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { deleteTweet, getAllTweets } from "../../services/tweetServices";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
+import { PuffLoader } from "react-spinners";
 import "./tweet.css";
+import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
 
 const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   const user = useSelector((state) => state.user);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [updatedTweet, setUpdatedTweet] = useState({});
   const [tweetLikes, setTweetLikes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
-  const handleShowDeleteModal = () => setShowDeleteModal(true);
-  const handleCloseDeleteModal = () => setShowDeleteModal(false);
+  const navigate = useNavigate();
+
+  const handleShowDeleteModal = (e) => {
+    e.stopPropagation();
+    setShowDeleteModal(true);
+  };
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleShowCommentModal = (e) => {
+    e.stopPropagation();
+    setShowCommentModal(true);
+  };
+
+  const handleCloseCommentModal = () => {
+    setShowCommentModal(false);
+  };
 
   const handleDeleteTweet = async () => {
-    const deleteResponse = await deleteTweet(tweet._id);
-    console.log("deleteTweet response: ", deleteResponse.data);
-    const getResponse = await getAllTweets(user);
-    const sortedData = await getResponse.data.sort(
+    setIsDeleteLoading(true);
+    await deleteTweet(updatedTweet._id);
+    const response = await getAllTweets(user);
+    const sortedData = await response.data.sort(
       (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
     );
     setAllTweets(sortedData);
-    setShowDeleteModal(false);
+    // setIsDeleteLoading(false);
+    // setShowDeleteModal(false);
     setShowDeleteToast(true);
   };
 
-  const handleLike = async () => {
-    await likeTweet(tweet._id, user._id);
-    const response = await fetchTweetLikes(tweet._id);
+  const handleLike = async (e) => {
+    e.stopPropagation();
+    await likeTweet(updatedTweet._id, user._id);
+    const response = await fetchTweetLikes(updatedTweet._id);
     setTweetLikes(response.data);
   };
 
+  const handleClick = (tweetId) => {
+    navigate(`/tweet/${tweetId}`);
+  };
+
   useEffect(() => {
-    const fetch = async () => {
-      const response = await fetchTweetLikes(tweet._id);
-      setTweetLikes(response.data);
-    };
-    fetch();
+    setUpdatedTweet(tweet);
   }, []);
+
+  useEffect(() => {
+    if (updatedTweet) {
+      const fetch = async () => {
+        const response = await fetchTweetLikes(updatedTweet._id, user._id);
+        setTweetLikes(response.data);
+        setIsLoading(false);
+      };
+      fetch();
+    }
+  }, [updatedTweet]);
 
   return (
     <>
-      <Row className="p-2">
-        <Col xs={2}>
-          <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
-            <FontAwesomeIcon icon={faUser} className="fa-3x text-secondary" />
-          </div>
-        </Col>
-        <Col xs={10}>
-          <Row className="d-flex flex-column">
-            <Col className="d-flex justify-content-between tweetHead">
-              <div>
-                <div>
-                  <b>{tweet.author.firstname + " " + tweet.author.lastname}</b>{" "}
-                  {" @" + tweet.author.username + " "}
-                  <FontAwesomeIcon
-                    icon={faCircle}
-                    className="dot text-muted mx-1"
-                  />
-                  <span>{getTimeElapsed(tweet.createdOn)}</span>
-                </div>
+      {isLoading ? (
+        <PuffLoader color="#1d9bf0" />
+      ) : (
+        <div onClick={(e) => handleClick(updatedTweet._id)} className="tweet">
+          <Row className="p-2">
+            <Col xs={2}>
+              <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
+                <FontAwesomeIcon
+                  icon={faUser}
+                  className="fa-3x text-secondary"
+                />
               </div>
-              {tweet.author._id === user._id ? (
-                <div className="deleteIcon">
-                  <FontAwesomeIcon
-                    icon={faTrashCan}
-                    onClick={handleShowDeleteModal}
-                  />
-                </div>
-              ) : null}
-
-              <DeleteModal
-                showDeleteModal={showDeleteModal}
-                handleCloseDeleteModal={handleCloseDeleteModal}
-                handleDeleteTweet={handleDeleteTweet}
-              />
             </Col>
-            <Col>{tweet.content}</Col>
-            <Col>
-              <Row className="text-muted">
-                <Col>
-                  <div className="d-flex align-items-center">
-                    <div className="rounded-circle tweetIcon me-3">
-                      <FontAwesomeIcon icon={faMessage} />
+            <Col xs={10}>
+              <Row className="d-flex flex-column">
+                <Col className="d-flex justify-content-between tweetHead">
+                  <div>
+                    <div>
+                      <b>
+                        {updatedTweet.author.firstname +
+                          " " +
+                          updatedTweet.author.lastname}
+                      </b>{" "}
+                      {" @" + updatedTweet.author.username + " "}
+                      <FontAwesomeIcon
+                        icon={faCircle}
+                        className="dot text-muted mx-1"
+                      />
+                      <span>{getTimeElapsed(updatedTweet.createdOn)}</span>
                     </div>
-                    <span>{tweet.comments.length}</span>
                   </div>
-                </Col>
-                <Col>
-                  <div className="rounded-circle tweetIcon">
-                    <FontAwesomeIcon icon={faRepeat} />
-                  </div>
-                </Col>
-                <Col>
-                  <div className="d-flex align-items-center">
-                    <div
-                      className="rounded-circle tweetIcon me-3"
-                      onClick={handleLike}
-                    >
-                      {userLiked() ? (
-                        <FontAwesomeIcon
-                          icon={faSolidHeart}
-                          className="text-danger"
-                        />
-                      ) : (
-                        <FontAwesomeIcon icon={faHeart} />
-                      )}
+                  {updatedTweet.author._id === user._id ? (
+                    <div className="deleteIcon">
+                      <FontAwesomeIcon
+                        icon={faTrashCan}
+                        onClick={(e) => handleShowDeleteModal(e)}
+                      />
                     </div>
-                    <span>{tweetLikes.length}</span>
-                  </div>
+                  ) : null}
                 </Col>
+                <Col>{updatedTweet.content}</Col>
                 <Col>
-                  <div className="rounded-circle tweetIcon">
-                    <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                  </div>
+                  <Row className="text-muted">
+                    <Col>
+                      <div className="d-flex align-items-center">
+                        <div
+                          className="rounded-circle tweetIcon me-3"
+                          onClick={(e) => handleShowCommentModal(e)}
+                        >
+                          <FontAwesomeIcon icon={faMessage} />
+                        </div>
+                        <span>{updatedTweet.comments.length}</span>
+                      </div>
+                    </Col>
+                    <Col>
+                      <div className="rounded-circle tweetIcon">
+                        <FontAwesomeIcon icon={faRepeat} />
+                      </div>
+                    </Col>
+                    <Col>
+                      <div className="d-flex align-items-center">
+                        <div
+                          className="rounded-circle tweetIcon me-3"
+                          onClick={(e) => handleLike(e)}
+                        >
+                          {userLiked() ? (
+                            <FontAwesomeIcon
+                              icon={faSolidHeart}
+                              className="text-danger"
+                            />
+                          ) : (
+                            <FontAwesomeIcon icon={faHeart} />
+                          )}
+                        </div>
+                        {isLoading ? (
+                          <PuffLoader size={18} color="#1d9bf0" />
+                        ) : (
+                          <span>{tweetLikes.length}</span>
+                        )}
+                      </div>
+                    </Col>
+                    <Col>
+                      <div className="rounded-circle tweetIcon">
+                        <FontAwesomeIcon icon={faArrowUpFromBracket} />
+                      </div>
+                    </Col>
+                  </Row>
                 </Col>
               </Row>
             </Col>
           </Row>
-        </Col>
-      </Row>
+        </div>
+      )}
+      {isLoading ? (
+        <PuffLoader />
+      ) : (
+        <DeleteModal
+          isDeleteLoading={isDeleteLoading}
+          title="Tweet"
+          showDeleteModal={showDeleteModal}
+          handleCloseDeleteModal={handleCloseDeleteModal}
+          handleDelete={handleDeleteTweet}
+        />
+      )}
+      {isLoading ? (
+        <PuffLoader />
+      ) : (
+        <TweetReplyModal
+          user={user}
+          setUpdatedTweet={setUpdatedTweet}
+          updatedTweet={updatedTweet}
+          showCommentModal={showCommentModal}
+          handleCloseCommentModal={handleCloseCommentModal}
+        />
+      )}
     </>
   );
 

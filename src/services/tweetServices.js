@@ -3,7 +3,6 @@ import axios from "axios";
 const apiUrl = process.env.REACT_APP_API_URL;
 
 export const postTweet = async (user, tweetInput) => {
-  console.log("user: ", user);
   const response = await axios({
     method: "post",
     url: apiUrl + "/tweet/",
@@ -16,11 +15,11 @@ export const postTweet = async (user, tweetInput) => {
   return response;
 };
 
-export const getAllTweets = async (user) => {
+export const getAllTweets = async (user, skip) => {
   const response = await axios({
     method: "get",
     url: apiUrl + "/tweet/",
-    headers: { userId: user._id },
+    headers: { userId: user._id, skip: skip },
   });
   return response;
 };

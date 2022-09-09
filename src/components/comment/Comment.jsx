@@ -10,27 +10,42 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { deleteTweet, getAllTweets } from "../../services/tweetServices";
+import {
+  deleteTweet,
+  getAllTweets,
+  getOneTweet,
+} from "../../services/tweetServices";
 import { useSelector } from "react-redux";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchCommentLikes, likeComment } from "../../services/likeServices";
+import { PuffLoader } from "react-spinners";
+import { deleteComment } from "../../services/commentServices";
 
-const Comment = ({ comment, setShowDeleteToast }) => {
+const Comment = ({
+  comment,
+  setShowDeleteToast,
+  tweet,
+  setTweet,
+  setComments,
+}) => {
   const user = useSelector((state) => state.user);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentLikes, setCommentLikes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleShowDeleteModal = () => setShowDeleteModal(true);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
-  const handleDeleteTweet = async () => {
-    const deleteResponse = await deleteTweet(comment._id);
-    console.log("deleteTweet response: ", deleteResponse.data);
-    const getResponse = await getAllTweets(user);
-    const sortedData = await getResponse.data.sort(
-      (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
-    );
-
+  const handleDeleteComment = async () => {
+    const deleteResponse = await deleteComment(comment._id);
+    console.log("deleteComment response: ", deleteResponse.data);
+    const response = await getOneTweet(tweet._id);
+    setTweet(response.data);
+    setIsLoading(false);
+    const sortedCommentsArr = tweet.comments.sort((a, b) => {
+      return Date.parse(b.createdOn) - Date.parse(a.createdOn);
+    });
+    setComments(sortedCommentsArr);
     setShowDeleteModal(false);
     setShowDeleteToast(true);
   };
@@ -45,95 +60,98 @@ const Comment = ({ comment, setShowDeleteToast }) => {
     const fetch = async () => {
       const response = await fetchCommentLikes(comment._id);
       setCommentLikes(response.data);
+      setIsLoading(false);
     };
     fetch();
   }, []);
 
-  useEffect(() => {
-    console.log("commentLikes: ", commentLikes);
-  }, [commentLikes]);
-
   return (
-    <Row className="p-2">
-      <Col xs={2}>
-        <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
-          <FontAwesomeIcon icon={faUser} className="fa-3x text-secondary" />
-        </div>
-      </Col>
-      <Col xs={10}>
-        <Row className="d-flex flex-column">
-          <Col className="d-flex justify-content-between tweetHead">
-            <div>
+    <>
+      <Row className="p-2">
+        <Col xs={2}>
+          <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
+            <FontAwesomeIcon icon={faUser} className="fa-3x text-secondary" />
+          </div>
+        </Col>
+        <Col xs={10}>
+          <Row className="d-flex flex-column">
+            <Col className="d-flex justify-content-between tweetHead">
               <div>
-                <b>
-                  {comment.author.firstname + " " + comment.author.lastname}
-                </b>{" "}
-                {" @" + comment.author.username + " "}
-                <FontAwesomeIcon
-                  icon={faCircle}
-                  className="dot text-muted mx-1"
-                />
-                <span>{getTimeElapsed(comment.createdOn)}</span>
+                <div>
+                  <b>
+                    {comment.author.firstname + " " + comment.author.lastname}
+                  </b>{" "}
+                  {" @" + comment.author.username + " "}
+                  <FontAwesomeIcon
+                    icon={faCircle}
+                    className="dot text-muted mx-1"
+                  />
+                  <span>{getTimeElapsed(comment.createdOn)}</span>
+                </div>
               </div>
-            </div>
-            {comment.author._id === user._id ? (
-              <div className="deleteIcon">
-                <FontAwesomeIcon
-                  icon={faTrashCan}
-                  onClick={handleShowDeleteModal}
-                />
-              </div>
-            ) : null}
-
-            <DeleteModal
-              showDeleteModal={showDeleteModal}
-              handleCloseDeleteModal={handleCloseDeleteModal}
-              handleDeleteTweet={handleDeleteTweet}
-            />
-          </Col>
-          <Col>{comment.content}</Col>
-          <Col>
-            <Row className="text-muted">
-              <Col>
-                <div className="d-flex align-items-center">
-                  <div className="rounded-circle tweetIcon me-3">
-                    <FontAwesomeIcon icon={faMessage} />
+              {comment.author._id === user._id ? (
+                <div className="deleteIcon">
+                  <FontAwesomeIcon
+                    icon={faTrashCan}
+                    onClick={handleShowDeleteModal}
+                  />
+                </div>
+              ) : null}
+            </Col>
+            <Col>{comment.content}</Col>
+            <Col>
+              <Row className="text-muted">
+                <Col>
+                  <div className="d-flex align-items-center">
+                    <div className="rounded-circle tweetIcon me-3">
+                      <FontAwesomeIcon icon={faMessage} />
+                    </div>
                   </div>
-                </div>
-              </Col>
-              <Col>
-                <div className="rounded-circle tweetIcon">
-                  <FontAwesomeIcon icon={faRepeat} />
-                </div>
-              </Col>
-              <Col>
-                <div className="d-flex align-items-center">
-                  <div
-                    className="rounded-circle tweetIcon me-3"
-                    onClick={handleLike}
-                  >
-                    {userLiked() ? (
-                      <FontAwesomeIcon
-                        icon={faSolidHeart}
-                        className="text-danger"
-                      />
+                </Col>
+                <Col>
+                  <div className="rounded-circle tweetIcon">
+                    <FontAwesomeIcon icon={faRepeat} />
+                  </div>
+                </Col>
+                <Col>
+                  <div className="d-flex align-items-center">
+                    <div
+                      className="rounded-circle tweetIcon me-3"
+                      onClick={handleLike}
+                    >
+                      {userLiked() ? (
+                        <FontAwesomeIcon
+                          icon={faSolidHeart}
+                          className="text-danger"
+                        />
+                      ) : (
+                        <FontAwesomeIcon icon={faHeart} />
+                      )}
+                    </div>
+                    {isLoading ? (
+                      <PuffLoader size={18} color="#1d9bf0" />
                     ) : (
-                      <FontAwesomeIcon icon={faHeart} />
+                      <span>{commentLikes.length}</span>
                     )}
                   </div>
-                  <span>{commentLikes.length}</span>
-                </div>
-              </Col>
-              <Col>
-                <div className="rounded-circle tweetIcon">
-                  <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                </div>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+                </Col>
+                <Col>
+                  <div className="rounded-circle tweetIcon">
+                    <FontAwesomeIcon icon={faArrowUpFromBracket} />
+                  </div>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+      <DeleteModal
+        title={"Comment"}
+        showDeleteModal={showDeleteModal}
+        handleCloseDeleteModal={handleCloseDeleteModal}
+        handleDelete={handleDeleteComment}
+      />
+    </>
   );
   function getTimeElapsed(date) {
     const second = 1000;

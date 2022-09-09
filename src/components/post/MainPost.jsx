@@ -44,6 +44,7 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
     };
     getTweets();
     setTweetInput("");
+    setFocused(false);
   };
 
   useEffect(() => {

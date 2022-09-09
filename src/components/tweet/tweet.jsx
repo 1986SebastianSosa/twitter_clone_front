@@ -12,7 +12,7 @@ import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { deleteTweet, getAllTweets } from "../../services/tweetServices";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
@@ -21,14 +21,15 @@ import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
 
 const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   const user = useSelector((state) => state.user);
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [updatedTweet, setUpdatedTweet] = useState({});
   const [tweetLikes, setTweetLikes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-
-  const navigate = useNavigate();
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -50,13 +51,16 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   const handleDeleteTweet = async () => {
     setIsDeleteLoading(true);
     await deleteTweet(updatedTweet._id);
+    if (location.pathname.split("/")[1]) {
+      return navigate("/home");
+    }
     const response = await getAllTweets(user);
     const sortedData = await response.data.sort(
       (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
     );
     setAllTweets(sortedData);
-    // setIsDeleteLoading(false);
-    // setShowDeleteModal(false);
+    setIsDeleteLoading(false);
+    setShowDeleteModal(false);
     setShowDeleteToast(true);
   };
 
@@ -76,7 +80,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   }, []);
 
   useEffect(() => {
-    if (updatedTweet) {
+    if (updatedTweet._id) {
       const fetch = async () => {
         const response = await fetchTweetLikes(updatedTweet._id, user._id);
         setTweetLikes(response.data);
@@ -89,7 +93,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   return (
     <>
       {isLoading ? (
-        <PuffLoader color="#1d9bf0" />
+        <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <div onClick={(e) => handleClick(updatedTweet._id)} className="tweet">
           <Row className="p-2">
@@ -182,7 +186,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
         </div>
       )}
       {isLoading ? (
-        <PuffLoader />
+        <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <DeleteModal
           isDeleteLoading={isDeleteLoading}
@@ -193,7 +197,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
         />
       )}
       {isLoading ? (
-        <PuffLoader />
+        <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <TweetReplyModal
           user={user}

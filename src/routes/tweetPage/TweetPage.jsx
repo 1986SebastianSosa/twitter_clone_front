@@ -26,7 +26,7 @@ const TweetPage = () => {
       setIsLoading(false);
     };
     fetch();
-  }, []);
+  }, [comments]);
 
   useEffect(() => {
     if (tweet.comments) {

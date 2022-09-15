@@ -10,8 +10,8 @@ const TweetsList = ({ allTweets, setAllTweets }) => {
   return (
     <>
       <MyToast
-        showDeleteToast={showDeleteToast}
-        toggleDeleteToast={toggleDeleteToast}
+        show={showDeleteToast}
+        onClose={toggleDeleteToast}
         content="Your tweet has been deleted"
       />
 

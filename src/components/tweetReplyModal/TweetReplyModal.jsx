@@ -1,7 +1,7 @@
 import { Modal, Button, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faCircle } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { postComment } from "../../services/commentServices";
 import {
   faImage,
@@ -20,6 +20,7 @@ const TweetReplyModal = ({
   user,
 }) => {
   const [commentInput, setCommentInput] = useState("");
+  const [invalidInput, setInvalidInput] = useState(false);
 
   const handleChange = (e) => {
     setCommentInput(e.target.value);
@@ -27,16 +28,22 @@ const TweetReplyModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await postComment(
-      commentInput,
-      user._id,
-      updatedTweet._id
-    );
+    if (!commentInput.length) {
+      return setInvalidInput(true);
+    }
+    await postComment(commentInput, user._id, updatedTweet._id);
     setCommentInput("");
     const fetchResponse = await getOneTweet(updatedTweet._id);
     setUpdatedTweet(fetchResponse.data);
     handleCloseCommentModal();
   };
+
+  useEffect(() => {
+    if (commentInput.length) {
+      setInvalidInput(false);
+    }
+  }, [commentInput]);
+
   return (
     <Modal
       show={showCommentModal}
@@ -98,6 +105,13 @@ const TweetReplyModal = ({
                 onChange={handleChange}
                 value={commentInput}
               />
+              {invalidInput && (
+                <div>
+                  <span className="text-danger">
+                    * You need to write something!
+                  </span>
+                </div>
+              )}
             </Col>
           </Row>
         </Modal.Body>

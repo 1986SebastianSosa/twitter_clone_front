@@ -51,17 +51,21 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   const handleDeleteTweet = async () => {
     setIsDeleteLoading(true);
     await deleteTweet(updatedTweet._id);
-    if (location.pathname.split("/")[1]) {
+    if (location.pathname.split("/")[1] === "tweet") {
+      console.log("should navigate");
       return navigate("/home");
+    } else {
+      console.log("shouldnt navigate");
+      console.log("tweet deleted");
+      const response = await getAllTweets(user);
+      const sortedData = await response.data.sort(
+        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+      );
+      setAllTweets(sortedData);
+      setIsDeleteLoading(false);
+      setShowDeleteModal(false);
+      setShowDeleteToast(true);
     }
-    const response = await getAllTweets(user);
-    const sortedData = await response.data.sort(
-      (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
-    );
-    setAllTweets(sortedData);
-    setIsDeleteLoading(false);
-    setShowDeleteModal(false);
-    setShowDeleteToast(true);
   };
 
   const handleLike = async (e) => {

@@ -14,14 +14,24 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import "./sidenav.css";
 import { Button } from "react-bootstrap";
+import UserMenu from "./../userMenu/UserMenu";
+import { useNavigate } from "react-router-dom";
 
 const Sidenav = () => {
+  const navigate = useNavigate();
+  const homeClickHandler = () => {
+    navigate("/home");
+  };
   return (
     <>
       <nav className="sidenav px-2">
-        <FontAwesomeIcon icon={faTwitter} className="fa-2xl logo" />
+        <FontAwesomeIcon
+          icon={faTwitter}
+          className="fa-2xl logo"
+          onClick={homeClickHandler}
+        />
 
-        <div className="navItem">
+        <div className="navItem" onClick={homeClickHandler}>
           <div className="iconDiv">
             <FontAwesomeIcon icon={faHouse} className="me-3 fa-xl" />
           </div>
@@ -72,6 +82,7 @@ const Sidenav = () => {
         <Button className="rounded-pill text-white fw-bold py-3 fs-5 ">
           Tweet
         </Button>
+        <UserMenu />
       </nav>
     </>
   );

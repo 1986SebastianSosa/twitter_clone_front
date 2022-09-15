@@ -11,10 +11,13 @@ import {
   FormControl,
 } from "react-bootstrap";
 import * as Yup from "yup";
-import { registerUser } from "../../services/authServices";
+import { loginUser, registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loginUserReducer } from "../../redux/userSlice";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
+  const dispatch = useDispatch();
   const SignupSchema = Yup.object().shape({
     firstname: Yup.string()
       .min(2, "Too Short!")
@@ -32,7 +35,9 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
       .min(5, "Too Short!")
       .max(50, "Too Long!")
       .required("Required"),
-    confirmPassword: Yup.string().required("Required"),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Required"),
     email: Yup.string().email("Invalid email").required("Required"),
   });
 
@@ -50,8 +55,12 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     validationSchema: SignupSchema,
     onSubmit: async (values) => {
       const result = await registerUser(values);
-      console.log(result);
+
       if (Object.entries(result).length > 0) {
+        const { email, password } = values;
+        const loginValues = { email, password };
+        const loginResult = await loginUser(loginValues);
+        dispatch(loginUserReducer(loginResult));
         handleCloseRegisterModal();
         navigate("/home");
       }
@@ -153,7 +162,7 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
             <Button variant="secondary" onClick={handleCloseRegisterModal}>
               Close
             </Button>
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" className="text-white">
               Create account
             </Button>
           </Modal.Footer>

@@ -18,13 +18,10 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
   const [focused, setFocused] = useState(false);
   const [tweetInput, setTweetInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [invalidInput, setInvalidInput] = useState(false);
 
   const handleFocus = () => {
     setFocused(true);
-  };
-
-  const handleBlur = () => {
-    setFocused(false);
   };
 
   const handleChange = (e) => {
@@ -32,6 +29,10 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
   };
 
   const handleSubmit = async (e) => {
+    if (!tweetInput.length) {
+      e.preventDefault();
+      return setInvalidInput(true);
+    }
     setIsLoading(true);
     e.preventDefault();
     await postTweet(user, tweetInput);
@@ -50,6 +51,12 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
   useEffect(() => {
     setIsLoading(false);
   }, [allTweets]);
+
+  useEffect(() => {
+    if (tweetInput.length) {
+      setInvalidInput(false);
+    }
+  }, [tweetInput]);
 
   return (
     <>
@@ -72,12 +79,16 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
                     className="border-0 main-input text-muted fs-5"
                     placeholder="What's happening?"
                     onFocus={handleFocus}
-                    onBlur={handleBlur}
                     onChange={handleChange}
                     value={tweetInput}
                   />
 
                   <Col>
+                    {invalidInput && (
+                      <span className="text-danger">
+                        * You need to write something!
+                      </span>
+                    )}
                     {focused && (
                       <div className="border-bottom border-light">
                         <Button className="bg-white border-0 text-primary reply-btn rounded-pill py-0 mt-3 mb-2">

@@ -15,10 +15,20 @@ import { loginUser } from "../../services/authServices";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginUserReducer } from "../../redux/userSlice";
+import { setCredentials } from "../../redux/authSlice";
+import { useState } from "react";
+import MyToast from "../../components/myToast/MyToast";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
+  const [errMsg, setErrMsg] = useState("");
+  const [showErrToast, setShowErrToast] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const handleCloseToast = () => {
+    setShowErrToast(false);
+  };
+
   const LoginSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
     password: Yup.string()
@@ -33,12 +43,21 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     },
     validationSchema: LoginSchema,
     onSubmit: async (values) => {
-      const response = await loginUser(values);
-      console.log(response);
-      if (Object.entries(response).length > 0) {
-        handleCloseLoginModal();
-        dispatch(loginUserReducer(response));
-        navigate("/home");
+      try {
+        const response = await loginUser(values);
+        console.log(response.status);
+        if (response.status !== 200) {
+          setErrMsg(response.response.data.msg);
+          setShowErrToast(true);
+        }
+        if (Object.entries(response).length > 0) {
+          dispatch(loginUserReducer(response.data.user));
+          dispatch(setCredentials(response.data.accessToken));
+          navigate("/home");
+          handleCloseLoginModal();
+        }
+      } catch (err) {
+        console.log(err);
       }
     },
   });
@@ -105,6 +124,11 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
                   </FormGroup>
                 );
               })}
+              <MyToast
+                show={showErrToast}
+                content={errMsg}
+                onClose={handleCloseToast}
+              />
             </Modal.Body>
 
             <Modal.Footer>

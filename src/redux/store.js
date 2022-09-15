@@ -9,7 +9,7 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import userReducer from "./userSlice";
+import { rootReducer } from "./rootReducer";
 import { configureStore } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
 
@@ -19,7 +19,7 @@ const persistConfig = {
   storage,
 };
 
-const persistedReducer = persistReducer(persistConfig, userReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
   reducer: persistedReducer,

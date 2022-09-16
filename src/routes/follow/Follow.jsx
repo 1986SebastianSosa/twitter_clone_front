@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import FollowCard from "../../components/followCard/FollowCard";
 import Searchbar from "../../components/searchbar/Searchbar";
 import Sidenav from "../../components/sidenav/Sidenav";
@@ -10,14 +11,19 @@ import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
 import { showFollowSuggestions } from "../../services/followServices";
 
 const Follow = () => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.auth.user);
   const [followSuggestions, setFollowSuggestions] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    (async function () {
+    if (!user) {
+      return navigate("/");
+    }
+    const fetch = async () => {
       const response = await showFollowSuggestions(user);
-      await setFollowSuggestions(response.data);
-    })();
+      setFollowSuggestions(response.data);
+    };
+    fetch();
   }, []);
 
   return (

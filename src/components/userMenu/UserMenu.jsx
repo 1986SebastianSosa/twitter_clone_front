@@ -5,20 +5,22 @@ import "./userMenu.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import UserMenuPopover from "./userMenuPopover/UserMenuPopover";
-import { logoutUserReducer } from "../../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { PuffLoader } from "react-spinners";
 import { logoutUser } from "./../../services/authServices";
+import { logOut } from "../../redux/authSlice";
+import { useEffect } from "react";
 
 const UserMenu = () => {
-  const user = useSelector((state) => state.user);
-  const { firstname, lastname, username } = user;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const user = useSelector((state) => state.auth.user);
+  const { firstname, lastname, username } = user;
   const logoutHandler = async () => {
-    const result = await logoutUser();
-    dispatch(logoutUserReducer(user));
+    const response = await logoutUser();
+    console.log(response.data);
+    dispatch(logOut());
     navigate("/");
   };
 

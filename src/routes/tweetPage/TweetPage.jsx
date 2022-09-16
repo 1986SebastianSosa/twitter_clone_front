@@ -4,24 +4,31 @@ import Sidenav from "../../components/sidenav/Sidenav";
 import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
 import Searchbar from "../../components/searchbar/Searchbar";
 import Topnav from "../../components/topnav/Topnav";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { getOneTweet } from "../../services/tweetServices";
 import { useState } from "react";
 import Comment from "../../components/comment/Comment";
 import { PuffLoader } from "react-spinners";
+import { useSelector } from "react-redux";
 
 const TweetPage = () => {
+  const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const [tweet, setTweet] = useState({});
   const [comments, setComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
+  const navigate = useNavigate();
   let { id } = useParams();
 
   useEffect(() => {
+    if (!user) {
+      return navigate("/");
+    }
     window.scrollTo(0, 0);
     const fetch = async () => {
-      const response = await getOneTweet(id);
+      const response = await getOneTweet(id, token);
       setTweet(response.data);
       setIsLoading(false);
     };

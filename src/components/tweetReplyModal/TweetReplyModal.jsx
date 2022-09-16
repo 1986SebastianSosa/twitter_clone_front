@@ -11,6 +11,7 @@ import {
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
 import { getOneTweet } from "../../services/tweetServices";
+import { useSelector } from "react-redux";
 
 const TweetReplyModal = ({
   updatedTweet,
@@ -19,6 +20,7 @@ const TweetReplyModal = ({
   handleCloseCommentModal,
   user,
 }) => {
+  const token = useSelector((state) => state.auth.token);
   const [commentInput, setCommentInput] = useState("");
   const [invalidInput, setInvalidInput] = useState(false);
 
@@ -31,9 +33,9 @@ const TweetReplyModal = ({
     if (!commentInput.length) {
       return setInvalidInput(true);
     }
-    await postComment(commentInput, user._id, updatedTweet._id);
+    await postComment(commentInput, user._id, updatedTweet._id, token);
     setCommentInput("");
-    const fetchResponse = await getOneTweet(updatedTweet._id);
+    const fetchResponse = await getOneTweet(updatedTweet._id, token);
     setUpdatedTweet(fetchResponse.data);
     handleCloseCommentModal();
   };

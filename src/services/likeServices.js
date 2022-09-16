@@ -11,29 +11,37 @@ export const fetchTweetLikes = async (tweetId, userId) => {
   return response;
 };
 
-export const fetchCommentLikes = async (tweetId, userId) => {
-  const response = axios({
-    method: "get",
-    url: apiUrl + `/commentLike/${tweetId}`,
-    headers: { userId },
-  });
-  return response;
+export const fetchCommentLikes = async (commentId, userId, token) => {
+  try {
+    const response = axios({
+      method: "get",
+      url: apiUrl + `/commentLike/${commentId}`,
+      headers: { userId, authorization: token },
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export const likeTweet = async (tweetId, userId) => {
+export const likeTweet = async (tweetId, userId, token) => {
   const response = await axios({
     method: "post",
     url: apiUrl + `/tweetLike/${tweetId}`,
-    headers: { userId },
+    headers: { userId, authorization: token },
   });
   return response;
 };
 
-export const likeComment = async (commentId, userId) => {
-  const response = await axios({
-    method: "post",
-    url: apiUrl + `/commentLike/${commentId}`,
-    headers: { userId },
-  });
-  return response;
+export const likeComment = async (commentId, userId, token) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: apiUrl + `/commentLike/${commentId}`,
+      headers: { userId, authorization: token },
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 };

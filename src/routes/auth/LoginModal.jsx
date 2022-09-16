@@ -14,7 +14,6 @@ import * as Yup from "yup";
 import { loginUser } from "../../services/authServices";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginUserReducer } from "../../redux/userSlice";
 import { setCredentials } from "../../redux/authSlice";
 import { useState } from "react";
 import MyToast from "../../components/myToast/MyToast";
@@ -45,14 +44,13 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     onSubmit: async (values) => {
       try {
         const response = await loginUser(values);
-        console.log(response.status);
         if (response.status !== 200) {
           setErrMsg(response.response.data.msg);
           setShowErrToast(true);
         }
         if (Object.entries(response).length > 0) {
-          dispatch(loginUserReducer(response.data.user));
-          dispatch(setCredentials(response.data.accessToken));
+          console.log("data: ", response.data);
+          dispatch(setCredentials(response.data));
           navigate("/home");
           handleCloseLoginModal();
         }

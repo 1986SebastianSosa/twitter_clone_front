@@ -5,7 +5,7 @@ export const registerUser = async (values) => {
   const body = values;
   try {
     const response = await axios.post(`${apiUrl}/auth/register`, body);
-    return response.data;
+    return response;
   } catch (err) {
     return err;
   }

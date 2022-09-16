@@ -20,7 +20,8 @@ import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
 
 const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -50,27 +51,29 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
 
   const handleDeleteTweet = async () => {
     setIsDeleteLoading(true);
-    await deleteTweet(updatedTweet._id);
+    await deleteTweet(updatedTweet._id, token);
     if (location.pathname.split("/")[1] === "tweet") {
-      console.log("should navigate");
       return navigate("/home");
     } else {
-      console.log("shouldnt navigate");
-      console.log("tweet deleted");
-      const response = await getAllTweets(user);
-      const sortedData = await response.data.sort(
-        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
-      );
-      setAllTweets(sortedData);
-      setIsDeleteLoading(false);
-      setShowDeleteModal(false);
-      setShowDeleteToast(true);
+      try {
+        const response = await getAllTweets(user, token);
+        const sortedData = await response.data.sort(
+          (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+        );
+        setAllTweets(sortedData);
+        setIsDeleteLoading(false);
+        setShowDeleteModal(false);
+        setShowDeleteToast(true);
+      } catch (error) {
+        console.log(error);
+        navigate("/");
+      }
     }
   };
 
   const handleLike = async (e) => {
     e.stopPropagation();
-    await likeTweet(updatedTweet._id, user._id);
+    await likeTweet(updatedTweet._id, user._id, token);
     const response = await fetchTweetLikes(updatedTweet._id);
     setTweetLikes(response.data);
   };

@@ -14,7 +14,7 @@ import * as Yup from "yup";
 import { loginUser, registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { loginUserReducer } from "../../redux/userSlice";
+import { setCredentials } from "../../redux/authSlice";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
   const dispatch = useDispatch();
@@ -55,12 +55,9 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     validationSchema: SignupSchema,
     onSubmit: async (values) => {
       const result = await registerUser(values);
-
-      if (Object.entries(result).length > 0) {
-        const { email, password } = values;
-        const loginValues = { email, password };
-        const loginResult = await loginUser(loginValues);
-        dispatch(loginUserReducer(loginResult));
+      if (result.data) {
+        console.log("result.data: ", result.data);
+        dispatch(setCredentials(result.data));
         handleCloseRegisterModal();
         navigate("/home");
       }

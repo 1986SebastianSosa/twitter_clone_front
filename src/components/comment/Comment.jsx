@@ -28,7 +28,8 @@ const Comment = ({
   setTweet,
   setComments,
 }) => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentLikes, setCommentLikes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -37,9 +38,8 @@ const Comment = ({
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
   const handleDeleteComment = async () => {
-    const deleteResponse = await deleteComment(comment._id);
-    console.log("deleteComment response: ", deleteResponse.data);
-    const response = await getOneTweet(tweet._id);
+    const deleteResponse = await deleteComment(comment._id, token, tweet._id);
+    const response = await getOneTweet(tweet._id, token);
     setTweet(response.data);
     setIsLoading(false);
     const sortedCommentsArr = tweet.comments.sort((a, b) => {
@@ -51,14 +51,19 @@ const Comment = ({
   };
 
   const handleLike = async () => {
-    await likeComment(comment._id, user._id);
-    const response = await fetchCommentLikes(comment._id);
+    await likeComment(comment._id, user._id, token);
+    const response = await fetchCommentLikes(comment._id, user._id, token);
     setCommentLikes(response.data);
   };
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await fetchCommentLikes(comment._id);
+      const response = await fetchCommentLikes(
+        tweet._id,
+        comment._id,
+        user._id,
+        token
+      );
       setCommentLikes(response.data);
       setIsLoading(false);
     };

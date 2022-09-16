@@ -1,10 +1,12 @@
 import { Modal, Button } from "react-bootstrap";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const GoFollowModal = ({ handleCloseGoFollowModal, showGoFollowModal }) => {
+  const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
   const clickHandler = () => {
-    navigate("/follow");
+    navigate("/follow/" + user._id);
   };
   return (
     <>

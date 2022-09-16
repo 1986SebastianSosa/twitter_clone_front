@@ -16,11 +16,7 @@ const MyRoutes = () => {
         <Route path="/" element={<Access />} />
         <Route path="/home" element={<Home />} />
         <Route path="/tweet/:id" element={<TweetPage />} />
-        <Route path="/follow" element={<Follow />} />
-        <Route path="/failure" element={<Failure />} />
-        <Route path="/success" element={<Success />} />
-        <Route path="/free" element={<FreeRoute />} />
-        <Route path="/protected" element={<ProtectedRoute />} />
+        <Route path="/follow/:id" element={<Follow />} />
       </Routes>
     </>
   );

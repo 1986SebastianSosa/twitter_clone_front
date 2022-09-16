@@ -13,12 +13,17 @@ import {
 import "./mainpost.css";
 import { getAllTweets, postTweet } from "./../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const MainPost = ({ user, allTweets, setAllTweets }) => {
+  const token = useSelector((state) => state.auth.token);
   const [focused, setFocused] = useState(false);
   const [tweetInput, setTweetInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [invalidInput, setInvalidInput] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [showErrorMsg, setShowErrorMsg] = useState(false);
+  const navigate = useNavigate();
 
   const handleFocus = () => {
     setFocused(true);
@@ -29,23 +34,33 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
   };
 
   const handleSubmit = async (e) => {
-    if (!tweetInput.length) {
-      e.preventDefault();
-      return setInvalidInput(true);
-    }
-    setIsLoading(true);
     e.preventDefault();
-    await postTweet(user, tweetInput);
-    const getTweets = async () => {
-      const response = await getAllTweets(user);
-      const sortedData = response.data.sort(
-        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
-      );
-      setAllTweets(sortedData);
-    };
-    getTweets();
-    setTweetInput("");
-    setFocused(false);
+    try {
+      if (!tweetInput.length) {
+        setErrorMsg("* You need to write something");
+        setShowErrorMsg(true);
+      } else {
+        const response = await postTweet(token, tweetInput);
+        setIsLoading(true);
+        e.preventDefault();
+        const getTweets = async () => {
+          const response = await getAllTweets(user, token);
+          const sortedData = response.data.sort(
+            (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+          );
+          setAllTweets(sortedData);
+        };
+        getTweets();
+        setTweetInput("");
+        setFocused(false);
+      }
+    } catch (error) {
+      setErrorMsg("You need to be logged in to write something");
+      setShowErrorMsg(true);
+      // setTimeout(() => {
+      //   navigate("/");
+      // }, 5000);
+    }
   };
 
   useEffect(() => {
@@ -54,7 +69,7 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
 
   useEffect(() => {
     if (tweetInput.length) {
-      setInvalidInput(false);
+      setShowErrorMsg(false);
     }
   }, [tweetInput]);
 
@@ -84,10 +99,8 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
                   />
 
                   <Col>
-                    {invalidInput && (
-                      <span className="text-danger">
-                        * You need to write something!
-                      </span>
+                    {showErrorMsg && (
+                      <span className="text-danger">{errorMsg}</span>
                     )}
                     {focused && (
                       <div className="border-bottom border-light">

@@ -4,8 +4,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 export const showFollowSuggestions = async (user) => {
   let response = axios({
     method: "get",
-    baseURL: apiUrl + "/followers",
-    headers: { userid: user._id },
+    baseURL: apiUrl + "/followers/" + user._id,
   });
   return response;
 };

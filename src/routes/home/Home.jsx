@@ -13,6 +13,7 @@ import TweetsList from "../../components/tweetsList/tweetList";
 import GoFollowModal from "../../components/goFollowModal/GoFollowModal";
 import "./home.css";
 import { Navigate, useNavigate } from "react-router-dom";
+import WhoToFollow from "../../components/whoToFollow/WhoToFollow";
 
 const Home = () => {
   const user = useSelector((state) => state.auth.user);
@@ -91,6 +92,7 @@ const Home = () => {
             <Col xs={3}>
               <Searchbar />
               <TrendingSidenav />
+              <WhoToFollow />
             </Col>
           </Row>
         </Container>

@@ -12,6 +12,7 @@ import { showFollowSuggestions } from "../../services/followServices";
 
 const Follow = () => {
   const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const [followSuggestions, setFollowSuggestions] = useState([]);
   const navigate = useNavigate();
 
@@ -19,8 +20,9 @@ const Follow = () => {
     if (!user) {
       return navigate("/");
     }
+    window.scrollTo(0, 0);
     const fetch = async () => {
-      const response = await showFollowSuggestions(user);
+      const response = await showFollowSuggestions(user, token);
       setFollowSuggestions(response.data);
     };
     fetch();
@@ -28,7 +30,7 @@ const Follow = () => {
 
   return (
     <>
-      <Container>
+      <Container className="followCard">
         <Row>
           <Col xs={3}>
             <Sidenav />

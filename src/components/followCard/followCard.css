@@ -1,11 +1,11 @@
 .follow-suggestion {
   transition: 0.2s;
-  background-color: white;
+  background-color: inherit;
 }
 
 .follow-suggestion:hover {
   cursor: pointer;
-  background-color: rgb(236, 240, 240);
+  background-color: rgb(228, 232, 232);
 }
 
 .avatar {

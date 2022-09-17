@@ -2,6 +2,10 @@
   width: 5rem;
   height: 5rem;
 }
+.user-icon-small {
+  width: 4rem;
+  height: 4rem;
+}
 
 .icon-list li {
   list-style: none;

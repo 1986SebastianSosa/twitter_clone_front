@@ -2,11 +2,11 @@ import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-export const fetchTweetLikes = async (tweetId, userId) => {
+export const fetchTweetLikes = async (tweetId, token) => {
   const response = axios({
     method: "get",
     url: apiUrl + `/tweetLike/${tweetId}`,
-    headers: { userId },
+    headers: { authorization: token },
   });
   return response;
 };

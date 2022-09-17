@@ -1,25 +1,26 @@
 import { Row, Col, Button } from "react-bootstrap";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "./followCard.css";
 import { useSelector } from "react-redux";
 import { followUser, unfollowUser } from "../../services/followServices";
 import { useState } from "react";
+import "./followCard.css";
 
 const FollowCard = ({ suggestion }) => {
-  const loggedUser = useSelector((state) => state.user);
+  const loggedUser = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const [isFollowed, setIsFollowed] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
 
   const followHandler = async () => {
     setIsFollowed(true);
-    const response = await followUser(loggedUser, suggestion);
+    const response = await followUser(loggedUser, suggestion, token);
     console.log(response.data);
   };
 
   const unfollowHandler = async () => {
     setIsFollowed(false);
-    const response = await unfollowUser(loggedUser, suggestion);
+    const response = await unfollowUser(loggedUser, suggestion, token);
     console.log(response.data);
   };
 

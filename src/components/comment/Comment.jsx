@@ -58,12 +58,7 @@ const Comment = ({
 
   useEffect(() => {
     const fetch = async () => {
-      const response = await fetchCommentLikes(
-        tweet._id,
-        comment._id,
-        user._id,
-        token
-      );
+      const response = await fetchCommentLikes(comment._id, user._id, token);
       setCommentLikes(response.data);
       setIsLoading(false);
     };
@@ -73,9 +68,9 @@ const Comment = ({
   return (
     <>
       <Row className="p-2">
-        <Col xs={2}>
-          <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
-            <FontAwesomeIcon icon={faUser} className="fa-3x text-secondary" />
+        <Col xs={2} className="d-flex justify-content-center">
+          <div className="rounded-circle d-flex justify-content-center align-items-center user-icon-small bg-light">
+            <FontAwesomeIcon icon={faUser} className="fa-2x text-secondary" />
           </div>
         </Col>
         <Col xs={10}>
@@ -165,30 +160,27 @@ const Comment = ({
     const day = 1000 * 60 * 60 * 24;
     const month = 1000 * 60 * 60 * 24 * 30;
     const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(new Date(date));
-    // console.log("difference: ", difference);
+    let difference = Date.now() - Date.parse(date);
 
-    // console.log("difference < second: ", difference < second);
-    // console.log("difference < minute: ", difference < minute);
-    // console.log("difference < hour: ", difference < hour);
-    // console.log("difference < month: ", difference < month);
-    // console.log("difference < year: ", difference < year);
-
-    switch (difference) {
-      case difference < second:
-        return "Now";
-      case difference < minute:
-        return `${Math.floor(difference / second)} seconds ago`;
-      case difference < hour:
-        return `${Math.floor(difference / minute)} minutes ago`;
-      case difference < day:
-        return `${Math.floor(difference / hour)} hours ago`;
-      case difference < month:
-        return `${Math.floor(difference / day)} days ago`;
-      case difference < year:
-        return `${Math.floor(difference / month)} months ago`;
-      default:
-        return `${Math.floor(difference / year)} years ago`;
+    if (difference < second) {
+      return "Now";
+    }
+    if (difference < minute) {
+      return `${Math.floor(difference / second)} seconds ago`;
+    }
+    if (difference < hour) {
+      return `${Math.floor(difference / minute)} minutes ago`;
+    }
+    if (difference < day) {
+      return `${Math.floor(difference / hour)} hours ago`;
+    }
+    if (difference < month) {
+      return `${Math.floor(difference / day)} days ago`;
+    }
+    if (difference < year) {
+      return `${Math.floor(difference / month)} months ago`;
+    } else {
+      return `${Math.floor(difference / year)} years ago`;
     }
   }
   function userLiked() {

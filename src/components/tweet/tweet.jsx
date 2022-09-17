@@ -74,7 +74,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   const handleLike = async (e) => {
     e.stopPropagation();
     await likeTweet(updatedTweet._id, user._id, token);
-    const response = await fetchTweetLikes(updatedTweet._id);
+    const response = await fetchTweetLikes(updatedTweet._id, token);
     setTweetLikes(response.data);
   };
 
@@ -89,7 +89,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   useEffect(() => {
     if (updatedTweet._id) {
       const fetch = async () => {
-        const response = await fetchTweetLikes(updatedTweet._id, user._id);
+        const response = await fetchTweetLikes(updatedTweet._id, token);
         setTweetLikes(response.data);
         setIsLoading(false);
       };
@@ -224,30 +224,27 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
     const day = 1000 * 60 * 60 * 24;
     const month = 1000 * 60 * 60 * 24 * 30;
     const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(new Date(date));
-    // console.log("difference: ", difference);
+    let difference = Date.now() - Date.parse(date);
 
-    // console.log("difference < second: ", difference < second);
-    // console.log("difference < minute: ", difference < minute);
-    // console.log("difference < hour: ", difference < hour);
-    // console.log("difference < month: ", difference < month);
-    // console.log("difference < year: ", difference < year);
-
-    switch (difference) {
-      case difference < second:
-        return "Now";
-      case difference < minute:
-        return `${Math.floor(difference / second)} seconds ago`;
-      case difference < hour:
-        return `${Math.floor(difference / minute)} minutes ago`;
-      case difference < day:
-        return `${Math.floor(difference / hour)} hours ago`;
-      case difference < month:
-        return `${Math.floor(difference / day)} days ago`;
-      case difference < year:
-        return `${Math.floor(difference / month)} months ago`;
-      default:
-        return `${Math.floor(difference / year)} years ago`;
+    if (difference < second) {
+      return "Now";
+    }
+    if (difference < minute) {
+      return `${Math.floor(difference / second)} seconds ago`;
+    }
+    if (difference < hour) {
+      return `${Math.floor(difference / minute)} minutes ago`;
+    }
+    if (difference < day) {
+      return `${Math.floor(difference / hour)} hours ago`;
+    }
+    if (difference < month) {
+      return `${Math.floor(difference / day)} days ago`;
+    }
+    if (difference < year) {
+      return `${Math.floor(difference / month)} months ago`;
+    } else {
+      return `${Math.floor(difference / year)} years ago`;
     }
   }
 

@@ -1,0 +1,47 @@
+.tweet:hover {
+  cursor: pointer;
+  background-color: rgb(236, 240, 240);
+}
+
+.tweetIcon {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.tweetIcon:hover {
+  cursor: pointer;
+  background-color: rgba(29, 155, 240, 0.1);
+  color: rgb(29, 155, 240);
+}
+
+.dot {
+  font-size: 3px;
+}
+
+.deleteIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.2s;
+}
+
+.deleteIcon:hover {
+  cursor: pointer;
+  background-color: rgba(255, 0, 0, 0.1);
+  color: red;
+}
+
+.reply-input-form {
+  width: 100%;
+}
+
+.reply-input-form input {
+  width: 100%;
+}

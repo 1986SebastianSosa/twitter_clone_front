@@ -49,7 +49,6 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
           setShowErrToast(true);
         }
         if (Object.entries(response).length > 0) {
-          console.log("data: ", response.data);
           dispatch(setCredentials(response.data));
           navigate("/home");
           handleCloseLoginModal();

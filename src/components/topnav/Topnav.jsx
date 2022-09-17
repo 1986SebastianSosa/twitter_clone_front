@@ -1,8 +1,10 @@
 import React from "react";
 import { Col, Container, Row } from "react-bootstrap";
+import "./topnav.css";
+
 const Topnav = ({ title }) => {
   return (
-    <Container className="position-sticky w-100 top-0">
+    <Container className="position-sticky w-100 top-0 topnav">
       <Row>
         <Col>
           <div className="d-flex justify-content-between py-3">

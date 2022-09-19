@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCircleInfo,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
 import "./searchbar.css";
+import ReactTooltip from "react-tooltip";
 
 const Searchbar = () => {
+  const [showTooltip, setShowTooltip] = useState(false);
   const [focused, setFocused] = useState(false);
 
   const handleFocus = () => {
@@ -35,8 +40,12 @@ const Searchbar = () => {
               </Col>
               <Col xs={10}>
                 <input
+                  data-for="outOfScope"
+                  data-tip={showTooltip && ""}
+                  onMouseEnter={() => setShowTooltip(true)}
+                  onMouseLeave={() => setShowTooltip(false)}
                   type="text"
-                  className={`border-0 me-2 text-muted ${
+                  className={`border-0 me-2 text-muted searchInput ${
                     focused && "bg-white"
                   }`}
                   onFocus={handleFocus}
@@ -47,6 +56,19 @@ const Searchbar = () => {
           </div>
         </Col>
       </Row>
+      {showTooltip && (
+        <ReactTooltip
+          id="outOfScope"
+          getContent={() => {
+            return;
+          }}
+          event="click"
+          type="info"
+        >
+          <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
+          the scope of this project
+        </ReactTooltip>
+      )}
     </Container>
   );
 };

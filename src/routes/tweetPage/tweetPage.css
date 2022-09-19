@@ -26,10 +26,10 @@
   width: 2rem;
   height: 2rem;
   border-radius: 100%;
-  display: flex;
-  justify-content: center;
   align-items: center;
   transition: 0.2s;
+  display: flex;
+  justify-content: center;
 }
 
 .deleteIcon:hover {

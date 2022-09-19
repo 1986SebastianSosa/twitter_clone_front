@@ -19,6 +19,7 @@ const TweetReplyModal = ({
   showCommentModal,
   handleCloseCommentModal,
   user,
+  windowWidth,
 }) => {
   const token = useSelector((state) => state.auth.token);
   const [commentInput, setCommentInput] = useState("");
@@ -57,12 +58,18 @@ const TweetReplyModal = ({
         <Modal.Header closeButton />
         <Modal.Body>
           {" "}
-          <Row className="p-2">
+          <Row className="border-bottom mb-3 pb-3">
             <Col xs={2} className="p-0">
-              <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
+              <div
+                className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                  windowWidth < 576 && "avatar"
+                }`}
+              >
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="fa-3x text-secondary"
+                  className={`${
+                    windowWidth > 576 ? "fa-3x" : "fa-2x"
+                  } text-secondary`}
                 />
               </div>
             </Col>
@@ -90,11 +97,17 @@ const TweetReplyModal = ({
             </Col>
           </Row>
           <Row>
-            <Col xs={2}>
-              <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
+            <Col xs={2} className="p-0">
+              <div
+                className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                  windowWidth < 576 && "avatar"
+                }`}
+              >
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="fa-3x text-secondary"
+                  className={`${
+                    windowWidth > 576 ? "fa-3x" : "fa-2x"
+                  } text-secondary`}
                 />
               </div>
             </Col>

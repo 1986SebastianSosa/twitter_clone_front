@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Container, Row, Col, Modal } from "react-bootstrap";
 import accessImg from "../../img/lohp_en_1302x955.png";
 import "./access.css";
@@ -43,7 +43,7 @@ const Access = () => {
             <FontAwesomeIcon icon={faTwitter} className="twitterLogo" />
           </div>
         </Col>
-        <Col xs={12} lg={5} className="m-0 p-0">
+        <Col xs={12} lg={5} className=" p-0 accessRegisterColumn">
           <Row className="accessRegisterLogin flex-column">
             <Col className="mb-5">
               <FontAwesomeIcon icon={faTwitter} className="twitterLogo fa-3x" />

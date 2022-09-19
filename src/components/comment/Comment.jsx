@@ -6,6 +6,7 @@ import {
   faArrowUpFromBracket,
   faCircle,
   faTrashCan,
+  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
@@ -20,6 +21,7 @@ import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchCommentLikes, likeComment } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
 import { deleteComment } from "../../services/commentServices";
+import ReactTooltip from "react-tooltip";
 
 const Comment = ({
   comment,
@@ -27,9 +29,11 @@ const Comment = ({
   tweet,
   setTweet,
   setComments,
+  windowWidth,
 }) => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentLikes, setCommentLikes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,10 +71,19 @@ const Comment = ({
 
   return (
     <>
-      <Row className="p-2">
-        <Col xs={2} className="d-flex justify-content-center">
-          <div className="rounded-circle d-flex justify-content-center align-items-center user-icon-small bg-light">
-            <FontAwesomeIcon icon={faUser} className="fa-2x text-secondary" />
+      <Row className="p-2 border-bottom my-2">
+        <Col xs={2} className="d-flex justify-content-center p-0">
+          <div
+            className={`rounded-circle d-flex justify-content-center align-items-center user-icon-small bg-light  ${
+              windowWidth < 768 && "avatar"
+            }`}
+          >
+            <FontAwesomeIcon
+              icon={faUser}
+              className={`${
+                windowWidth < 768 ? "fa-2x" : "fa-3x"
+              } text-secondary`}
+            />
           </div>
         </Col>
         <Col xs={10}>
@@ -100,16 +113,28 @@ const Comment = ({
             </Col>
             <Col>{comment.content}</Col>
             <Col>
-              <Row className="text-muted">
+              <Row className="text-muted mt-1">
                 <Col>
                   <div className="d-flex align-items-center">
-                    <div className="rounded-circle tweetIcon me-3">
+                    <div
+                      className="rounded-circle tweetIcon me-3"
+                      data-for="outOfScope"
+                      data-tip={showTooltip && ""}
+                      onMouseEnter={() => setShowTooltip(true)}
+                      onMouseLeave={() => setShowTooltip(false)}
+                    >
                       <FontAwesomeIcon icon={faMessage} />
                     </div>
                   </div>
                 </Col>
                 <Col>
-                  <div className="rounded-circle tweetIcon">
+                  <div
+                    className="rounded-circle tweetIcon"
+                    data-for="outOfScope"
+                    data-tip={showTooltip && ""}
+                    onMouseEnter={() => setShowTooltip(true)}
+                    onMouseLeave={() => setShowTooltip(false)}
+                  >
                     <FontAwesomeIcon icon={faRepeat} />
                   </div>
                 </Col>
@@ -136,7 +161,13 @@ const Comment = ({
                   </div>
                 </Col>
                 <Col>
-                  <div className="rounded-circle tweetIcon">
+                  <div
+                    className="rounded-circle tweetIcon"
+                    data-for="outOfScope"
+                    data-tip={showTooltip && ""}
+                    onMouseEnter={() => setShowTooltip(true)}
+                    onMouseLeave={() => setShowTooltip(false)}
+                  >
                     <FontAwesomeIcon icon={faArrowUpFromBracket} />
                   </div>
                 </Col>
@@ -145,6 +176,19 @@ const Comment = ({
           </Row>
         </Col>
       </Row>
+      {showTooltip && (
+        <ReactTooltip
+          id="outOfScope"
+          getContent={() => {
+            return;
+          }}
+          event="click"
+          type="info"
+        >
+          <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
+          the scope of this project
+        </ReactTooltip>
+      )}
       <DeleteModal
         title={"Comment"}
         showDeleteModal={showDeleteModal}

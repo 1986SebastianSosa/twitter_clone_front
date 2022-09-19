@@ -11,78 +11,122 @@ import {
   faHouse,
   faEllipsis,
   faHashtag,
+  faFeather,
+  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import "./sidenav.css";
 import { Button } from "react-bootstrap";
 import UserMenu from "./../userMenu/UserMenu";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import ReactTooltip from "react-tooltip";
 
-const Sidenav = () => {
+const Sidenav = ({ windowWidth }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
   const homeClickHandler = () => {
     navigate("/home");
   };
+
+  const sideNavItems = [
+    {
+      id: 1,
+      name: "Home",
+      icon: faHouse,
+      handler: homeClickHandler,
+    },
+    {
+      id: 2,
+      name: "Explore",
+      icon: faHashtag,
+    },
+    {
+      id: 3,
+      name: "Notifications",
+      icon: faBell,
+    },
+    {
+      id: 4,
+      name: "Messages",
+      icon: faEnvelope,
+    },
+    {
+      id: 5,
+      name: "Bookmarks",
+      icon: faBookmark,
+    },
+    {
+      id: 6,
+      name: "Lists",
+      icon: faFileLines,
+    },
+    {
+      id: 7,
+      name: "Profile",
+      icon: faCircleUser,
+    },
+    {
+      id: 8,
+      name: "More",
+      icon: faEllipsis,
+    },
+  ];
+
   return (
     <>
       <nav className="sidenav px-2">
-        <FontAwesomeIcon
-          icon={faTwitter}
-          className="fa-2xl logo"
-          onClick={homeClickHandler}
-        />
+        <div className="logoDiv">
+          <FontAwesomeIcon
+            icon={faTwitter}
+            className="fa-2xl logo"
+            onClick={homeClickHandler}
+          />
+        </div>
+        {sideNavItems.map((item) => {
+          return (
+            <div
+              className="navItem"
+              key={item.id}
+              onClick={item.handler && item.handler}
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
+              data-tip={!item.handler && ""}
+              data-for={!item.handler && "outOfScope"}
+            >
+              <div className="iconDiv">
+                <FontAwesomeIcon
+                  icon={item.icon}
+                  className={`${windowWidth > 1260 ? "me-3" : "m-auto"} fa-xl`}
+                />
+              </div>
+              <h5 className="sidenavItemTitle">{item.name}</h5>
+            </div>
+          );
+        })}
+        {windowWidth >= 1260 ? (
+          <Button className="tweetBtn rounded-pill text-white fw-bold fs-5">
+            Tweet
+          </Button>
+        ) : (
+          <Button className="tweetBtn rounded-circle text-white fw-bold fs-5">
+            <FontAwesomeIcon icon={faFeather} />
+          </Button>
+        )}
 
-        <div className="navItem" onClick={homeClickHandler}>
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faHouse} className="me-3 fa-xl" />
-          </div>
-          <h5>Home</h5>
-        </div>
-        <div className="navItem">
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faHashtag} className="me-3 fa-xl" />
-          </div>
-          <h5>Explore</h5>
-        </div>
-        <div className="navItem">
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faBell} className="me-3 fa-xl" />
-          </div>
-          <h5>Notifications</h5>
-        </div>
-        <div className="navItem">
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faEnvelope} className="me-3 fa-xl" />
-          </div>
-          <h5>Messages</h5>
-        </div>
-        <div className="navItem">
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faBookmark} className="me-3 fa-xl" />
-          </div>
-          <h5>Bookmarks</h5>
-        </div>
-        <div className="navItem">
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faFileLines} className="me-3 fa-xl" />
-          </div>
-          <h5>Lists</h5>
-        </div>
-        <div className="navItem">
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faCircleUser} className="me-3 fa-xl" />
-          </div>
-          <h5>Profile</h5>
-        </div>
-        <div className="navItem">
-          <div className="iconDiv">
-            <FontAwesomeIcon icon={faEllipsis} className="me-3 fa-xl" />
-          </div>
-          <h5>More</h5>
-        </div>
-        <Button className="rounded-pill text-white fw-bold py-3 fs-5 ">
-          Tweet
-        </Button>
-        <UserMenu />
+        <UserMenu windowWidth={windowWidth} />
+        {showTooltip && (
+          <ReactTooltip
+            id="outOfScope"
+            getContent={() => {
+              return;
+            }}
+            event="click"
+            type="info"
+          >
+            <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
+            the scope of this project
+          </ReactTooltip>
+        )}
       </nav>
     </>
   );

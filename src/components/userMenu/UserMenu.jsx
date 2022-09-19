@@ -11,12 +11,13 @@ import { logoutUser } from "./../../services/authServices";
 import { logOut } from "../../redux/authSlice";
 import { useEffect } from "react";
 
-const UserMenu = () => {
+const UserMenu = ({ windowWidth }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.auth.user);
   const { firstname, lastname, username } = user;
+
   const logoutHandler = async () => {
     const response = await logoutUser();
     console.log(response.data);
@@ -64,9 +65,13 @@ const UserMenu = () => {
   return (
     <>
       <OverlayTrigger trigger="click" placement="top" overlay={popover}>
-        <div className="userMenu mt-5 rounded-pill px-4 py-2">
-          <Row>
-            <Col xs={3} className="p-0">
+        <div
+          className={`userMenu mt-5 rounded-pill ${
+            windowWidth >= 1260 && "px-4"
+          } py-2`}
+        >
+          <Row className="d-flex justify-content-center">
+            <Col className="d-flex justify-content-center p-0" xs={3}>
               <div className="avatar bg-light">
                 <FontAwesomeIcon
                   icon={faUser}
@@ -74,19 +79,26 @@ const UserMenu = () => {
                 />
               </div>
             </Col>
-            <Col className="p-0">
-              <div>
-                <span className="fw-bold">{firstname + " " + lastname}</span>
-              </div>
-              <div>
-                <span className="text-muted">@{username}</span>
-              </div>
-            </Col>
-            <Col xs={1} className="p-0 d-flex align-items-center">
-              <div className="menuDots d-flex align-items-center">
-                <span className="fw-bold">...</span>
-              </div>
-            </Col>
+            {windowWidth >= 1260 ? (
+              <>
+                {" "}
+                <Col className="p-0">
+                  <div>
+                    <span className="fw-bold">
+                      {firstname + " " + lastname}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-muted">@{username}</span>
+                  </div>
+                </Col>
+                <Col xs={1} className="p-0 d-flex align-items-center">
+                  <div className="menuDots d-flex align-items-center">
+                    <span className="fw-bold">...</span>
+                  </div>
+                </Col>
+              </>
+            ) : null}
           </Row>
         </div>
       </OverlayTrigger>

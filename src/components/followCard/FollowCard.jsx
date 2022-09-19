@@ -51,8 +51,8 @@ const FollowCard = ({ suggestion }) => {
 
   return (
     <>
-      <Row className="follow-suggestion py-3">
-        <Col xs={1} className="px-0 mx-2 d-flex justify-content-center">
+      <Row className="follow-suggestion py-3 px-2">
+        <Col xs={2} xl={1} className="px-0 mx-2 d-flex justify-content-center">
           <div className="avatar border rounded-circle d-flex justify-content-center align-items-center bg-light">
             <FontAwesomeIcon icon={faUser} className="fa-2x text-secondary" />
           </div>

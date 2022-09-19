@@ -13,8 +13,7 @@ import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowUpFromBracket,
-  faCircle,
-  faEarthAmericas,
+  faCircleInfo,
   faRepeat,
   faTrashCan,
   faUser,
@@ -23,8 +22,10 @@ import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart, faMessage } from "@fortawesome/free-regular-svg-icons";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import DeleteModal from "../../components/deleteModal/DeleteModal";
-import "./tweetPage.css";
 import { postComment } from "../../services/commentServices";
+import BotNav from "../../components/botNav/BotNav";
+import ReactTooltip from "react-tooltip";
+import "./tweetPage.css";
 
 const TweetPage = () => {
   const user = useSelector((state) => state.auth.user);
@@ -43,6 +44,8 @@ const TweetPage = () => {
   const [commentInput, setCommentInput] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
   let { id } = useParams();
 
@@ -142,14 +145,27 @@ const TweetPage = () => {
     }
   }, [commentInput]);
 
+  useEffect(() => {
+    const handleWindowResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleWindowResize);
+  }, []);
+
   return (
     <>
       <Container>
         <Row>
-          <Col xs={3}>
-            <Sidenav />
+          <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
+            <Sidenav windowWidth={windowWidth} />
           </Col>
-          <Col xs={6} className="border-start border-end border-light p-0">
+          <Col
+            xs={11}
+            sm={10}
+            md={9}
+            lg={6}
+            className="border-start border-end border-light p-0"
+          >
             <Topnav title="Tweet" />
             {isLoading ? (
               <PuffLoader color="#1d9bf0" />
@@ -157,11 +173,17 @@ const TweetPage = () => {
               <>
                 <Container>
                   <Row className="p-2">
-                    <Col xs={2} className="d-flex justify-content-center">
-                      <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
+                    <Col xs={2} className="d-flex justify-content-center p-0">
+                      <div
+                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                          windowWidth < 768 && "avatar"
+                        }`}
+                      >
                         <FontAwesomeIcon
                           icon={faUser}
-                          className="fa-3x text-secondary"
+                          className={`${
+                            windowWidth < 768 ? "fa-2x" : "fa-3x"
+                          } text-secondary`}
                         />
                       </div>
                     </Col>
@@ -181,11 +203,16 @@ const TweetPage = () => {
                           </div>
                         </Col>
                         {tweet.author._id === user._id ? (
-                          <Col className="deleteIcon" xs={2}>
-                            <FontAwesomeIcon
-                              icon={faTrashCan}
-                              onClick={(e) => handleShowDeleteModal(e)}
-                            />
+                          <Col
+                            className="p-0 d-flex justify-content-end"
+                            xs={2}
+                          >
+                            <div className="deleteIcon me-2">
+                              <FontAwesomeIcon
+                                icon={faTrashCan}
+                                onClick={(e) => handleShowDeleteModal(e)}
+                              />
+                            </div>
                           </Col>
                         ) : null}
                       </Row>
@@ -209,7 +236,13 @@ const TweetPage = () => {
                       </div>
                     </Col>
                     <Col>
-                      <div className="rounded-circle tweetIcon">
+                      <div
+                        className="rounded-circle tweetIcon"
+                        data-for="outOfScope"
+                        data-tip={showTooltip && ""}
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      >
                         <FontAwesomeIcon icon={faRepeat} />
                       </div>
                     </Col>
@@ -236,7 +269,13 @@ const TweetPage = () => {
                       </div>
                     </Col>
                     <Col>
-                      <div className="rounded-circle tweetIcon">
+                      <div
+                        className="rounded-circle tweetIcon"
+                        data-for="outOfScope"
+                        data-tip={showTooltip && ""}
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      >
                         <FontAwesomeIcon icon={faArrowUpFromBracket} />
                       </div>
                     </Col>
@@ -244,12 +283,18 @@ const TweetPage = () => {
                   <Row className="p-2 my-2 border-top border-bottom">
                     <Col
                       xs={2}
-                      className="d-flex justify-content-center align-items-center"
+                      className="d-flex justify-content-center align-items-center p-0"
                     >
-                      <div className="rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0">
+                      <div
+                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
+                          windowWidth < 768 && "avatar"
+                        }`}
+                      >
                         <FontAwesomeIcon
                           icon={faUser}
-                          className="fa-2x text-secondary"
+                          className={`${
+                            windowWidth < 768 ? "fa-2x" : "fa-3x"
+                          } text-secondary`}
                         />
                       </div>
                     </Col>
@@ -293,16 +338,20 @@ const TweetPage = () => {
                     comment={comment}
                     setComments={setComments}
                     setShowDeleteToast={setShowDeleteToast}
+                    windowWidth={windowWidth}
                   />
                 ))}
               </Container>
             )}
           </Col>
-          <Col xs={3}>
-            <Searchbar />
-            <TrendingSidenav />
-          </Col>
+          {windowWidth >= 992 && (
+            <Col xs={3}>
+              <Searchbar />
+              <TrendingSidenav />
+            </Col>
+          )}
         </Row>
+        {windowWidth < 576 && <BotNav />}
       </Container>
       {isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />
@@ -314,6 +363,19 @@ const TweetPage = () => {
           handleCloseDeleteModal={handleCloseDeleteModal}
           handleDelete={handleDeleteTweet}
         />
+      )}
+      {showTooltip && (
+        <ReactTooltip
+          id="outOfScope"
+          getContent={() => {
+            return;
+          }}
+          event="click"
+          type="info"
+        >
+          <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
+          the scope of this project
+        </ReactTooltip>
       )}
       {/* {isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />

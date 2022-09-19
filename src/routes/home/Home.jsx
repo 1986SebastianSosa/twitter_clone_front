@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { getAllTweets } from "../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
@@ -14,6 +14,9 @@ import GoFollowModal from "../../components/goFollowModal/GoFollowModal";
 import "./home.css";
 import { Navigate, useNavigate } from "react-router-dom";
 import WhoToFollow from "../../components/whoToFollow/WhoToFollow";
+import BotNav from "../../components/botNav/BotNav";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFeather } from "@fortawesome/free-solid-svg-icons";
 
 const Home = () => {
   const user = useSelector((state) => state.auth.user);
@@ -22,7 +25,16 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [noTweets, setNoTweets] = useState(false);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleWindowResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener("resize", handleWindowResize);
+  }, []);
 
   const handleShowGoFollowModal = () => {
     setShowGoFollowModal(true);
@@ -65,18 +77,29 @@ const Home = () => {
   return (
     <>
       {user && (
-        <Container>
+        <Container className="homeContainer">
           <Row>
-            <Col xs={3}>
-              <Sidenav />
+            <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
+              <Sidenav windowWidth={windowWidth} />
             </Col>
-            <Col xs={6} className="border-start border-end border-light p-0">
-              <Topnav title="Home" />
-              <MainPost
-                user={user}
-                setAllTweets={setAllTweets}
-                allTweets={allTweets}
-              />
+            <Col
+              xs={11}
+              sm={10}
+              md={9}
+              lg={6}
+              className="border-start border-end border-light p-0"
+            >
+              {windowWidth > 576 && (
+                <>
+                  <Topnav title="Home" />
+                  <MainPost
+                    user={user}
+                    setAllTweets={setAllTweets}
+                    allTweets={allTweets}
+                  />
+                </>
+              )}
+
               {isLoading ? (
                 <div className="loading">
                   <PuffLoader size={200} color="#1d9bf0" />
@@ -86,15 +109,27 @@ const Home = () => {
                   Sorry, there are no tweets to show at this moment :({" "}
                 </h4>
               ) : (
-                <TweetsList allTweets={allTweets} setAllTweets={setAllTweets} />
+                <TweetsList
+                  allTweets={allTweets}
+                  setAllTweets={setAllTweets}
+                  windowWidth={windowWidth}
+                />
               )}
             </Col>
-            <Col xs={3}>
-              <Searchbar />
-              <TrendingSidenav />
-              <WhoToFollow />
-            </Col>
+            {windowWidth >= 992 && (
+              <Col xs={3}>
+                <Searchbar />
+                <TrendingSidenav />
+                <WhoToFollow />
+              </Col>
+            )}
           </Row>
+          {/* {windowWidth < 576 && (
+            <Button className="tweetBtn rounded-circle text-white fw-bold fs-5">
+              <FontAwesomeIcon icon={faFeather} />
+            </Button>
+          )} */}
+          {windowWidth < 576 && <BotNav />}
         </Container>
       )}
       <GoFollowModal

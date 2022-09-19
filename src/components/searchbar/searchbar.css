@@ -1,5 +1,6 @@
 .searchbar input {
   background-color: rgb(236, 240, 240);
+  max-width: 95%;
 }
 .searchbar input:focus {
   outline: none;

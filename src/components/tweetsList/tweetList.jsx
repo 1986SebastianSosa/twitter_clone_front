@@ -3,7 +3,7 @@ import MyToast from "../myToast/MyToast";
 import Tweet from "../tweet/tweet";
 import "./tweetList.css";
 
-const TweetsList = ({ allTweets, setAllTweets }) => {
+const TweetsList = ({ allTweets, setAllTweets, windowWidth }) => {
   const toggleDeleteToast = () => setShowDeleteToast(!showDeleteToast);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
 
@@ -22,6 +22,7 @@ const TweetsList = ({ allTweets, setAllTweets }) => {
             tweet={tweet}
             setAllTweets={setAllTweets}
             setShowDeleteToast={setShowDeleteToast}
+            windowWidth={windowWidth}
           />
         );
       })}

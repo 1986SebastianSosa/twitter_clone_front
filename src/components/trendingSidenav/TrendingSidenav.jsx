@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { faCircleInfo, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import "./trendingSidenav.css";
+import ReactTooltip from "react-tooltip";
 
 const trending = [
   {
@@ -58,6 +59,7 @@ const trending = [
 ];
 
 const TrendingSidenav = () => {
+  const [showTooltip, setShowTooltip] = useState(false);
   return (
     <>
       <Container>
@@ -66,7 +68,14 @@ const TrendingSidenav = () => {
             <h4 className="fw-bold p-3">Trends for you</h4>
             {trending.map((trend, index) => {
               return (
-                <div className="trend" key={index}>
+                <div
+                  className="trend"
+                  key={index}
+                  data-for="outOfScope"
+                  data-tip={showTooltip && ""}
+                  onMouseEnter={() => setShowTooltip(true)}
+                  onMouseLeave={() => setShowTooltip(false)}
+                >
                   <div className="px-3 py-2 d-flex justify-content-between">
                     <div>
                       <span className="d-block text-muted">{trend.topic}</span>
@@ -85,6 +94,19 @@ const TrendingSidenav = () => {
             })}
           </Col>
         </Row>
+        {showTooltip && (
+          <ReactTooltip
+            id="outOfScope"
+            getContent={() => {
+              return;
+            }}
+            event="click"
+            type="info"
+          >
+            <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
+            the scope of this project
+          </ReactTooltip>
+        )}
       </Container>
     </>
   );

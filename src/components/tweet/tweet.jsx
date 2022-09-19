@@ -6,6 +6,7 @@ import {
   faArrowUpFromBracket,
   faCircle,
   faTrashCan,
+  faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
@@ -18,8 +19,9 @@ import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
 import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
+import ReactTooltip from "react-tooltip";
 
-const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
+const Tweet = ({ tweet, setAllTweets, setShowDeleteToast, windowWidth }) => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const location = useLocation();
@@ -31,6 +33,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
   const [tweetLikes, setTweetLikes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -102,13 +105,22 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
       {isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
-        <div onClick={(e) => handleClick(updatedTweet._id)} className="tweet">
+        <div
+          onClick={(e) => handleClick(updatedTweet._id)}
+          className="tweet py-2 border-bottom"
+        >
           <Row className="p-2">
-            <Col xs={2}>
-              <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
+            <Col xs={2} className="d-flex justify-content-center p-0">
+              <div
+                className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                  windowWidth < 768 && "avatar"
+                }`}
+              >
                 <FontAwesomeIcon
                   icon={faUser}
-                  className="fa-3x text-secondary"
+                  className={`${
+                    windowWidth < 768 ? "fa-2x" : "fa-3x"
+                  } text-secondary`}
                 />
               </div>
             </Col>
@@ -154,7 +166,16 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
                       </div>
                     </Col>
                     <Col>
-                      <div className="rounded-circle tweetIcon">
+                      <div
+                        className="rounded-circle tweetIcon"
+                        onClick={(e) => {
+                          return e.stopPropagation;
+                        }}
+                        data-for="outOfScope"
+                        data-tip={showTooltip && ""}
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      >
                         <FontAwesomeIcon icon={faRepeat} />
                       </div>
                     </Col>
@@ -181,7 +202,16 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
                       </div>
                     </Col>
                     <Col>
-                      <div className="rounded-circle tweetIcon">
+                      <div
+                        className="rounded-circle tweetIcon"
+                        onClick={(e) => {
+                          return e.stopPropagation;
+                        }}
+                        data-for="outOfScope"
+                        data-tip={showTooltip && ""}
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      >
                         <FontAwesomeIcon icon={faArrowUpFromBracket} />
                       </div>
                     </Col>
@@ -190,6 +220,19 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
               </Row>
             </Col>
           </Row>
+          {showTooltip && (
+            <ReactTooltip
+              id="outOfScope"
+              getContent={() => {
+                return;
+              }}
+              event="click"
+              type="info"
+            >
+              <FontAwesomeIcon icon={faCircleInfo} /> This functionality is
+              beyond the scope of this project
+            </ReactTooltip>
+          )}
         </div>
       )}
       {isLoading ? (
@@ -212,6 +255,7 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast }) => {
           updatedTweet={updatedTweet}
           showCommentModal={showCommentModal}
           handleCloseCommentModal={handleCloseCommentModal}
+          windowWidth={windowWidth}
         />
       )}
     </>

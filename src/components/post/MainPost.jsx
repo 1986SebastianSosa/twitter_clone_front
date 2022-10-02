@@ -50,6 +50,7 @@ const MainPost = ({
       } else {
         setIsLoading(true);
         await postTweet(token, tweetInput);
+        setTweetInput("");
         const fetchTweets = async () => {
           const response = await getAllTweets(user, token, page);
           if (!response.data.tweetsToShow.length && !allTweets.length) {

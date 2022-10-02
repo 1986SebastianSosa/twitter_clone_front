@@ -63,7 +63,7 @@ const Home = () => {
     }
     const fetchUser = async (userId) => {
       const response = await getUser(userId);
-      if (response.data.following.length <= 1) {
+      if (response?.data?.following?.length <= 1) {
         handleShowGoFollowModal();
       }
     };

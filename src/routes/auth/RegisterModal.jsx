@@ -60,7 +60,6 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
       setIsLoading(true);
       const result = await registerUser(values);
       if (result.data) {
-        console.log("result.data: ", result.data);
         dispatch(setCredentials(result.data));
         handleCloseRegisterModal();
         setIsLoading(false);

@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import "./followCard.css";
 
 const FollowCard = ({ suggestion }) => {
-  // console.log(suggestion);
   const loggedUser = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const [isFollowed, setIsFollowed] = useState(false);
@@ -22,13 +21,11 @@ const FollowCard = ({ suggestion }) => {
   const followHandler = async () => {
     setIsFollowed(true);
     const response = await followUser(loggedUser, suggestion, token);
-    console.log(response.data);
   };
 
   const unfollowHandler = async () => {
     setIsFollowed(false);
     const response = await unfollowUser(loggedUser, suggestion, token);
-    console.log(response.data);
   };
 
   const setFollowBtn = (following) => {

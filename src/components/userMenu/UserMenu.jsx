@@ -1,15 +1,11 @@
 import { Col, Row, OverlayTrigger, Popover } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faCheck } from "@fortawesome/free-solid-svg-icons";
-import "./userMenu.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import UserMenuPopover from "./userMenuPopover/UserMenuPopover";
 import { useNavigate } from "react-router-dom";
-import { PuffLoader } from "react-spinners";
 import { logoutUser } from "./../../services/authServices";
 import { logOut } from "../../redux/authSlice";
-import { useEffect } from "react";
+import "./userMenu.css";
 
 const UserMenu = ({ windowWidth }) => {
   const dispatch = useDispatch();

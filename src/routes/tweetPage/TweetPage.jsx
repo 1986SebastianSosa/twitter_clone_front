@@ -153,7 +153,7 @@ const TweetPage = () => {
 
   return (
     <>
-      <Container>
+      <Container className="mb-5">
         <Row>
           <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
             <Sidenav windowWidth={windowWidth} />

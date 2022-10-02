@@ -13,6 +13,7 @@ import { Button, Col, Modal, Row } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { PuffLoader } from "react-spinners";
 import { getAllTweets, postTweet } from "../../services/tweetServices";
+import "./postModal.css";
 
 const PostModal = ({
   showPostModal,
@@ -97,7 +98,7 @@ const PostModal = ({
           onHide={handleClosePostModal}
           keyboard={false}
         >
-          <Row className="p-2 border-bottom border-light">
+          <Row className="postModal p-2 border-bottom border-light">
             <Col xs={2}>
               <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
                 <FontAwesomeIcon

@@ -354,7 +354,7 @@ const TweetPage = () => {
             </Col>
           )}
         </Row>
-        {windowWidth < 576 && <BotNav />}
+        {windowWidth < 576 && <BotNav className="mb-5" />}
       </Container>
       {isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />

@@ -7,8 +7,6 @@ const useRefresh = () => {
   const dispatch = useDispatch();
   const refresh = async () => {
     const response = await axios.get("/refresh", { withCredentials: true });
-    console.log(response.data);
-    // dispatch(updateToken());
     return response.data.accessToken;
   };
   return refresh;

@@ -172,13 +172,6 @@ const TweetReplyModal = ({
     const month = 1000 * 60 * 60 * 24 * 30;
     const year = 1000 * 60 * 60 * 24 * 30 * 12;
     let difference = Date.now() - Date.parse(new Date(date));
-    // console.log("difference: ", difference);
-
-    // console.log("difference < second: ", difference < second);
-    // console.log("difference < minute: ", difference < minute);
-    // console.log("difference < hour: ", difference < hour);
-    // console.log("difference < month: ", difference < month);
-    // console.log("difference < year: ", difference < year);
 
     switch (difference) {
       case difference < second:

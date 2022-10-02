@@ -16,7 +16,6 @@ const UserMenu = ({ windowWidth }) => {
 
   const logoutHandler = async () => {
     const response = await logoutUser();
-    console.log(response.data);
     dispatch(logOut());
     navigate("/");
   };

@@ -12,24 +12,27 @@ import MainPost from "../../components/post/MainPost";
 import TweetsList from "../../components/tweetsList/tweetList";
 import GoFollowModal from "../../components/goFollowModal/GoFollowModal";
 import "./home.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import WhoToFollow from "../../components/whoToFollow/WhoToFollow";
 import BotNav from "../../components/botNav/BotNav";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFeather } from "@fortawesome/free-solid-svg-icons";
 
 const Home = () => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const [allTweets, setAllTweets] = useState([]);
+  const [allTweetsLength, setAllTweetsLength] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [noTweets, setNoTweets] = useState(false);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const navigate = useNavigate();
+  console.log(allTweetsLength);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const handleWindowResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -56,23 +59,27 @@ const Home = () => {
     };
 
     fetchUser(user._id);
-    window.scrollTo(0, 0);
+
     const fetchTweets = async () => {
-      const response = await getAllTweets(user, token);
-      if (!response.data.length) {
+      const response = await getAllTweets(user, token, page);
+      if (!response.data.tweetsToShow.length && !allTweets.length) {
         setNoTweets(true);
         setIsLoading(false);
         return;
       }
+      if (response.data.tweetsToShow.length === 0) {
+        setHasMore(false);
+      }
       setNoTweets(false);
-      const sortedData = response.data.sort(
-        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
-      );
-      setAllTweets(sortedData);
+      setAllTweetsLength(response.data.allTweetsLength);
+      setAllTweets((prevTweets) => [
+        ...prevTweets,
+        ...response.data.tweetsToShow,
+      ]);
       setIsLoading(false);
     };
     fetchTweets();
-  }, []);
+  }, [page]);
 
   return (
     <>
@@ -110,7 +117,11 @@ const Home = () => {
                 </h4>
               ) : (
                 <TweetsList
+                  page={page}
+                  setPage={setPage}
+                  hasMore={hasMore}
                   allTweets={allTweets}
+                  allTweetsLength={allTweetsLength}
                   setAllTweets={setAllTweets}
                   windowWidth={windowWidth}
                 />

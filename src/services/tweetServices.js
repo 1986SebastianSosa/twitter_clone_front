@@ -20,11 +20,12 @@ export const postTweet = async (token, tweetInput) => {
   }
 };
 
-export const getAllTweets = async (user, token) => {
+export const getAllTweets = async (user, token, page) => {
   try {
     const response = await axios({
       method: "get",
       url: apiUrl + "/tweet/",
+      params: { page: page },
       headers: { userId: user._id, Authorization: token },
     });
     return response;

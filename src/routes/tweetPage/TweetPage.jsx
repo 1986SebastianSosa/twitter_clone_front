@@ -42,6 +42,7 @@ const TweetPage = () => {
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const [focused, setFocused] = useState(false);
   const [commentInput, setCommentInput] = useState("");
+  const [commentIsLoading, setCommentIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -60,7 +61,6 @@ const TweetPage = () => {
   const handleDeleteTweet = async () => {
     setIsDeleteLoading(true);
     await deleteTweet(tweet._id, token);
-
     return navigate("/home");
   };
 
@@ -96,12 +96,12 @@ const TweetPage = () => {
         setShowErrorMsg(true);
       } else {
         await postComment(commentInput, user._id, tweet._id, token);
-        setIsLoading(true);
+        setCommentIsLoading(true);
         e.preventDefault();
         const fetch = async () => {
           const response = await getOneTweet(id, token);
           setTweet(response.data);
-          setIsLoading(false);
+          setCommentIsLoading(false);
         };
         fetch();
       }
@@ -280,49 +280,53 @@ const TweetPage = () => {
                       </div>
                     </Col>
                   </Row>
-                  <Row className="p-2 my-2 border-top border-bottom">
-                    <Col
-                      xs={2}
-                      className="d-flex justify-content-center align-items-center p-0"
-                    >
-                      <div
-                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
-                          windowWidth < 768 && "avatar"
-                        }`}
+                  {commentIsLoading ? (
+                    <PuffLoader color="#1d9bf0" className="mx-auto my-5" />
+                  ) : (
+                    <Row className="p-2 my-2 border-top border-bottom">
+                      <Col
+                        xs={2}
+                        className="d-flex justify-content-center align-items-center p-0"
                       >
-                        <FontAwesomeIcon
-                          icon={faUser}
-                          className={`${
-                            windowWidth < 768 ? "fa-2x" : "fa-3x"
-                          } text-secondary`}
-                        />
-                      </div>
-                    </Col>
-                    <Col xs={10} className="py-2 my-2">
-                      <div>
-                        <form
-                          onSubmit={handleSubmit}
-                          className="reply-input-form"
+                        <div
+                          className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
+                            windowWidth < 768 && "avatar"
+                          }`}
                         >
-                          <input
-                            name="commentContent"
-                            type="text"
-                            className="border-0 main-input text-muted fs-5"
-                            placeholder="Tweet your reply"
-                            onFocus={handleFocus}
-                            onChange={handleChange}
-                            value={commentInput}
-                            width="100%"
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className={`${
+                              windowWidth < 768 ? "fa-2x" : "fa-3x"
+                            } text-secondary`}
                           />
-                        </form>
-                      </div>
-                      <div className="py-2">
-                        {showErrorMsg && (
-                          <span className="text-danger">{errorMsg}</span>
-                        )}
-                      </div>
-                    </Col>
-                  </Row>
+                        </div>
+                      </Col>
+                      <Col xs={10} className="py-2 my-2">
+                        <div>
+                          <form
+                            onSubmit={handleSubmit}
+                            className="reply-input-form"
+                          >
+                            <input
+                              name="commentContent"
+                              type="text"
+                              className="border-0 main-input text-muted fs-5"
+                              placeholder="Tweet your reply"
+                              onFocus={handleFocus}
+                              onChange={handleChange}
+                              value={commentInput}
+                              width="100%"
+                            />
+                          </form>
+                        </div>
+                        <div className="py-2">
+                          {showErrorMsg && (
+                            <span className="text-danger">{errorMsg}</span>
+                          )}
+                        </div>
+                      </Col>
+                    </Row>
+                  )}
                 </Container>
               </>
             )}

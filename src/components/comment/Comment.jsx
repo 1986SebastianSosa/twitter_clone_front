@@ -36,16 +36,18 @@ const Comment = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentLikes, setCommentLikes] = useState([]);
+  const [isDeleteCommentLoading, setIsDeleteCommentLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const handleShowDeleteModal = () => setShowDeleteModal(true);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
   const handleDeleteComment = async () => {
-    const deleteResponse = await deleteComment(comment._id, token, tweet._id);
+    setIsDeleteCommentLoading(true);
+    await deleteComment(comment._id, token, tweet._id);
     const response = await getOneTweet(tweet._id, token);
     setTweet(response.data);
-    setIsLoading(false);
+    setIsDeleteCommentLoading(false);
     const sortedCommentsArr = tweet.comments.sort((a, b) => {
       return Date.parse(b.createdOn) - Date.parse(a.createdOn);
     });
@@ -194,6 +196,7 @@ const Comment = ({
         showDeleteModal={showDeleteModal}
         handleCloseDeleteModal={handleCloseDeleteModal}
         handleDelete={handleDeleteComment}
+        isDeleteCommentLoading={isDeleteCommentLoading}
       />
     </>
   );

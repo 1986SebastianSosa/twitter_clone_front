@@ -29,7 +29,6 @@ const Home = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const navigate = useNavigate();
-  console.log(allTweetsLength);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -62,7 +61,7 @@ const Home = () => {
 
     const fetchTweets = async () => {
       const response = await getAllTweets(user, token, page);
-      if (!response.data.tweetsToShow.length && !allTweets.length) {
+      if (!response?.data?.tweetsToShow?.length && !allTweets.length) {
         setNoTweets(true);
         setIsLoading(false);
         return;
@@ -103,6 +102,10 @@ const Home = () => {
                     user={user}
                     setAllTweets={setAllTweets}
                     allTweets={allTweets}
+                    page={page}
+                    setNoTweets={setNoTweets}
+                    setHasMore={setHasMore}
+                    setAllTweetsLength={setAllTweetsLength}
                   />
                 </>
               )}

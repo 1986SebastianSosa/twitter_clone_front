@@ -2,6 +2,7 @@ import { Modal, Button } from "react-bootstrap";
 import { PuffLoader } from "react-spinners";
 
 const DeleteModal = ({
+  isDeleteCommentLoading,
   isDeleteLoading,
   showDeleteModal,
   handleCloseDeleteModal,
@@ -15,7 +16,7 @@ const DeleteModal = ({
       backdrop="static"
       keyboard={false}
     >
-      {isDeleteLoading ? (
+      {isDeleteCommentLoading ? (
         <div className="py-5">
           <PuffLoader className="m-auto" color="#1d9bf0" />
           <h6 className="m-auto text-center text-muted pt-3">

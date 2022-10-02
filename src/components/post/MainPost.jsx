@@ -16,7 +16,15 @@ import { PuffLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const MainPost = ({ user, allTweets, setAllTweets }) => {
+const MainPost = ({
+  user,
+  allTweets,
+  setAllTweets,
+  page,
+  setNoTweets,
+  setHasMore,
+  setAllTweetsLength,
+}) => {
   const token = useSelector((state) => state.auth.token);
   const [focused, setFocused] = useState(false);
   const [tweetInput, setTweetInput] = useState("");
@@ -40,19 +48,24 @@ const MainPost = ({ user, allTweets, setAllTweets }) => {
         setErrorMsg("* You need to write something");
         setShowErrorMsg(true);
       } else {
-        const response = await postTweet(token, tweetInput);
         setIsLoading(true);
-        e.preventDefault();
-        const getTweets = async () => {
-          const response = await getAllTweets(user, token);
-          const sortedData = response.data.sort(
-            (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
-          );
-          setAllTweets(sortedData);
+        await postTweet(token, tweetInput);
+        const fetchTweets = async () => {
+          const response = await getAllTweets(user, token, page);
+          if (!response.data.tweetsToShow.length && !allTweets.length) {
+            setNoTweets(true);
+            setIsLoading(false);
+            return;
+          }
+          if (response.data.tweetsToShow.length === 0) {
+            setHasMore(false);
+          }
+          setNoTweets(false);
+          setAllTweetsLength(response.data.allTweetsLength);
+          setAllTweets(response.data.tweetsToShow);
+          setIsLoading(false);
         };
-        getTweets();
-        setTweetInput("");
-        setFocused(false);
+        fetchTweets();
       }
     } catch (error) {
       setErrorMsg("You need to be logged in to write something");

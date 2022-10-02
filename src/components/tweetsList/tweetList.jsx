@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { PuffLoader } from "react-spinners";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MyToast from "../myToast/MyToast";
@@ -12,6 +11,10 @@ const TweetsList = ({
   hasMore,
   windowWidth,
   setPage,
+  page,
+  setNoTweets,
+  setHasMore,
+  setAllTweetsLength,
 }) => {
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const toggleDeleteToast = () => setShowDeleteToast(!showDeleteToast);
@@ -41,6 +44,10 @@ const TweetsList = ({
               key={tweet._id}
               tweet={tweet}
               setAllTweets={setAllTweets}
+              page={page}
+              setNoTweets={setNoTweets}
+              setHasMore={setHasMore}
+              setAllTweetsLength={setAllTweetsLength}
               setShowDeleteToast={setShowDeleteToast}
               windowWidth={windowWidth}
             />

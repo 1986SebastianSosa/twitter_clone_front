@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useSelector } from "react-redux";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 

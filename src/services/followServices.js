@@ -2,7 +2,7 @@ import axios from "axios";
 const apiUrl = process.env.REACT_APP_API_URL;
 
 export const showFollowSuggestions = async (user, token) => {
-  let response = axios({
+  const response = axios({
     method: "get",
     baseURL: apiUrl + "/followers/" + user._id,
     headers: { authorization: token },

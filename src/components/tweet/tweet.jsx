@@ -21,7 +21,16 @@ import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
 import ReactTooltip from "react-tooltip";
 
-const Tweet = ({ tweet, setAllTweets, setShowDeleteToast, windowWidth }) => {
+const Tweet = ({
+  tweet,
+  setAllTweets,
+  page,
+  allTweets,
+  setNoTweets,
+  setHasMore,
+  setShowDeleteToast,
+  windowWidth,
+}) => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const location = useLocation();
@@ -59,14 +68,24 @@ const Tweet = ({ tweet, setAllTweets, setShowDeleteToast, windowWidth }) => {
       return navigate("/home");
     } else {
       try {
-        const response = await getAllTweets(user, token);
-        const sortedData = await response.data.sort(
-          (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
-        );
-        setAllTweets(sortedData);
-        setIsDeleteLoading(false);
-        setShowDeleteModal(false);
-        setShowDeleteToast(true);
+        const fetchTweets = async () => {
+          const response = await getAllTweets(user, token, page);
+          if (!response.data.tweetsToShow.length && !allTweets.length) {
+            setNoTweets(true);
+            setIsLoading(false);
+            return;
+          }
+          if (response.data.tweetsToShow.length === 0) {
+            setHasMore(false);
+          }
+
+          setAllTweets(response.data.tweetsToShow);
+          setIsLoading(false);
+          setIsDeleteLoading(false);
+          setShowDeleteModal(false);
+          setShowDeleteToast(true);
+        };
+        fetchTweets();
       } catch (error) {
         console.log(error);
         navigate("/");

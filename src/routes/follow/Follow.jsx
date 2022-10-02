@@ -25,7 +25,10 @@ const Follow = () => {
     window.scrollTo(0, 0);
     const fetch = async () => {
       const response = await showFollowSuggestions(user, token);
-      setFollowSuggestions(response.data);
+      const sortedFollowSuggestions = response.data.sort(
+        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+      );
+      setFollowSuggestions(sortedFollowSuggestions);
     };
     fetch();
   }, []);

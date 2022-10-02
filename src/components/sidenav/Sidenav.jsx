@@ -75,12 +75,8 @@ const Sidenav = ({ windowWidth }) => {
   return (
     <>
       <nav className="sidenav px-2">
-        <div className="logoDiv">
-          <FontAwesomeIcon
-            icon={faTwitter}
-            className="fa-2xl logo"
-            onClick={homeClickHandler}
-          />
+        <div className="logoDiv" onClick={homeClickHandler}>
+          <FontAwesomeIcon icon={faTwitter} className="fa-2xl logo" />
         </div>
         {sideNavItems.map((item) => {
           return (

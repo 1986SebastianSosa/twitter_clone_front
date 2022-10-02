@@ -64,6 +64,9 @@
 @media (min-width: 1260px) {
   .sidenav .logoDiv {
     justify-content: start;
+    width: 60px;
+    height: 60px;
+    border-radius: 100%;
   }
 
   .sidenav .navItem {

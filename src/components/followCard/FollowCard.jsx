@@ -3,14 +3,21 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSelector } from "react-redux";
 import { followUser, unfollowUser } from "../../services/followServices";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./followCard.css";
 
 const FollowCard = ({ suggestion }) => {
+  // console.log(suggestion);
   const loggedUser = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const [isFollowed, setIsFollowed] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
+
+  useEffect(() => {
+    if (loggedUser.following.includes(suggestion._id)) {
+      setIsFollowed(true);
+    }
+  }, []);
 
   const followHandler = async () => {
     setIsFollowed(true);

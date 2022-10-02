@@ -14,7 +14,6 @@ import "./mainpost.css";
 import { getAllTweets, postTweet } from "./../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 const MainPost = ({
   user,
@@ -31,7 +30,6 @@ const MainPost = ({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
-  const navigate = useNavigate();
 
   const handleFocus = () => {
     setFocused(true);

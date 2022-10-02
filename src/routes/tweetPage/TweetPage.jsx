@@ -1,4 +1,4 @@
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import Sidenav from "../../components/sidenav/Sidenav";
 import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
 import Searchbar from "../../components/searchbar/Searchbar";
@@ -30,7 +30,6 @@ import "./tweetPage.css";
 const TweetPage = () => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
-  const location = useLocation();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);

@@ -11,7 +11,7 @@ import {
   FormControl,
 } from "react-bootstrap";
 import * as Yup from "yup";
-import { loginUser, registerUser } from "../../services/authServices";
+import { registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/authSlice";

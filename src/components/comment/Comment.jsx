@@ -11,11 +11,7 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import {
-  deleteTweet,
-  getAllTweets,
-  getOneTweet,
-} from "../../services/tweetServices";
+import { getOneTweet } from "../../services/tweetServices";
 import { useSelector } from "react-redux";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchCommentLikes, likeComment } from "../../services/likeServices";

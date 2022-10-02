@@ -8,3 +8,11 @@
 .homeContainer {
   /* max-width: 100% !important; */
 }
+
+.tweetMobileBtn {
+  position: fixed;
+  bottom: 5rem;
+  right: 2rem;
+  width: 4rem;
+  height: 4rem;
+}

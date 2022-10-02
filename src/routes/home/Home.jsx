@@ -15,6 +15,9 @@ import "./home.css";
 import { useNavigate } from "react-router-dom";
 import WhoToFollow from "../../components/whoToFollow/WhoToFollow";
 import BotNav from "../../components/botNav/BotNav";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFeather } from "@fortawesome/free-solid-svg-icons";
+import PostModal from "../../components/postModal/PostModal";
 
 const Home = () => {
   const user = useSelector((state) => state.auth.user);
@@ -27,6 +30,7 @@ const Home = () => {
   const [noTweets, setNoTweets] = useState(false);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [showPostModal, setShowPostModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -44,6 +48,13 @@ const Home = () => {
 
   const handleCloseGoFollowModal = () => {
     setShowGoFollowModal(false);
+  };
+
+  const handleShowPostModal = () => {
+    setShowPostModal(true);
+  };
+  const handleClosePostModal = () => {
+    setShowPostModal(false);
   };
 
   useEffect(() => {
@@ -138,17 +149,30 @@ const Home = () => {
               </Col>
             )}
           </Row>
-          {/* {windowWidth < 576 && (
-            <Button className="tweetBtn rounded-circle text-white fw-bold fs-5">
+          {windowWidth < 576 && (
+            <Button
+              className="tweetMobileBtn tweetBtn rounded-circle text-white fw-bold fs-5"
+              onClick={handleShowPostModal}
+            >
               <FontAwesomeIcon icon={faFeather} />
             </Button>
-          )} */}
+          )}
           {windowWidth < 576 && <BotNav />}
         </Container>
       )}
       <GoFollowModal
         handleCloseGoFollowModal={handleCloseGoFollowModal}
         showGoFollowModal={showGoFollowModal}
+      />
+      <PostModal
+        showPostModal={showPostModal}
+        handleClosePostModal={handleClosePostModal}
+        page={page}
+        allTweets={allTweets}
+        setAllTweets={setAllTweets}
+        setNoTweets={setNoTweets}
+        setHasMore={setHasMore}
+        setAllTweetsLength={setAllTweetsLength}
       />
     </>
   );

@@ -94,13 +94,13 @@ const Home = () => {
   return (
     <>
       {user && (
-        <Container className="homeContainer">
+        <Container>
           <Row>
             <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
               <Sidenav windowWidth={windowWidth} />
             </Col>
             <Col
-              xs={11}
+              xs={12}
               sm={10}
               md={9}
               lg={6}

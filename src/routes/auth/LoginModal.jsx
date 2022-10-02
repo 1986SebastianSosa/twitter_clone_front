@@ -17,10 +17,12 @@ import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../redux/authSlice";
 import { useState } from "react";
 import MyToast from "../../components/myToast/MyToast";
+import { PuffLoader } from "react-spinners";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
   const [errMsg, setErrMsg] = useState("");
   const [showErrToast, setShowErrToast] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -42,6 +44,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     },
     validationSchema: LoginSchema,
     onSubmit: async (values) => {
+      setIsLoading(true);
       try {
         const response = await loginUser(values);
         if (response.status !== 200) {
@@ -52,6 +55,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
           dispatch(setCredentials(response.data));
           navigate("/home");
           handleCloseLoginModal();
+          setIsLoading(false);
         }
       } catch (err) {
         console.log(err);
@@ -78,67 +82,72 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
 
   return (
     <>
-      <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
-        <Modal.Dialog className="m-0">
-          <Modal.Header closeButton>
-            <Modal.Title>
-              <FontAwesomeIcon
-                icon={faTwitter}
-                className="twitterLogo fa"
-                color="rgb(29, 155, 240)"
-              />{" "}
-              Login to your account
-            </Modal.Title>
-          </Modal.Header>
+      {isLoading ? (
+        <PuffLoader size={200} color="#1d9bf0" />
+      ) : (
+        <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
+          <Modal.Dialog className="m-0">
+            <Modal.Header closeButton>
+              <Modal.Title>
+                <FontAwesomeIcon
+                  icon={faTwitter}
+                  className="twitterLogo fa"
+                  color="rgb(29, 155, 240)"
+                />{" "}
+                Login to your account
+              </Modal.Title>
+            </Modal.Header>
 
-          <Form noValidate onSubmit={formik.handleSubmit}>
-            <Modal.Body>
-              {inputFields.map((field) => {
-                return (
-                  <FormGroup
-                    key={field.id}
-                    controlId={field.name}
-                    className="mb-4"
-                  >
-                    <FormLabel>{field.label}</FormLabel>
-                    <FormControl
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      value={formik.values[field.name]}
-                      onChange={formik.handleChange}
-                    />
-                    {formik.errors[field.name] && formik.touched[field.name] ? (
-                      <div>
-                        <p className="text-danger">
-                          <FontAwesomeIcon
-                            icon={faCircleExclamation}
-                            className="me-1"
-                          />
-                          {formik.errors[field.name]}
-                        </p>
-                      </div>
-                    ) : null}
-                  </FormGroup>
-                );
-              })}
-              <MyToast
-                show={showErrToast}
-                content={errMsg}
-                onClose={handleCloseToast}
-              />
-            </Modal.Body>
+            <Form noValidate onSubmit={formik.handleSubmit}>
+              <Modal.Body>
+                {inputFields.map((field) => {
+                  return (
+                    <FormGroup
+                      key={field.id}
+                      controlId={field.name}
+                      className="mb-4"
+                    >
+                      <FormLabel>{field.label}</FormLabel>
+                      <FormControl
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        value={formik.values[field.name]}
+                        onChange={formik.handleChange}
+                      />
+                      {formik.errors[field.name] &&
+                      formik.touched[field.name] ? (
+                        <div>
+                          <p className="text-danger">
+                            <FontAwesomeIcon
+                              icon={faCircleExclamation}
+                              className="me-1"
+                            />
+                            {formik.errors[field.name]}
+                          </p>
+                        </div>
+                      ) : null}
+                    </FormGroup>
+                  );
+                })}
+                <MyToast
+                  show={showErrToast}
+                  content={errMsg}
+                  onClose={handleCloseToast}
+                />
+              </Modal.Body>
 
-            <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseLoginModal}>
-                Close
-              </Button>
-              <Button variant="primary" type="submit" className="text-white">
-                Login
-              </Button>
-            </Modal.Footer>
-          </Form>
-        </Modal.Dialog>
-      </Modal>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseLoginModal}>
+                  Close
+                </Button>
+                <Button variant="primary" type="submit" className="text-white">
+                  Login
+                </Button>
+              </Modal.Footer>
+            </Form>
+          </Modal.Dialog>
+        </Modal>
+      )}
     </>
   );
 };

@@ -15,8 +15,11 @@ import { loginUser, registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/authSlice";
+import { useState } from "react";
+import { PuffLoader } from "react-spinners";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const SignupSchema = Yup.object().shape({
     firstname: Yup.string()
@@ -54,11 +57,13 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     },
     validationSchema: SignupSchema,
     onSubmit: async (values) => {
+      setIsLoading(true);
       const result = await registerUser(values);
       if (result.data) {
         console.log("result.data: ", result.data);
         dispatch(setCredentials(result.data));
         handleCloseRegisterModal();
+        setIsLoading(false);
         navigate("/home");
       }
     },
@@ -110,62 +115,69 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
   ];
 
   return (
-    <Modal show={showRegisterModal} onHide={handleCloseRegisterModal}>
-      <Modal.Dialog className="m-0">
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <FontAwesomeIcon
-              icon={faTwitter}
-              className="twitterLogo fa"
-              color="rgb(29, 155, 240)"
-            />{" "}
-            Create your account
-          </Modal.Title>
-        </Modal.Header>
+    <>
+      {isLoading ? (
+        <PuffLoader size={200} color="#1d9bf0" />
+      ) : (
+        <Modal show={showRegisterModal} onHide={handleCloseRegisterModal}>
+          <Modal.Dialog className="m-0">
+            <Modal.Header closeButton>
+              <Modal.Title>
+                <FontAwesomeIcon
+                  icon={faTwitter}
+                  className="twitterLogo fa"
+                  color="rgb(29, 155, 240)"
+                />{" "}
+                Create your account
+              </Modal.Title>
+            </Modal.Header>
 
-        <Form noValidate onSubmit={formik.handleSubmit}>
-          <Modal.Body>
-            {inputFields.map((field) => {
-              return (
-                <FormGroup
-                  key={field.id}
-                  controlId={field.name}
-                  className="mb-4"
-                >
-                  <FormLabel>{field.label}</FormLabel>
-                  <FormControl
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    value={formik.values[field.name]}
-                    onChange={formik.handleChange}
-                  />
-                  {formik.errors[field.name] && formik.touched[field.name] ? (
-                    <div>
-                      <p className="text-danger">
-                        <FontAwesomeIcon
-                          icon={faCircleExclamation}
-                          className="me-1"
-                        />
-                        {formik.errors[field.name]}
-                      </p>
-                    </div>
-                  ) : null}
-                </FormGroup>
-              );
-            })}
-          </Modal.Body>
+            <Form noValidate onSubmit={formik.handleSubmit}>
+              <Modal.Body>
+                {inputFields.map((field) => {
+                  return (
+                    <FormGroup
+                      key={field.id}
+                      controlId={field.name}
+                      className="mb-4"
+                    >
+                      <FormLabel>{field.label}</FormLabel>
+                      <FormControl
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        value={formik.values[field.name]}
+                        onChange={formik.handleChange}
+                      />
+                      {formik.errors[field.name] &&
+                      formik.touched[field.name] ? (
+                        <div>
+                          <p className="text-danger">
+                            <FontAwesomeIcon
+                              icon={faCircleExclamation}
+                              className="me-1"
+                            />
+                            {formik.errors[field.name]}
+                          </p>
+                        </div>
+                      ) : null}
+                    </FormGroup>
+                  );
+                })}
+              </Modal.Body>
 
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseRegisterModal}>
-              Close
-            </Button>
-            <Button variant="primary" type="submit" className="text-white">
-              Create account
-            </Button>
-          </Modal.Footer>
-        </Form>
-      </Modal.Dialog>
-    </Modal>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleCloseRegisterModal}>
+                  Close
+                </Button>
+                <Button variant="primary" type="submit" className="text-white">
+                  Create account
+                </Button>
+              </Modal.Footer>
+            </Form>
+          </Modal.Dialog>
+        </Modal>
+      )}
+    </>
   );
 }
 

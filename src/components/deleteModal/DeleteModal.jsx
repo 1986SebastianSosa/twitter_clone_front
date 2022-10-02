@@ -16,7 +16,7 @@ const DeleteModal = ({
       backdrop="static"
       keyboard={false}
     >
-      {isDeleteCommentLoading ? (
+      {isDeleteCommentLoading || isDeleteLoading ? (
         <div className="py-5">
           <PuffLoader className="m-auto" color="#1d9bf0" />
           <h6 className="m-auto text-center text-muted pt-3">

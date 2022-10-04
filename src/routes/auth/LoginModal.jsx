@@ -20,15 +20,11 @@ import MyToast from "../../components/myToast/MyToast";
 import { PuffLoader } from "react-spinners";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
+  const [error, setError] = useState(false);
   const [errMsg, setErrMsg] = useState("");
-  const [showErrToast, setShowErrToast] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const handleCloseToast = () => {
-    setShowErrToast(false);
-  };
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
@@ -47,9 +43,13 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       setIsLoading(true);
       try {
         const response = await loginUser(values);
-        if (response.status !== 200) {
+        if (!response.response.status) {
+          setIsLoading(false);
+          setErrMsg("No server response");
+          setError(true);
+        } else if (response.status !== 200) {
           setErrMsg(response.response.data.msg);
-          setShowErrToast(true);
+          setError(true);
         }
         if (Object.entries(response).length > 0) {
           dispatch(setCredentials(response.data));
@@ -82,10 +82,18 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
 
   return (
     <>
-      {isLoading ? (
-        <PuffLoader size={200} color="#1d9bf0" />
-      ) : (
-        <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
+      <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
+        {isLoading ? (
+          <PuffLoader size={200} color="#1d9bf0" className="m-auto my-5" />
+        ) : error ? (
+          <div className="m-auto my-5">
+            <MyToast
+              show={error}
+              content={errMsg}
+              onClose={() => setError(false)}
+            />
+          </div>
+        ) : (
           <Modal.Dialog className="m-0">
             <Modal.Header closeButton>
               <Modal.Title>
@@ -129,11 +137,6 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
                     </FormGroup>
                   );
                 })}
-                <MyToast
-                  show={showErrToast}
-                  content={errMsg}
-                  onClose={handleCloseToast}
-                />
               </Modal.Body>
 
               <Modal.Footer>
@@ -146,8 +149,8 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
               </Modal.Footer>
             </Form>
           </Modal.Dialog>
-        </Modal>
-      )}
+        )}
+      </Modal>
     </>
   );
 };

@@ -17,10 +17,15 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/authSlice";
 import { useState } from "react";
 import { PuffLoader } from "react-spinners";
+import MyToast from "./../../components/myToast/MyToast";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const SignupSchema = Yup.object().shape({
     firstname: Yup.string()
       .min(2, "Too Short!")
@@ -44,8 +49,6 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     email: Yup.string().email("Invalid email").required("Required"),
   });
 
-  const navigate = useNavigate();
-
   const formik = useFormik({
     initialValues: {
       firstname: "",
@@ -58,9 +61,20 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     validationSchema: SignupSchema,
     onSubmit: async (values) => {
       setIsLoading(true);
-      const result = await registerUser(values);
-      if (result.data) {
-        dispatch(setCredentials(result.data));
+      const response = await registerUser(values);
+      console.log(response);
+      if (!response) {
+        setIsLoading(false);
+        setErrorMsg("No server response");
+        setError(true);
+      } else if (response.response?.status === 409) {
+        setIsLoading(false);
+        setErrorMsg(response.response.data.msj);
+        setError(true);
+      }
+
+      if (response.data) {
+        dispatch(setCredentials(response.data));
         handleCloseRegisterModal();
         setIsLoading(false);
         navigate("/home");
@@ -115,10 +129,18 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
 
   return (
     <>
-      {isLoading ? (
-        <PuffLoader size={200} color="#1d9bf0" />
-      ) : (
-        <Modal show={showRegisterModal} onHide={handleCloseRegisterModal}>
+      <Modal show={showRegisterModal} onHide={handleCloseRegisterModal}>
+        {isLoading ? (
+          <PuffLoader size={200} color="#1d9bf0" className="m-auto" />
+        ) : error ? (
+          <div className="m-auto py-5">
+            <MyToast
+              show={error}
+              onClose={() => setError(false)}
+              content={errorMsg}
+            />
+          </div>
+        ) : (
           <Modal.Dialog className="m-0">
             <Modal.Header closeButton>
               <Modal.Title>
@@ -174,8 +196,8 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
               </Modal.Footer>
             </Form>
           </Modal.Dialog>
-        </Modal>
-      )}
+        )}
+      </Modal>
     </>
   );
 }

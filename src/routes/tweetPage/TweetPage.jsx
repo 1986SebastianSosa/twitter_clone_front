@@ -3,7 +3,7 @@ import Sidenav from "../../components/sidenav/Sidenav";
 import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
 import Searchbar from "../../components/searchbar/Searchbar";
 import Topnav from "../../components/topnav/Topnav";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import { deleteTweet, getOneTweet } from "../../services/tweetServices";
 import { useState } from "react";
@@ -21,8 +21,8 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart, faMessage } from "@fortawesome/free-regular-svg-icons";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
-import DeleteModal from "../../components/deleteModal/DeleteModal";
 import { postComment } from "../../services/commentServices";
+import DeleteModal from "../../components/deleteModal/DeleteModal";
 import BotNav from "../../components/botNav/BotNav";
 import ReactTooltip from "react-tooltip";
 import "./tweetPage.css";

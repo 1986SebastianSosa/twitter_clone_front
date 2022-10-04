@@ -1,3 +1,5 @@
+This is a Twitter clone using the MERN Stack (MongoDB - Express.js - React.js - Node.js)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

@@ -60,24 +60,27 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     },
     validationSchema: SignupSchema,
     onSubmit: async (values) => {
-      setIsLoading(true);
-      const response = await registerUser(values);
-      console.log(response);
-      if (!response) {
-        setIsLoading(false);
-        setErrorMsg("No server response");
-        setError(true);
-      } else if (response.response?.status === 409) {
-        setIsLoading(false);
-        setErrorMsg(response.response.data.msj);
-        setError(true);
-      }
+      try {
+        setIsLoading(true);
+        const response = await registerUser(values);
+        if (!response.response.status) {
+          setIsLoading(false);
+          setErrorMsg("No server response");
+          setError(true);
+        } else if (response.response?.status === 409) {
+          setIsLoading(false);
+          setErrorMsg(response.response.data.msj);
+          setError(true);
+        }
 
-      if (response.data) {
-        dispatch(setCredentials(response.data));
-        handleCloseRegisterModal();
-        setIsLoading(false);
-        navigate("/home");
+        if (response.data) {
+          dispatch(setCredentials(response.data));
+          handleCloseRegisterModal();
+          setIsLoading(false);
+          navigate("/home");
+        }
+      } catch (error) {
+        console.log(error);
       }
     },
   });

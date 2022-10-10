@@ -43,7 +43,8 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       setIsLoading(true);
       try {
         const response = await loginUser(values);
-        if (!response.response.status) {
+        console.log(response);
+        if (!response.status) {
           setIsLoading(false);
           setErrMsg("No server response");
           setError(true);
@@ -59,6 +60,8 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
         }
       } catch (err) {
         console.log(err);
+        setErrMsg(err);
+        setError(true);
       }
     },
   });

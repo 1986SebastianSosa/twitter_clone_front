@@ -63,11 +63,11 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
       try {
         setIsLoading(true);
         const response = await registerUser(values);
-        if (!response.response.status) {
+        if (!response.status) {
           setIsLoading(false);
           setErrorMsg("No server response");
           setError(true);
-        } else if (response.response?.status === 409) {
+        } else if (response?.status === 409) {
           setIsLoading(false);
           setErrorMsg(response.response.data.msj);
           setError(true);

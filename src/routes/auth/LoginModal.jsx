@@ -43,16 +43,17 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       setIsLoading(true);
       try {
         const response = await loginUser(values);
-        console.log(response);
-        if (!response.status) {
+
+        if (response.response.status === 0) {
+          console.log("entre");
           setIsLoading(false);
           setErrMsg("No server response");
           setError(true);
-        } else if (response.status !== 200) {
-          setErrMsg(response.data.msg);
+        } else if (response.response.status === 401) {
+          setErrMsg(response.response.data.msg);
           setError(true);
+          setIsLoading(false);
         } else if (response.status === 200) {
-          console.log(response.data);
           dispatch(setCredentials(response.data));
           navigate("/home");
           handleCloseLoginModal();
@@ -60,9 +61,6 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
         }
       } catch (err) {
         console.log(err);
-        setErrMsg(err);
-        setError(true);
-        setIsLoading(false);
       }
     },
   });

@@ -44,13 +44,12 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       try {
         const response = await loginUser(values);
 
-        if (response.response.status === 0) {
-          console.log("entre");
+        if (response.response?.status === 0) {
           setIsLoading(false);
           setErrMsg("No server response");
           setError(true);
-        } else if (response.response.status === 401) {
-          setErrMsg(response.response.data.msg);
+        } else if (response.response?.status === 401) {
+          setErrMsg(response.response?.data?.msg);
           setError(true);
           setIsLoading(false);
         } else if (response.status === 200) {

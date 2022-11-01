@@ -49,10 +49,10 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
           setErrMsg("No server response");
           setError(true);
         } else if (response.status !== 200) {
-          setErrMsg(response.response.data.msg);
+          setErrMsg(response.data.msg);
           setError(true);
-        }
-        if (Object.entries(response).length > 0) {
+        } else if (response.status === 200) {
+          console.log(response.data);
           dispatch(setCredentials(response.data));
           navigate("/home");
           handleCloseLoginModal();
@@ -62,6 +62,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
         console.log(err);
         setErrMsg(err);
         setError(true);
+        setIsLoading(false);
       }
     },
   });

@@ -19,22 +19,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import PostModal from "../../components/postModal/PostModal";
 import { selectCurrentToken, selectCurrentUser } from "./../../redux/authSlice";
+import { useFetchTweetsQuery } from "../../redux/tweetsApiSlice";
 
 const Home = () => {
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectCurrentToken);
-  const [allTweets, setAllTweets] = useState([]);
+  // const [allTweets, setAllTweets] = useState([]);
   const [allTweetsLength, setAllTweetsLength] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [noTweets, setNoTweets] = useState(false);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [noTweets, setNoTweets] = useState(false);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showPostModal, setShowPostModal] = useState(false);
+  const {
+    data: allTweets,
+    isLoading,
+    isSuccess,
+    error,
+  } = useFetchTweetsQuery(page);
 
   const navigate = useNavigate();
-  console.log(user, token);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -117,10 +123,10 @@ const Home = () => {
                   <Topnav title="Home" />
                   <MainPost
                     user={user}
-                    setAllTweets={setAllTweets}
+                    // setAllTweets={setAllTweets}
                     allTweets={allTweets}
                     page={page}
-                    setNoTweets={setNoTweets}
+                    // setNoTweets={setNoTweets}
                     setHasMore={setHasMore}
                     setAllTweetsLength={setAllTweetsLength}
                   />
@@ -131,7 +137,7 @@ const Home = () => {
                 <div className="loading">
                   <PuffLoader size={200} color="#1d9bf0" />
                 </div>
-              ) : noTweets ? (
+              ) : !allTweets?.length ? (
                 <h4 className="p-2 mt-5 text-muted">
                   Sorry, there are no tweets to show at this moment :({" "}
                 </h4>
@@ -142,7 +148,7 @@ const Home = () => {
                   hasMore={hasMore}
                   allTweets={allTweets}
                   allTweetsLength={allTweetsLength}
-                  setAllTweets={setAllTweets}
+                  // setAllTweets={setAllTweets}
                   windowWidth={windowWidth}
                 />
               )}
@@ -175,8 +181,8 @@ const Home = () => {
         handleClosePostModal={handleClosePostModal}
         page={page}
         allTweets={allTweets}
-        setAllTweets={setAllTweets}
-        setNoTweets={setNoTweets}
+        // setAllTweets={setAllTweets}
+        // setNoTweets={setNoTweets}
         setHasMore={setHasMore}
         setAllTweetsLength={setAllTweetsLength}
       />

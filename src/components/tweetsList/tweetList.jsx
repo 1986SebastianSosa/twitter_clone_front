@@ -4,9 +4,11 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import MyToast from "../myToast/MyToast";
 import Tweet from "../tweet/tweet";
 import "./tweetList.css";
+import { selectAllTweets } from "../../redux/tweetsSlice";
+import { useSelector } from "react-redux";
 
 const TweetsList = ({
-  allTweets,
+  // allTweets,
   setAllTweets,
   hasMore,
   windowWidth,
@@ -16,6 +18,7 @@ const TweetsList = ({
   setHasMore,
   setAllTweetsLength,
 }) => {
+  const allTweets = useSelector(selectAllTweets);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const toggleDeleteToast = () => setShowDeleteToast(!showDeleteToast);
 

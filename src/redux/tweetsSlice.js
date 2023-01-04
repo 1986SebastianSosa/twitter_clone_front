@@ -19,5 +19,7 @@ export const tweetsSlice = createSlice({
 
 export const { setTweets } = tweetsSlice.actions;
 export const selectAllTweets = (state) => state.tweetsToShow;
+export const selectAllTweetsLength = (state) => state.allTweetsLength;
+export const selectHasMore = (state) => state.hasMore;
 
 export default tweetsSlice.reducer;

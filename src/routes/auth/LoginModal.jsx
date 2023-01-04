@@ -16,17 +16,17 @@ import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../redux/authSlice";
 import MyToast from "../../components/myToast/MyToast";
 import { PuffLoader } from "react-spinners";
-import { useLoginMutation } from "../../redux/authApi";
 import { useState } from "react";
+import { useLoginMutation } from "../../redux/authApiSlice";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
   const [showToast, setShowToast] = useState(false);
+  const [login, response] = useLoginMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [login, response] = useLoginMutation();
 
   const toggleCloseToast = () => {
-    setShowToast(!showToast);
+    setShowToast(false);
   };
 
   const LoginSchema = Yup.object().shape({
@@ -44,20 +44,15 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     validationSchema: LoginSchema,
     onSubmit: async (values) => {
       try {
-        const data = await login(values).unwrap();
-
-        if (data.user) {
-          await dispatch(
-            setCredentials({ user: data.user, token: data.token })
-          );
-          navigate("/home");
-        }
+        const results = await login(values).unwrap();
+        dispatch(setCredentials(results));
+        navigate("/home");
       } catch (err) {
         setShowToast(true);
       }
-      // if (response.isSuccess) {
-      //   navigate("/home");
-      // }
+      if (response.isSuccess) {
+        navigate("/home");
+      }
       //   setIsLoading(true);
       //   try {
       //     const response = await loginUser(values);
@@ -108,7 +103,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
             <MyToast
               show={showToast}
               close={toggleCloseToast}
-              content={response?.error?.error}
+              content={response?.error?.data?.msg || response?.error?.error}
             />
           </div>
         ) : (

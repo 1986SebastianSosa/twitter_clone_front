@@ -18,11 +18,11 @@ import BotNav from "../../components/botNav/BotNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import PostModal from "../../components/postModal/PostModal";
+import { selectCurrentToken, selectCurrentUser } from "./../../redux/authSlice";
 
 const Home = () => {
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
-  const state = useSelector((state) => state);
+  const user = useSelector(selectCurrentUser);
+  const token = useSelector(selectCurrentToken);
   const [allTweets, setAllTweets] = useState([]);
   const [allTweetsLength, setAllTweetsLength] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -34,6 +34,7 @@ const Home = () => {
   const [showPostModal, setShowPostModal] = useState(false);
 
   const navigate = useNavigate();
+  console.log(user, token);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,37 +60,41 @@ const Home = () => {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!token) {
       return navigate("/");
     }
-    const fetchUser = async (userId) => {
-      const response = await getUser(userId);
-      if (response?.data?.following?.length <= 1) {
-        handleShowGoFollowModal();
-      }
-    };
+    if (user.following.length <= 1) {
+      handleShowGoFollowModal();
+    }
+    // const fetchUser = async (userId) => {
+    //   const response = await getUser(userId);
+    //   if (response?.data?.following?.length <= 1) {
+    //     handleShowGoFollowModal();
+    //   }
+    // };
 
-    fetchUser(user._id);
+    // fetchUser(user._id);
 
-    const fetchTweets = async () => {
-      const response = await getAllTweets(user, token, page);
-      if (!response?.data?.tweetsToShow?.length && !allTweets.length) {
-        setNoTweets(true);
-        setIsLoading(false);
-        return;
-      }
-      if (response.data.tweetsToShow.length === 0) {
-        setHasMore(false);
-      }
-      setNoTweets(false);
-      setAllTweetsLength(response.data.allTweetsLength);
-      setAllTweets((prevTweets) => [
-        ...prevTweets,
-        ...response.data.tweetsToShow,
-      ]);
-      setIsLoading(false);
-    };
-    fetchTweets();
+    // const fetchTweets = async () => {
+    //   const response = await getAllTweets(user, token, page);
+    //   if (!response?.data?.tweetsToShow?.length && !allTweets.length) {
+    //     setNoTweets(true);
+    //     setIsLoading(false);
+    //     return;
+    //   }
+    //   if (response.data.tweetsToShow.length === 0) {
+    //     setHasMore(false);
+    //   }
+    //   setNoTweets(false);
+    //   setAllTweetsLength(response.data.allTweetsLength);
+    //   setAllTweets((prevTweets) => [
+    //     ...prevTweets,
+    //     ...response.data.tweetsToShow,
+    //   ]);
+    //   setIsLoading(false);
+    // };
+
+    // fetchTweets();
   }, [page]);
 
   return (

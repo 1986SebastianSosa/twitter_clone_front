@@ -18,13 +18,18 @@ import { setCredentials } from "../../redux/authSlice";
 import { useState } from "react";
 import { PuffLoader } from "react-spinners";
 import MyToast from "./../../components/myToast/MyToast";
+import { useRegisterMutation } from "../../redux/authApiSlice";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState(false);
+  // const [errorMsg, setErrorMsg] = useState("");
+  const [showToast, setShowToast] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [register, response] = useRegisterMutation();
+
+  const toggleCloseToast = () => setShowToast(false);
 
   const SignupSchema = Yup.object().shape({
     firstname: Yup.string()
@@ -61,27 +66,38 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     validationSchema: SignupSchema,
     onSubmit: async (values) => {
       try {
-        setIsLoading(true);
-        const response = await registerUser(values);
-        if (!response.status) {
-          setIsLoading(false);
-          setErrorMsg("No server response");
-          setError(true);
-        } else if (response?.status === 409) {
-          setIsLoading(false);
-          setErrorMsg(response.response.data.msj);
-          setError(true);
+        const result = await register(values).unwrap();
+        if (response.isError) {
+          setShowToast(true);
         }
 
-        if (response.data) {
-          dispatch(setCredentials(response.data));
-          handleCloseRegisterModal();
-          setIsLoading(false);
-          navigate("/home");
-        }
-      } catch (error) {
-        console.log(error);
+        dispatch(setCredentials(result));
+        handleCloseRegisterModal();
+        navigate("/home");
+      } catch (err) {
+        setShowToast(true);
       }
+      // try {
+      //   setIsLoading(true);
+      //   const response = await registerUser(values);
+      //   if (!response.status) {
+      //     setIsLoading(false);
+      //     setErrorMsg("No server response");
+      //     setError(true);
+      //   } else if (response?.status === 409) {
+      //     setIsLoading(false);
+      //     setErrorMsg(response.response.data.msj);
+      //     setError(true);
+      //   }
+      //   if (response.data) {
+      //     dispatch(setCredentials(response.data));
+      //     handleCloseRegisterModal();
+      //     setIsLoading(false);
+      //     navigate("/home");
+      //   }
+      // } catch (error) {
+      //   console.log(error);
+      // }
     },
   });
 
@@ -133,14 +149,14 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
   return (
     <>
       <Modal show={showRegisterModal} onHide={handleCloseRegisterModal}>
-        {isLoading ? (
-          <PuffLoader size={200} color="#1d9bf0" className="m-auto" />
-        ) : error ? (
+        {response.isLoading ? (
+          <PuffLoader size={200} color="#1d9bf0" className="m-auto my-5" />
+        ) : showToast ? (
           <div className="m-auto py-5">
             <MyToast
-              show={error}
-              onClose={() => setError(false)}
-              content={errorMsg}
+              show={showToast}
+              close={toggleCloseToast}
+              content={response?.error?.data?.msg || response?.error?.error}
             />
           </div>
         ) : (

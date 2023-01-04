@@ -22,6 +22,7 @@ import PostModal from "../../components/postModal/PostModal";
 const Home = () => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
+  const state = useSelector((state) => state);
   const [allTweets, setAllTweets] = useState([]);
   const [allTweetsLength, setAllTweetsLength] = useState(0);
   const [hasMore, setHasMore] = useState(true);

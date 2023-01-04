@@ -11,20 +11,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import * as Yup from "yup";
-import { loginUser } from "../../services/authServices";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../redux/authSlice";
-import { useState } from "react";
 import MyToast from "../../components/myToast/MyToast";
 import { PuffLoader } from "react-spinners";
+import { useLoginMutation } from "../../redux/authApi";
+import { useState } from "react";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
-  const [error, setError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [login, response] = useLoginMutation();
+
+  const toggleCloseToast = () => {
+    setShowToast(!showToast);
+  };
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
@@ -40,27 +43,41 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     },
     validationSchema: LoginSchema,
     onSubmit: async (values) => {
-      setIsLoading(true);
       try {
-        const response = await loginUser(values);
+        const data = await login(values).unwrap();
 
-        if (response.response?.status === 0) {
-          setIsLoading(false);
-          setErrMsg("No server response");
-          setError(true);
-        } else if (response.response?.status === 401) {
-          setErrMsg(response.response?.data?.msg);
-          setError(true);
-          setIsLoading(false);
-        } else if (response.status === 200) {
-          dispatch(setCredentials(response.data));
+        if (data.user) {
+          await dispatch(
+            setCredentials({ user: data.user, token: data.token })
+          );
           navigate("/home");
-          handleCloseLoginModal();
-          setIsLoading(false);
         }
       } catch (err) {
-        console.log(err);
+        setShowToast(true);
       }
+      // if (response.isSuccess) {
+      //   navigate("/home");
+      // }
+      //   setIsLoading(true);
+      //   try {
+      //     const response = await loginUser(values);
+      //     if (response.response?.status === 0) {
+      //       setIsLoading(false);
+      //       setErrMsg("No server response");
+      //       setError(true);
+      //     } else if (response.response?.status === 401) {
+      //       setErrMsg(response.response?.data?.msg);
+      //       setError(true);
+      //       setIsLoading(false);
+      //     } else if (response.status === 200) {
+      //       dispatch(setCredentials(response.data));
+      //       navigate("/home");
+      //       handleCloseLoginModal();
+      //       setIsLoading(false);
+      //     }
+      //   } catch (err) {
+      //     console.log(err);
+      //   }
     },
   });
 
@@ -84,14 +101,14 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
   return (
     <>
       <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
-        {isLoading ? (
+        {response.isLoading ? (
           <PuffLoader size={200} color="#1d9bf0" className="m-auto my-5" />
-        ) : error ? (
+        ) : showToast ? (
           <div className="m-auto my-5">
             <MyToast
-              show={error}
-              content={errMsg}
-              onClose={() => setError(false)}
+              show={showToast}
+              close={toggleCloseToast}
+              content={response?.error?.error}
             />
           </div>
         ) : (

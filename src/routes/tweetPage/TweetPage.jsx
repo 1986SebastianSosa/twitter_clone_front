@@ -34,10 +34,8 @@ const TweetPage = () => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
-  const [tweet, setTweet] = useState({});
   const [tweetLikes, setTweetLikes] = useState([]);
   const [comments, setComments] = useState([]);
-  // const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -49,7 +47,7 @@ const TweetPage = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
   let { id } = useParams();
-  const { data, isLoading, isSuccess, error } = useFetchOneTweetQuery();
+  const { data: tweet, isLoading } = useFetchOneTweetQuery(id);
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -101,7 +99,7 @@ const TweetPage = () => {
         e.preventDefault();
         const fetch = async () => {
           const response = await getOneTweet(id, token);
-          setTweet(response.data);
+          // setTweet(response.data);
           setCommentIsLoading(false);
         };
         fetch();
@@ -338,7 +336,7 @@ const TweetPage = () => {
                 {comments.map((comment) => (
                   <Comment
                     tweet={tweet}
-                    setTweet={setTweet}
+                    // setTweet={setTweet}
                     key={comment._id}
                     comment={comment}
                     setComments={setComments}

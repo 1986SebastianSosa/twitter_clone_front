@@ -11,8 +11,8 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { deleteTweet, getAllTweets } from "../../services/tweetServices";
-import { useSelector } from "react-redux";
+import { getAllTweets } from "../../services/tweetServices";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
@@ -20,6 +20,8 @@ import { PuffLoader } from "react-spinners";
 import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
 import ReactTooltip from "react-tooltip";
+import { useDeleteTweetMutation } from "../../redux/tweetsApiSlice";
+import { setTweets } from "../../redux/tweetsSlice";
 
 const Tweet = ({
   tweet,
@@ -43,6 +45,8 @@ const Tweet = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [deleteTweet, response] = useDeleteTweetMutation(tweet.id);
+  const dispatch = useDispatch();
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -62,35 +66,36 @@ const Tweet = ({
   };
 
   const handleDeleteTweet = async () => {
-    setIsDeleteLoading(true);
-    await deleteTweet(updatedTweet._id, token);
-    if (location.pathname.split("/")[1] === "tweet") {
-      return navigate("/home");
-    } else {
-      try {
-        const fetchTweets = async () => {
-          const response = await getAllTweets(user, token, page);
-          if (!response.data.tweetsToShow.length && !allTweets.length) {
-            setNoTweets(true);
-            setIsLoading(false);
-            return;
-          }
-          if (response.data.tweetsToShow.length === 0) {
-            setHasMore(false);
-          }
+    await deleteTweet(tweet._id);
+    dispatch(setTweets({ tweetsToShow: [], hasMore: false }));
+    // setIsDeleteLoading(true);
+    // if (location.pathname.split("/")[1] === "tweet") {
+    //   return navigate("/home");
+    // } else {
+    //   try {
+    //     const fetchTweets = async () => {
+    //       const response = await getAllTweets(user, token, page);
+    //       if (!response.data.tweetsToShow.length && !allTweets.length) {
+    //         setNoTweets(true);
+    //         setIsLoading(false);
+    //         return;
+    //       }
+    //       if (response.data.tweetsToShow.length === 0) {
+    //         setHasMore(false);
+    //       }
 
-          setAllTweets(response.data.tweetsToShow);
-          setIsLoading(false);
-          setIsDeleteLoading(false);
-          setShowDeleteModal(false);
-          setShowDeleteToast(true);
-        };
-        fetchTweets();
-      } catch (error) {
-        console.log(error);
-        navigate("/");
-      }
-    }
+    //       setAllTweets(response.data.tweetsToShow);
+    //       setIsLoading(false);
+    //       setIsDeleteLoading(false);
+    //       setShowDeleteModal(false);
+    //       setShowDeleteToast(true);
+    //     };
+    //     fetchTweets();
+    //   } catch (error) {
+    //     console.log(error);
+    //     navigate("/");
+    //   }
+    // }
   };
 
   const handleLike = async (e) => {

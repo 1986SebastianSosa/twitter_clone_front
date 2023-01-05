@@ -12,17 +12,21 @@ import {
   REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import thunk from "redux-thunk";
 import authReducer from "../redux/authSlice";
+import appReducer from "../redux/appSlice";
+import tweetsReducer from "../redux/tweetsSlice";
 
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: "auth",
 };
 
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   auth: authReducer,
+  tweets: tweetsReducer,
+  app: appReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

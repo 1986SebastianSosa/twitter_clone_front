@@ -14,57 +14,69 @@ import "./mainpost.css";
 import { getAllTweets, postTweet } from "./../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
 import { useSelector } from "react-redux";
+import {
+  useFetchTweetsQuery,
+  usePostTweetMutation,
+} from "../../redux/tweetsApiSlice";
+import { apiSlice } from "../../app/api/apiSlice";
+import { useFormik } from "formik";
+import { selectpage } from "../../redux/appSlice";
 
 const MainPost = ({
   user,
   allTweets,
   setAllTweets,
-  page,
   setNoTweets,
   setHasMore,
   setAllTweetsLength,
 }) => {
   const token = useSelector((state) => state.auth.token);
+  const page = useSelector(selectpage);
   const [focused, setFocused] = useState(false);
-  const [tweetInput, setTweetInput] = useState("");
+  const [tweetContent, setTweetContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
+
+  const [postTweet, response] = usePostTweetMutation();
+  const { refetch } = useFetchTweetsQuery(page);
 
   const handleFocus = () => {
     setFocused(true);
   };
 
   const handleChange = (e) => {
-    setTweetInput(e.target.value);
+    setTweetContent(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!tweetInput.length) {
+      if (!tweetContent.length) {
         setErrorMsg("* You need to write something");
         setShowErrorMsg(true);
       } else {
-        setIsLoading(true);
-        await postTweet(token, tweetInput);
-        setTweetInput("");
-        const fetchTweets = async () => {
-          const response = await getAllTweets(user, token, page);
-          if (!response.data.tweetsToShow.length && !allTweets.length) {
-            setNoTweets(true);
-            setIsLoading(false);
-            return;
-          }
-          if (response.data.tweetsToShow.length === 0) {
-            setHasMore(false);
-          }
-          setNoTweets(false);
-          setAllTweetsLength(response.data.allTweetsLength);
-          setAllTweets(response.data.tweetsToShow);
-          setIsLoading(false);
-        };
-        fetchTweets();
+        await postTweet({ tweetContent, createdOn: new Date() });
+        refetch(page);
+        // setIsLoading(true);
+        // await postTweet(token, tweetContent);
+        // setTweetContent("");
+        // const fetchTweets = async () => {
+        //   const response = await getAllTweets(user, token, page);
+        //   if (!response.data.tweetsToShow.length && !allTweets.length) {
+        //     setNoTweets(true);
+        //     setIsLoading(false);
+        //     return;
+        //   }
+        //   if (response.data.tweetsToShow.length === 0) {
+        //     setHasMore(false);
+        //   }
+        //   setNoTweets(false);
+        //   setAllTweetsLength(response.data.allTweetsLength);
+        //   setAllTweets(response.data.tweetsToShow);
+        //   setIsLoading(false);
+        // };
+        // fetchTweets();
       }
     } catch (error) {
       setErrorMsg("You need to be logged in to write something");
@@ -80,10 +92,10 @@ const MainPost = ({
   }, [allTweets]);
 
   useEffect(() => {
-    if (tweetInput.length) {
+    if (tweetContent.length) {
       setShowErrorMsg(false);
     }
-  }, [tweetInput]);
+  }, [tweetContent]);
 
   return (
     <>
@@ -107,7 +119,7 @@ const MainPost = ({
                     placeholder="What's happening?"
                     onFocus={handleFocus}
                     onChange={handleChange}
-                    value={tweetInput}
+                    value={tweetContent}
                   />
 
                   <Col>

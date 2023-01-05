@@ -5,11 +5,21 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
     fetchTweets: builder.query({
       query: (page) => ({
         url: "/tweet",
-        method: "GET",
         params: {
           page: page,
         },
+        method: "GET",
       }),
+      serializeQueryArgs: ({ endpointName }) => {
+        return endpointName;
+      },
+      merge: (currentCache, newItems) => {
+        currentCache.tweetsToShow.push(...newItems.tweetsToShow);
+        currentCache.hasMore = newItems.hasMore;
+      },
+      forceRefetch({ currentArg, previousArg }) {
+        return currentArg !== previousArg;
+      },
     }),
   }),
 });

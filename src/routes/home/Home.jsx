@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { useSelector } from "react-redux";
-import { getAllTweets } from "../../services/tweetServices";
+import { useDispatch, useSelector } from "react-redux";
 import { PuffLoader } from "react-spinners";
-import { getUser } from "../../services/userServices";
 import Topnav from "../../components/topnav/Topnav";
 import Searchbar from "../../components/searchbar/Searchbar";
 import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
@@ -19,26 +17,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import PostModal from "../../components/postModal/PostModal";
 import { selectCurrentToken, selectCurrentUser } from "./../../redux/authSlice";
-import { useFetchTweetsQuery } from "../../redux/tweetsApiSlice";
 
 const Home = () => {
   const user = useSelector(selectCurrentUser);
   const token = useSelector(selectCurrentToken);
-  // const [allTweets, setAllTweets] = useState([]);
-  const [allTweetsLength, setAllTweetsLength] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1);
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [noTweets, setNoTweets] = useState(false);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showPostModal, setShowPostModal] = useState(false);
-  const {
-    data: allTweets,
-    isLoading,
-    isSuccess,
-    error,
-  } = useFetchTweetsQuery(page);
 
   const navigate = useNavigate();
 
@@ -48,6 +33,15 @@ const Home = () => {
       setWindowWidth(window.innerWidth);
     };
     window.addEventListener("resize", handleWindowResize);
+  }, []);
+
+  useEffect(() => {
+    if (!token) {
+      return navigate("/");
+    }
+    if (user.following.length <= 1) {
+      handleShowGoFollowModal();
+    }
   }, []);
 
   const handleShowGoFollowModal = () => {
@@ -64,44 +58,6 @@ const Home = () => {
   const handleClosePostModal = () => {
     setShowPostModal(false);
   };
-
-  useEffect(() => {
-    if (!token) {
-      return navigate("/");
-    }
-    if (user.following.length <= 1) {
-      handleShowGoFollowModal();
-    }
-    // const fetchUser = async (userId) => {
-    //   const response = await getUser(userId);
-    //   if (response?.data?.following?.length <= 1) {
-    //     handleShowGoFollowModal();
-    //   }
-    // };
-
-    // fetchUser(user._id);
-
-    // const fetchTweets = async () => {
-    //   const response = await getAllTweets(user, token, page);
-    //   if (!response?.data?.tweetsToShow?.length && !allTweets.length) {
-    //     setNoTweets(true);
-    //     setIsLoading(false);
-    //     return;
-    //   }
-    //   if (response.data.tweetsToShow.length === 0) {
-    //     setHasMore(false);
-    //   }
-    //   setNoTweets(false);
-    //   setAllTweetsLength(response.data.allTweetsLength);
-    //   setAllTweets((prevTweets) => [
-    //     ...prevTweets,
-    //     ...response.data.tweetsToShow,
-    //   ]);
-    //   setIsLoading(false);
-    // };
-
-    // fetchTweets();
-  }, [page]);
 
   return (
     <>
@@ -121,37 +77,10 @@ const Home = () => {
               {windowWidth > 576 && (
                 <>
                   <Topnav title="Home" />
-                  <MainPost
-                    user={user}
-                    // setAllTweets={setAllTweets}
-                    allTweets={allTweets}
-                    page={page}
-                    // setNoTweets={setNoTweets}
-                    setHasMore={setHasMore}
-                    setAllTweetsLength={setAllTweetsLength}
-                  />
+                  <MainPost />
                 </>
               )}
-
-              {isLoading ? (
-                <div className="loading">
-                  <PuffLoader size={200} color="#1d9bf0" />
-                </div>
-              ) : !allTweets?.length ? (
-                <h4 className="p-2 mt-5 text-muted">
-                  Sorry, there are no tweets to show at this moment :({" "}
-                </h4>
-              ) : (
-                <TweetsList
-                  page={page}
-                  setPage={setPage}
-                  hasMore={hasMore}
-                  allTweets={allTweets}
-                  allTweetsLength={allTweetsLength}
-                  // setAllTweets={setAllTweets}
-                  windowWidth={windowWidth}
-                />
-              )}
+              <TweetsList windowWidth={windowWidth} />
             </Col>
             {windowWidth >= 992 && (
               <Col xs={3}>
@@ -179,12 +108,6 @@ const Home = () => {
       <PostModal
         showPostModal={showPostModal}
         handleClosePostModal={handleClosePostModal}
-        page={page}
-        allTweets={allTweets}
-        // setAllTweets={setAllTweets}
-        // setNoTweets={setNoTweets}
-        setHasMore={setHasMore}
-        setAllTweetsLength={setAllTweetsLength}
       />
     </>
   );

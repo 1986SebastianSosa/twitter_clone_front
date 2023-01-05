@@ -15,20 +15,10 @@ const baseQuery = fetchBaseQuery({
 });
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
-  // console.log("args: ", args);
-  // console.log("api: ", api);
-  // console.log("extraOptions: ", extraOptions);
-
   let result = await baseQuery(args, api, extraOptions);
 
-  console.log(result?.error?.status === 401);
-
   if (result?.error?.status === 401) {
-    console.log("sending refresh token");
-
     const refreshResult = await baseQuery("/auth/refresh", api, extraOptions);
-
-    console.log(refreshResult);
 
     if (refreshResult?.data) {
       api.dispatch(setCredentials({ ...refreshResult.data }));
@@ -48,6 +38,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 };
 
 export const apiSlice = createApi({
+  reducerPath: "apiSlice",
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({}),
 });

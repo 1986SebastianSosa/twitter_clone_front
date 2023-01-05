@@ -26,6 +26,7 @@ import DeleteModal from "../../components/deleteModal/DeleteModal";
 import BotNav from "../../components/botNav/BotNav";
 import ReactTooltip from "react-tooltip";
 import "./tweetPage.css";
+import { useFetchOneTweetQuery } from "../../redux/tweetsApiSlice";
 
 const TweetPage = () => {
   const user = useSelector((state) => state.auth.user);
@@ -36,7 +37,7 @@ const TweetPage = () => {
   const [tweet, setTweet] = useState({});
   const [tweetLikes, setTweetLikes] = useState([]);
   const [comments, setComments] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -48,6 +49,7 @@ const TweetPage = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
   let { id } = useParams();
+  const { data, isLoading, isSuccess, error } = useFetchOneTweetQuery();
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -121,12 +123,12 @@ const TweetPage = () => {
       return navigate("/");
     }
     window.scrollTo(0, 0);
-    const fetch = async () => {
-      const response = await getOneTweet(id, token);
-      setTweet(response.data);
-      setIsLoading(false);
-    };
-    fetch();
+    // const fetch = async () => {
+    //   const response = await getOneTweet(id, token);
+    //   setTweet(response.data);
+    //   setIsLoading(false);
+    // };
+    // fetch();
   }, []);
 
   useEffect(() => {

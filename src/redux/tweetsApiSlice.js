@@ -21,7 +21,13 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
         return currentArg !== previousArg;
       },
     }),
+    fetchOneTweet: builder.query({
+      query: (tweetId) => ({
+        url: `/tweet/${tweetId}`,
+        method: "GET",
+      }),
+    }),
   }),
 });
 
-export const { useFetchTweetsQuery } = tweetsApiSlice;
+export const { useFetchTweetsQuery, useFetchOneTweetQuery } = tweetsApiSlice;

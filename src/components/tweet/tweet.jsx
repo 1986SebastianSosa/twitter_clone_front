@@ -11,42 +11,33 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { getAllTweets } from "../../services/tweetServices";
-import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
 import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
 import ReactTooltip from "react-tooltip";
-import { useDeleteTweetMutation } from "../../redux/tweetsApiSlice";
-import { setTweets } from "../../redux/tweetsSlice";
+import {
+  useDeleteTweetMutation,
+  useLazyFetchTweetsQuery,
+} from "../../redux/tweetsApiSlice";
+import { selectPage, selectWindowWidth } from "../../redux/appSlice";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-const Tweet = ({
-  tweet,
-  setAllTweets,
-  page,
-  allTweets,
-  setNoTweets,
-  setHasMore,
-  setShowDeleteToast,
-  windowWidth,
-}) => {
+const Tweet = ({ tweet }) => {
   const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
-  const location = useLocation();
+  const page = useSelector(selectPage);
+  const windowWidth = useSelector(selectWindowWidth);
   const navigate = useNavigate();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
-  const [updatedTweet, setUpdatedTweet] = useState({});
   const [tweetLikes, setTweetLikes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [deleteTweet, response] = useDeleteTweetMutation(tweet.id);
-  const dispatch = useDispatch();
+  const [deleteTweet, result] = useDeleteTweetMutation(tweet.id);
+  const [trigger] = useLazyFetchTweetsQuery();
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -67,7 +58,9 @@ const Tweet = ({
 
   const handleDeleteTweet = async () => {
     await deleteTweet(tweet._id);
-    dispatch(setTweets({ tweetsToShow: [], hasMore: false }));
+    setShowDeleteModal(false);
+    trigger(page);
+    // dispatch(setTweets({ tweetsToShow: [], hasMore: true }));
     // setIsDeleteLoading(true);
     // if (location.pathname.split("/")[1] === "tweet") {
     //   return navigate("/home");
@@ -100,8 +93,8 @@ const Tweet = ({
 
   const handleLike = async (e) => {
     e.stopPropagation();
-    await likeTweet(updatedTweet._id, user._id, token);
-    const response = await fetchTweetLikes(updatedTweet._id, token);
+    await likeTweet(tweet._id, user._id);
+    const response = await fetchTweetLikes(tweet._id);
     setTweetLikes(response.data);
   };
 
@@ -109,28 +102,28 @@ const Tweet = ({
     navigate(`/tweet/${tweetId}`);
   };
 
-  useEffect(() => {
-    setUpdatedTweet(tweet);
-  }, []);
+  // useEffect(() => {
+  //   setUpdatedTweet(tweet);
+  // }, []);
 
   useEffect(() => {
-    if (updatedTweet._id) {
+    if (tweet._id) {
       const fetch = async () => {
-        const response = await fetchTweetLikes(updatedTweet._id, token);
+        const response = await fetchTweetLikes(tweet._id);
         setTweetLikes(response.data);
         setIsLoading(false);
       };
       fetch();
     }
-  }, [updatedTweet]);
+  }, [tweet]);
 
   return (
     <>
-      {isLoading ? (
+      {result.isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <div
-          onClick={(e) => handleClick(updatedTweet._id)}
+          onClick={(e) => handleClick(tweet._id)}
           className="tweet py-2 border-bottom"
         >
           <Row className="p-2">
@@ -154,19 +147,17 @@ const Tweet = ({
                   <div>
                     <div>
                       <b>
-                        {updatedTweet.author.firstname +
-                          " " +
-                          updatedTweet.author.lastname}
+                        {tweet.author.firstname + " " + tweet.author.lastname}
                       </b>{" "}
-                      {" @" + updatedTweet.author.username + " "}
+                      {" @" + tweet.author.username + " "}
                       <FontAwesomeIcon
                         icon={faCircle}
                         className="dot text-muted mx-1"
                       />
-                      <span>{getTimeElapsed(updatedTweet.createdOn)}</span>
+                      <span>{getTimeElapsed(tweet.createdOn)}</span>
                     </div>
                   </div>
-                  {updatedTweet.author._id === user._id ? (
+                  {tweet.author._id === user._id ? (
                     <div className="deleteIcon">
                       <FontAwesomeIcon
                         icon={faTrashCan}
@@ -175,7 +166,7 @@ const Tweet = ({
                     </div>
                   ) : null}
                 </Col>
-                <Col>{updatedTweet.content}</Col>
+                <Col>{tweet.content}</Col>
                 <Col>
                   <Row className="text-muted">
                     <Col>
@@ -186,7 +177,7 @@ const Tweet = ({
                         >
                           <FontAwesomeIcon icon={faMessage} />
                         </div>
-                        <span>{updatedTweet.comments.length}</span>
+                        <span>{tweet.comments.length}</span>
                       </div>
                     </Col>
                     <Col>
@@ -263,7 +254,7 @@ const Tweet = ({
         <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <DeleteModal
-          isDeleteLoading={isDeleteLoading}
+          isDeleteLoading={result.isLoading}
           title="Tweet"
           showDeleteModal={showDeleteModal}
           handleCloseDeleteModal={handleCloseDeleteModal}
@@ -275,8 +266,8 @@ const Tweet = ({
       ) : (
         <TweetReplyModal
           user={user}
-          setUpdatedTweet={setUpdatedTweet}
-          updatedTweet={updatedTweet}
+          // setUpdatedTweet={setUpdatedTweet}
+          tweet={tweet}
           showCommentModal={showCommentModal}
           handleCloseCommentModal={handleCloseCommentModal}
           windowWidth={windowWidth}

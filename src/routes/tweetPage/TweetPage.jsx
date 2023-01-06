@@ -5,7 +5,7 @@ import Searchbar from "../../components/searchbar/Searchbar";
 import Topnav from "../../components/topnav/Topnav";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { deleteTweet, getOneTweet } from "../../services/tweetServices";
+// import { deleteTweet, getOneTweet } from "../../services/tweetServices";
 import { useState } from "react";
 import Comment from "../../components/comment/Comment";
 import { PuffLoader } from "react-spinners";
@@ -26,7 +26,10 @@ import DeleteModal from "../../components/deleteModal/DeleteModal";
 import BotNav from "../../components/botNav/BotNav";
 import ReactTooltip from "react-tooltip";
 import "./tweetPage.css";
-import { useFetchOneTweetQuery } from "../../redux/tweetsApiSlice";
+import {
+  useDeleteTweetMutation,
+  useFetchOneTweetQuery,
+} from "../../redux/tweetsApiSlice";
 
 const TweetPage = () => {
   const user = useSelector((state) => state.auth.user);
@@ -47,7 +50,8 @@ const TweetPage = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
   let { id } = useParams();
-  const { data: tweet, isLoading } = useFetchOneTweetQuery(id);
+  const { data: tweet, isLoading, isSuccess } = useFetchOneTweetQuery(id);
+  const [deleteTweet] = useDeleteTweetMutation(id);
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -59,7 +63,7 @@ const TweetPage = () => {
 
   const handleDeleteTweet = async () => {
     setIsDeleteLoading(true);
-    await deleteTweet(tweet._id, token);
+    await deleteTweet(tweet._id);
     return navigate("/home");
   };
 
@@ -98,7 +102,7 @@ const TweetPage = () => {
         setCommentIsLoading(true);
         e.preventDefault();
         const fetch = async () => {
-          const response = await getOneTweet(id, token);
+          // const response = await getOneTweet(id, token);
           // setTweet(response.data);
           setCommentIsLoading(false);
         };
@@ -130,8 +134,8 @@ const TweetPage = () => {
   }, []);
 
   useEffect(() => {
-    if (tweet.comments) {
-      const sortedCommentsArr = tweet.comments.sort((a, b) => {
+    if (tweet?.comments) {
+      const sortedCommentsArr = tweet.comments.slice().sort((a, b) => {
         return Date.parse(b.createdOn) - Date.parse(a.createdOn);
       });
       setComments(sortedCommentsArr);
@@ -166,15 +170,124 @@ const TweetPage = () => {
             className="border-start border-end border-light p-0"
           >
             <Topnav title="Tweet" />
-            {isLoading ? (
-              <PuffLoader color="#1d9bf0" />
-            ) : (
-              <>
-                <Container>
-                  <Row className="p-2">
-                    <Col xs={2} className="d-flex justify-content-center p-0">
+            {isLoading && <PuffLoader color="#1d9bf0" />}
+            {isSuccess && (
+              <Container>
+                <Row className="p-2">
+                  <Col xs={2} className="d-flex justify-content-center p-0">
+                    <div
+                      className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                        windowWidth < 768 && "avatar"
+                      }`}
+                    >
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className={`${
+                          windowWidth < 768 ? "fa-2x" : "fa-3x"
+                        } text-secondary`}
+                      />
+                    </div>
+                  </Col>
+                  <Col xs={10}>
+                    <Row>
+                      <Col className="tweetHead" xs={10}>
+                        <div>
+                          <b>
+                            {tweet.author.firstname +
+                              " " +
+                              tweet.author.lastname}
+                          </b>{" "}
+                        </div>
+                        <div>{" @" + tweet.author.username + " "}</div>
+                        <div>
+                          <span>{getTimeElapsed(tweet.createdOn)}</span>
+                        </div>
+                      </Col>
+                      {tweet.author._id === user._id ? (
+                        <Col className="p-0 d-flex justify-content-end" xs={2}>
+                          <div className="deleteIcon me-2">
+                            <FontAwesomeIcon
+                              icon={faTrashCan}
+                              onClick={(e) => handleShowDeleteModal(e)}
+                            />
+                          </div>
+                        </Col>
+                      ) : null}
+                    </Row>
+                  </Col>
+                </Row>
+                <Row className="p-2">
+                  <Col xs={12} className="p-2">
+                    <p className="fs-5 my-0 ">{tweet.content}</p>
+                  </Col>
+                </Row>
+                <Row className="text-muted">
+                  <Col>
+                    <div className="d-flex align-items-center">
                       <div
-                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                        className="rounded-circle tweetIcon me-3"
+                        onClick={(e) => handleShowCommentModal(e)}
+                      >
+                        <FontAwesomeIcon icon={faMessage} />
+                      </div>
+                      <span>{tweet.comments.length}</span>
+                    </div>
+                  </Col>
+                  <Col>
+                    <div
+                      className="rounded-circle tweetIcon"
+                      data-for="outOfScope"
+                      data-tip={showTooltip && ""}
+                      onMouseEnter={() => setShowTooltip(true)}
+                      onMouseLeave={() => setShowTooltip(false)}
+                    >
+                      <FontAwesomeIcon icon={faRepeat} />
+                    </div>
+                  </Col>
+                  <Col>
+                    <div className="d-flex align-items-center">
+                      <div
+                        className="rounded-circle tweetIcon me-3"
+                        onClick={(e) => handleLike(e)}
+                      >
+                        {userLiked() ? (
+                          <FontAwesomeIcon
+                            icon={faSolidHeart}
+                            className="text-danger"
+                          />
+                        ) : (
+                          <FontAwesomeIcon icon={faHeart} />
+                        )}
+                      </div>
+                      {isLoading ? (
+                        <PuffLoader size={18} color="#1d9bf0" />
+                      ) : (
+                        <span>{tweetLikes.length}</span>
+                      )}
+                    </div>
+                  </Col>
+                  <Col>
+                    <div
+                      className="rounded-circle tweetIcon"
+                      data-for="outOfScope"
+                      data-tip={showTooltip && ""}
+                      onMouseEnter={() => setShowTooltip(true)}
+                      onMouseLeave={() => setShowTooltip(false)}
+                    >
+                      <FontAwesomeIcon icon={faArrowUpFromBracket} />
+                    </div>
+                  </Col>
+                </Row>
+                {commentIsLoading ? (
+                  <PuffLoader color="#1d9bf0" className="mx-auto my-5" />
+                ) : (
+                  <Row className="p-2 my-2 border-top border-bottom">
+                    <Col
+                      xs={2}
+                      className="d-flex justify-content-center align-items-center p-0"
+                    >
+                      <div
+                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
                           windowWidth < 768 && "avatar"
                         }`}
                       >
@@ -186,148 +299,33 @@ const TweetPage = () => {
                         />
                       </div>
                     </Col>
-                    <Col xs={10}>
-                      <Row>
-                        <Col className="tweetHead" xs={10}>
-                          <div>
-                            <b>
-                              {tweet.author.firstname +
-                                " " +
-                                tweet.author.lastname}
-                            </b>{" "}
-                          </div>
-                          <div>{" @" + tweet.author.username + " "}</div>
-                          <div>
-                            <span>{getTimeElapsed(tweet.createdOn)}</span>
-                          </div>
-                        </Col>
-                        {tweet.author._id === user._id ? (
-                          <Col
-                            className="p-0 d-flex justify-content-end"
-                            xs={2}
-                          >
-                            <div className="deleteIcon me-2">
-                              <FontAwesomeIcon
-                                icon={faTrashCan}
-                                onClick={(e) => handleShowDeleteModal(e)}
-                              />
-                            </div>
-                          </Col>
-                        ) : null}
-                      </Row>
-                    </Col>
-                  </Row>
-                  <Row className="p-2">
-                    <Col xs={12} className="p-2">
-                      <p className="fs-5 my-0 ">{tweet.content}</p>
-                    </Col>
-                  </Row>
-                  <Row className="text-muted">
-                    <Col>
-                      <div className="d-flex align-items-center">
-                        <div
-                          className="rounded-circle tweetIcon me-3"
-                          onClick={(e) => handleShowCommentModal(e)}
+                    <Col xs={10} className="py-2 my-2">
+                      <div>
+                        <form
+                          onSubmit={handleSubmit}
+                          className="reply-input-form"
                         >
-                          <FontAwesomeIcon icon={faMessage} />
-                        </div>
-                        <span>{tweet.comments.length}</span>
+                          <input
+                            name="commentContent"
+                            type="text"
+                            className="border-0 main-input text-muted fs-5"
+                            placeholder="Tweet your reply"
+                            onFocus={handleFocus}
+                            onChange={handleChange}
+                            value={commentInput}
+                            width="100%"
+                          />
+                        </form>
                       </div>
-                    </Col>
-                    <Col>
-                      <div
-                        className="rounded-circle tweetIcon"
-                        data-for="outOfScope"
-                        data-tip={showTooltip && ""}
-                        onMouseEnter={() => setShowTooltip(true)}
-                        onMouseLeave={() => setShowTooltip(false)}
-                      >
-                        <FontAwesomeIcon icon={faRepeat} />
-                      </div>
-                    </Col>
-                    <Col>
-                      <div className="d-flex align-items-center">
-                        <div
-                          className="rounded-circle tweetIcon me-3"
-                          onClick={(e) => handleLike(e)}
-                        >
-                          {userLiked() ? (
-                            <FontAwesomeIcon
-                              icon={faSolidHeart}
-                              className="text-danger"
-                            />
-                          ) : (
-                            <FontAwesomeIcon icon={faHeart} />
-                          )}
-                        </div>
-                        {isLoading ? (
-                          <PuffLoader size={18} color="#1d9bf0" />
-                        ) : (
-                          <span>{tweetLikes.length}</span>
+                      <div className="py-2">
+                        {showErrorMsg && (
+                          <span className="text-danger">{errorMsg}</span>
                         )}
                       </div>
                     </Col>
-                    <Col>
-                      <div
-                        className="rounded-circle tweetIcon"
-                        data-for="outOfScope"
-                        data-tip={showTooltip && ""}
-                        onMouseEnter={() => setShowTooltip(true)}
-                        onMouseLeave={() => setShowTooltip(false)}
-                      >
-                        <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                      </div>
-                    </Col>
                   </Row>
-                  {commentIsLoading ? (
-                    <PuffLoader color="#1d9bf0" className="mx-auto my-5" />
-                  ) : (
-                    <Row className="p-2 my-2 border-top border-bottom">
-                      <Col
-                        xs={2}
-                        className="d-flex justify-content-center align-items-center p-0"
-                      >
-                        <div
-                          className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
-                            windowWidth < 768 && "avatar"
-                          }`}
-                        >
-                          <FontAwesomeIcon
-                            icon={faUser}
-                            className={`${
-                              windowWidth < 768 ? "fa-2x" : "fa-3x"
-                            } text-secondary`}
-                          />
-                        </div>
-                      </Col>
-                      <Col xs={10} className="py-2 my-2">
-                        <div>
-                          <form
-                            onSubmit={handleSubmit}
-                            className="reply-input-form"
-                          >
-                            <input
-                              name="commentContent"
-                              type="text"
-                              className="border-0 main-input text-muted fs-5"
-                              placeholder="Tweet your reply"
-                              onFocus={handleFocus}
-                              onChange={handleChange}
-                              value={commentInput}
-                              width="100%"
-                            />
-                          </form>
-                        </div>
-                        <div className="py-2">
-                          {showErrorMsg && (
-                            <span className="text-danger">{errorMsg}</span>
-                          )}
-                        </div>
-                      </Col>
-                    </Row>
-                  )}
-                </Container>
-              </>
+                )}
+              </Container>
             )}
             {isLoading ? (
               <PuffLoader color="#1d9bf0" />
@@ -406,13 +404,13 @@ const TweetPage = () => {
       return "Now";
     }
     if (difference < minute) {
-      return `${Math.floor(difference / second)} seconds ago`;
+      return `${Math.floor(difference / second)} sec ago`;
     }
     if (difference < hour) {
-      return `${Math.floor(difference / minute)} minutes ago`;
+      return `${Math.floor(difference / minute)} min ago`;
     }
     if (difference < day) {
-      return `${Math.floor(difference / hour)} hours ago`;
+      return `${Math.floor(difference / hour)} hr ago`;
     }
     if (difference < month) {
       return `${Math.floor(difference / day)} days ago`;

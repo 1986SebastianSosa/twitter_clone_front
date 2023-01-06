@@ -13,14 +13,16 @@ import {
 import "./mainpost.css";
 import { getAllTweets, postTweet } from "./../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   useFetchTweetsQuery,
+  useLazyFetchTweetsQuery,
   usePostTweetMutation,
+  useResetCacheQuery,
 } from "../../redux/tweetsApiSlice";
 import { apiSlice } from "../../app/api/apiSlice";
 import { useFormik } from "formik";
-import { selectpage } from "../../redux/appSlice";
+import { selectPage } from "../../redux/appSlice";
 
 const MainPost = ({
   user,
@@ -31,15 +33,15 @@ const MainPost = ({
   setAllTweetsLength,
 }) => {
   const token = useSelector((state) => state.auth.token);
-  const page = useSelector(selectpage);
+  const page = useSelector(selectPage);
   const [focused, setFocused] = useState(false);
   const [tweetContent, setTweetContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
-
-  const [postTweet, response] = usePostTweetMutation();
-  const { refetch } = useFetchTweetsQuery(page);
+  // console.log(useFetchTweetsQuery(page));
+  const [postTweet] = usePostTweetMutation();
+  const [trigger] = useLazyFetchTweetsQuery(page);
 
   const handleFocus = () => {
     setFocused(true);
@@ -56,8 +58,10 @@ const MainPost = ({
         setErrorMsg("* You need to write something");
         setShowErrorMsg(true);
       } else {
+        setTweetContent("");
         await postTweet({ tweetContent, createdOn: new Date() });
-        refetch(page);
+        trigger(page);
+
         // setIsLoading(true);
         // await postTweet(token, tweetContent);
         // setTweetContent("");

@@ -14,7 +14,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import authReducer from "../redux/authSlice";
 import appReducer from "../redux/appSlice";
-import tweetsReducer from "../redux/tweetsSlice";
+// import tweetsReducer from "../redux/tweetsSlice";
 
 const persistConfig = {
   key: "root",
@@ -25,7 +25,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   auth: authReducer,
-  tweets: tweetsReducer,
+  // tweets: tweetsReducer,
   app: appReducer,
 });
 

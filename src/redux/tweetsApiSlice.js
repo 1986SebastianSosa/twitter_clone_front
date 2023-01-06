@@ -1,10 +1,8 @@
 import { apiSlice } from "../app/api/apiSlice";
-import { setTweets } from "./tweetsSlice";
 
 export const tweetsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     fetchTweets: builder.query({
-      providesTags: ["Tweets"],
       query: (page) => ({
         url: "/tweet",
         params: {
@@ -12,12 +10,21 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
         },
         method: "GET",
       }),
-      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(setTweets(data));
-        } catch (err) {
-          console.log(err);
+      providesTags: ["Tweet"],
+
+      serializeQueryArgs: ({ endpointName }) => {
+        return endpointName;
+      },
+      merge: (currentCache, newItems) => {
+        currentCache.tweetsToShow.push(...newItems.tweetsToShow);
+        currentCache.hasMore = newItems.hasMore;
+      },
+      forceRefetch({ currentArg, previousArg, endpointState, state }) {
+        return currentArg !== previousArg;
+      },
+      onQueryStarted: (arg, { queryFulfilled }) => {
+        if (queryFulfilled) {
+          return queryFulfilled.data;
         }
       },
     }),
@@ -28,19 +35,35 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
       }),
     }),
     postTweet: builder.mutation({
-      invalidatesTags: ["Tweets"],
       query: (body) => ({
         url: "/tweet",
         method: "POST",
         body,
       }),
+      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(apiSlice.util.resetApiState());
+          return data;
+        } catch (err) {
+          console.log(err);
+        }
+      },
+      invalidatesTags: ["Tweet"],
     }),
     deleteTweet: builder.mutation({
-      invalidatesTags: ["Tweets"],
       query: (tweetId) => ({
         url: `/tweet/${tweetId}`,
         method: "DELETE",
       }),
+      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          dispatch(apiSlice.util.resetApiState());
+        } catch (err) {
+          console.log(err);
+        }
+      },
     }),
   }),
 });
@@ -50,4 +73,5 @@ export const {
   useFetchOneTweetQuery,
   usePostTweetMutation,
   useDeleteTweetMutation,
+  useLazyFetchTweetsQuery,
 } = tweetsApiSlice;

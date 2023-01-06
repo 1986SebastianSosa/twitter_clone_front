@@ -16,6 +16,6 @@ export const appSlice = createSlice({
 export const { setWindowWidth, setPage } = appSlice.actions;
 
 export const selectWindowWidth = (state) => state.app.windowWidth;
-export const selectpage = (state) => state.app.page;
+export const selectPage = (state) => state.app.page;
 
 export default appSlice.reducer;

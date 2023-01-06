@@ -7,19 +7,17 @@ import { useFetchTweetsQuery } from "../../redux/tweetsApiSlice";
 import { useEffect } from "react";
 import "./tweetList.css";
 import { useDispatch, useSelector } from "react-redux";
-import { selectpage, setPage } from "../../redux/appSlice";
+import { selectPage, setPage } from "../../redux/appSlice";
 import { selectAllTweets, selectHasMore } from "../../redux/tweetsSlice";
 
 const TweetsList = () => {
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const toggleDeleteToast = () => setShowDeleteToast(!showDeleteToast);
-  const page = useSelector(selectpage);
+  const page = useSelector(selectPage);
   const dispatch = useDispatch();
-  const { isLoading, isSuccess } = useFetchTweetsQuery(page);
-  const tweetsToShow = useSelector(selectAllTweets);
-  const hasMore = useSelector(selectHasMore);
-
-  console.log(tweetsToShow);
+  const { data, isLoading, isFetching, isSuccess } = useFetchTweetsQuery(page);
+  // const tweetsToShow = useSelector(selectAllTweets);
+  // const hasMore = useSelector(selectHasMore);
 
   const handleNextPage = () => {
     dispatch(setPage({ page: page + 1 }));
@@ -32,20 +30,19 @@ const TweetsList = () => {
       </div>
     );
   }
-  if (isSuccess && tweetsToShow.length === 0) {
+  if (isSuccess && data.tweetsToShow.length === 0) {
     return (
       <h4 className="p-2 mt-5 text-muted">
         Sorry, there are no tweets to show at this moment :({" "}
       </h4>
     );
   }
-  if (isSuccess && tweetsToShow.length > 0) {
-    console.log(tweetsToShow.length);
+  if (isSuccess && data.tweetsToShow.length > 0) {
     return (
       <InfiniteScroll
-        dataLength={tweetsToShow.length}
+        dataLength={data.tweetsToShow.length}
         next={handleNextPage}
-        hasMore={hasMore}
+        hasMore={data.hasMore}
         loader={<PuffLoader color="#1d9bf0" />}
         endMessage={
           <p style={{ textAlign: "center", color: "#1d9bf0" }}>
@@ -54,7 +51,7 @@ const TweetsList = () => {
         }
         style={{ overflow: "hidden" }}
       >
-        {tweetsToShow.map((tweet) => {
+        {data.tweetsToShow.map((tweet) => {
           return (
             <Tweet
               key={tweet._id}

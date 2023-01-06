@@ -14,7 +14,7 @@ import { getOneTweet } from "../../services/tweetServices";
 import { useSelector } from "react-redux";
 
 const TweetReplyModal = ({
-  updatedTweet,
+  tweet,
   setUpdatedTweet,
   showCommentModal,
   handleCloseCommentModal,
@@ -34,9 +34,9 @@ const TweetReplyModal = ({
     if (!commentInput.length) {
       return setInvalidInput(true);
     }
-    await postComment(commentInput, user._id, updatedTweet._id, token);
+    await postComment(commentInput, user._id, tweet._id, token);
     setCommentInput("");
-    const fetchResponse = await getOneTweet(updatedTweet._id, token);
+    const fetchResponse = await getOneTweet(tweet._id, token);
     setUpdatedTweet(fetchResponse.data);
     handleCloseCommentModal();
   };
@@ -79,20 +79,18 @@ const TweetReplyModal = ({
                   <div>
                     <div>
                       <b>
-                        {updatedTweet.author.firstname +
-                          " " +
-                          updatedTweet.author.lastname}
+                        {tweet.author.firstname + " " + tweet.author.lastname}
                       </b>{" "}
-                      {" @" + updatedTweet.author.username + " "}
+                      {" @" + tweet.author.username + " "}
                       <FontAwesomeIcon
                         icon={faCircle}
                         className="dot text-muted mx-1"
                       />
-                      <span>{getTimeElapsed(updatedTweet.createdOn)}</span>
+                      <span>{getTimeElapsed(tweet.createdOn)}</span>
                     </div>
                   </div>
                 </Col>
-                <Col>{updatedTweet.content}</Col>
+                <Col>{tweet.content}</Col>
               </Row>
             </Col>
           </Row>

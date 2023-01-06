@@ -11,19 +11,16 @@ import {
   FormControl,
 } from "react-bootstrap";
 import * as Yup from "yup";
-import { registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/authSlice";
 import { useState } from "react";
 import { PuffLoader } from "react-spinners";
 import MyToast from "./../../components/myToast/MyToast";
-import { useRegisterMutation } from "../../redux/authApiSlice";
+import { useRegisterMutation } from "../../app/api/authApiSlice";
+import { inputFields } from "../../util/registerModalInputFliends";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState(false);
-  // const [errorMsg, setErrorMsg] = useState("");
   const [showToast, setShowToast] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -77,74 +74,8 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
       } catch (err) {
         setShowToast(true);
       }
-      // try {
-      //   setIsLoading(true);
-      //   const response = await registerUser(values);
-      //   if (!response.status) {
-      //     setIsLoading(false);
-      //     setErrorMsg("No server response");
-      //     setError(true);
-      //   } else if (response?.status === 409) {
-      //     setIsLoading(false);
-      //     setErrorMsg(response.response.data.msj);
-      //     setError(true);
-      //   }
-      //   if (response.data) {
-      //     dispatch(setCredentials(response.data));
-      //     handleCloseRegisterModal();
-      //     setIsLoading(false);
-      //     navigate("/home");
-      //   }
-      // } catch (error) {
-      //   console.log(error);
-      // }
     },
   });
-
-  const inputFields = [
-    {
-      id: 1,
-      name: "firstname",
-      type: "text",
-      placeholder: "Enter your firstname",
-      label: "Firstname:",
-    },
-    {
-      id: 2,
-      name: "lastname",
-      type: "text",
-      placeholder: "Enter your lastname",
-      label: "Lastname:",
-    },
-    {
-      id: 3,
-      name: "username",
-      type: "text",
-      placeholder: "Enter your username",
-      label: "Username:",
-    },
-    {
-      id: 4,
-      name: "password",
-      type: "password",
-      placeholder: "Enter your password",
-      label: "Password:",
-    },
-    {
-      id: 5,
-      name: "confirmPassword",
-      type: "password",
-      placeholder: "Confirm your password",
-      label: "Password confirmation:",
-    },
-    {
-      id: 6,
-      name: "email",
-      type: "email",
-      placeholder: "Enter your email",
-      label: "Email:",
-    },
-  ];
 
   return (
     <>

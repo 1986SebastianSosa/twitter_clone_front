@@ -5,7 +5,6 @@ import Searchbar from "../../components/searchbar/Searchbar";
 import Topnav from "../../components/topnav/Topnav";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-// import { deleteTweet, getOneTweet } from "../../services/tweetServices";
 import { useState } from "react";
 import Comment from "../../components/comment/Comment";
 import { PuffLoader } from "react-spinners";
@@ -21,7 +20,6 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart, faMessage } from "@fortawesome/free-regular-svg-icons";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
-import { postComment } from "../../services/commentServices";
 import DeleteModal from "../../components/deleteModal/DeleteModal";
 import BotNav from "../../components/botNav/BotNav";
 import ReactTooltip from "react-tooltip";
@@ -29,7 +27,9 @@ import "./tweetPage.css";
 import {
   useDeleteTweetMutation,
   useFetchOneTweetQuery,
-} from "../../redux/tweetsApiSlice";
+} from "../../app/api/tweetsApiSlice";
+import getTimeElapsed from "../../util/getTimeElapsed";
+import { usePostCommentMutation } from "../../app/api/commentsApiSlice";
 
 const TweetPage = () => {
   const user = useSelector((state) => state.auth.user);
@@ -49,9 +49,10 @@ const TweetPage = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
-  let { id } = useParams();
+  const { id } = useParams();
   const { data: tweet, isLoading, isSuccess } = useFetchOneTweetQuery(id);
-  const [deleteTweet] = useDeleteTweetMutation(id);
+  const [deleteTweet, deleteTweetResult] = useDeleteTweetMutation(id);
+  const [postComment, postCommentResult] = usePostCommentMutation();
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -98,15 +99,8 @@ const TweetPage = () => {
         setErrorMsg("* You need to write something");
         setShowErrorMsg(true);
       } else {
-        await postComment(commentInput, user._id, tweet._id, token);
-        setCommentIsLoading(true);
-        e.preventDefault();
-        const fetch = async () => {
-          // const response = await getOneTweet(id, token);
-          // setTweet(response.data);
-          setCommentIsLoading(false);
-        };
-        fetch();
+        console.log({ commentInput, tweetId: id });
+        await postComment({ commentInput, tweetId: id });
       }
 
       setCommentInput("");
@@ -278,53 +272,63 @@ const TweetPage = () => {
                     </div>
                   </Col>
                 </Row>
-                {commentIsLoading ? (
-                  <PuffLoader color="#1d9bf0" className="mx-auto my-5" />
-                ) : (
-                  <Row className="p-2 my-2 border-top border-bottom">
-                    <Col
-                      xs={2}
-                      className="d-flex justify-content-center align-items-center p-0"
-                    >
-                      <div
-                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
-                          windowWidth < 768 && "avatar"
-                        }`}
+
+                <Row className="p-2 my-2 border-top border-bottom">
+                  {postCommentResult.isLoading ? (
+                    <Col>
+                      <PuffLoader
+                        size={50}
+                        color="#1d9bf0"
+                        className="m-auto"
+                      />
+                    </Col>
+                  ) : (
+                    <>
+                      <Col
+                        xs={2}
+                        className="d-flex justify-content-center align-items-center p-0"
                       >
-                        <FontAwesomeIcon
-                          icon={faUser}
-                          className={`${
-                            windowWidth < 768 ? "fa-2x" : "fa-3x"
-                          } text-secondary`}
-                        />
-                      </div>
-                    </Col>
-                    <Col xs={10} className="py-2 my-2">
-                      <div>
-                        <form
-                          onSubmit={handleSubmit}
-                          className="reply-input-form"
+                        <div
+                          className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
+                            windowWidth < 768 && "avatar"
+                          }`}
                         >
-                          <input
-                            name="commentContent"
-                            type="text"
-                            className="border-0 main-input text-muted fs-5"
-                            placeholder="Tweet your reply"
-                            onFocus={handleFocus}
-                            onChange={handleChange}
-                            value={commentInput}
-                            width="100%"
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className={`${
+                              windowWidth < 768 ? "fa-2x" : "fa-3x"
+                            } text-secondary`}
                           />
-                        </form>
-                      </div>
-                      <div className="py-2">
-                        {showErrorMsg && (
-                          <span className="text-danger">{errorMsg}</span>
-                        )}
-                      </div>
-                    </Col>
-                  </Row>
-                )}
+                        </div>
+                      </Col>
+
+                      <Col xs={10} className="py-2 my-2">
+                        <div>
+                          <form
+                            onSubmit={handleSubmit}
+                            className="reply-input-form"
+                          >
+                            <input
+                              name="commentContent"
+                              type="text"
+                              className="border-0 main-input text-muted fs-5"
+                              placeholder="Tweet your reply"
+                              onFocus={handleFocus}
+                              onChange={handleChange}
+                              value={commentInput}
+                              width="100%"
+                            />
+                          </form>
+                        </div>
+                        <div className="py-2">
+                          {showErrorMsg && (
+                            <span className="text-danger">{errorMsg}</span>
+                          )}
+                        </div>
+                      </Col>
+                    </>
+                  )}
+                </Row>
               </Container>
             )}
             {isLoading ? (
@@ -391,36 +395,6 @@ const TweetPage = () => {
       )} */}
     </>
   );
-  function getTimeElapsed(date) {
-    const second = 1000;
-    const minute = 1000 * 60;
-    const hour = 1000 * 60 * 60;
-    const day = 1000 * 60 * 60 * 24;
-    const month = 1000 * 60 * 60 * 24 * 30;
-    const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(date);
-
-    if (difference < second) {
-      return "Now";
-    }
-    if (difference < minute) {
-      return `${Math.floor(difference / second)} sec ago`;
-    }
-    if (difference < hour) {
-      return `${Math.floor(difference / minute)} min ago`;
-    }
-    if (difference < day) {
-      return `${Math.floor(difference / hour)} hr ago`;
-    }
-    if (difference < month) {
-      return `${Math.floor(difference / day)} days ago`;
-    }
-    if (difference < year) {
-      return `${Math.floor(difference / month)} months ago`;
-    } else {
-      return `${Math.floor(difference / year)} years ago`;
-    }
-  }
 
   function userLiked() {
     return tweetLikes.filter((el) => el._id === user._id).length;

@@ -3,12 +3,10 @@ import { PuffLoader } from "react-spinners";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MyToast from "../myToast/MyToast";
 import Tweet from "../tweet/tweet";
-import { useFetchTweetsQuery } from "../../redux/tweetsApiSlice";
-import { useEffect } from "react";
+import { useFetchTweetsQuery } from "../../app/api/tweetsApiSlice";
 import "./tweetList.css";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPage, setPage } from "../../redux/appSlice";
-import { selectAllTweets, selectHasMore } from "../../redux/tweetsSlice";
 
 const TweetsList = () => {
   const [showDeleteToast, setShowDeleteToast] = useState(false);
@@ -16,8 +14,6 @@ const TweetsList = () => {
   const page = useSelector(selectPage);
   const dispatch = useDispatch();
   const { data, isLoading, isFetching, isSuccess } = useFetchTweetsQuery(page);
-  // const tweetsToShow = useSelector(selectAllTweets);
-  // const hasMore = useSelector(selectHasMore);
 
   const handleNextPage = () => {
     dispatch(setPage({ page: page + 1 }));

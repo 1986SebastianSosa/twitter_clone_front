@@ -1,4 +1,4 @@
-import { apiSlice } from "../app/api/apiSlice";
+import { apiSlice } from "./apiSlice";
 
 export const tweetsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -6,18 +6,25 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
       query: (page) => ({
         url: "/tweet",
         params: {
-          page: page,
+          page,
         },
         method: "GET",
       }),
-      providesTags: ["Tweet"],
-
+      providesTags: (result, error, arg) => {
+        const tags = result.tweetsToShow.map((tweet) => {
+          return { type: "Tweet", id: tweet._id };
+        });
+        return tags;
+      },
       serializeQueryArgs: ({ endpointName }) => {
         return endpointName;
       },
-      merge: (currentCache, newItems) => {
-        currentCache.tweetsToShow.push(...newItems.tweetsToShow);
-        currentCache.hasMore = newItems.hasMore;
+      merge: (currentCache, newItems, args) => {
+        console.log(args);
+        if (args.arg > 1) {
+          currentCache.tweetsToShow.push(...newItems.tweetsToShow);
+          currentCache.hasMore = newItems.hasMore;
+        }
       },
       forceRefetch({ currentArg, previousArg, endpointState, state }) {
         return currentArg !== previousArg;
@@ -33,6 +40,9 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
         url: `/tweet/${tweetId}`,
         method: "GET",
       }),
+      providesTags: (result, error, tweetId) => [
+        { type: "Tweet", id: tweetId },
+      ],
     }),
     postTweet: builder.mutation({
       query: (body) => ({
@@ -41,15 +51,8 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
         body,
       }),
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
-        try {
-          const { data } = await queryFulfilled;
-          dispatch(apiSlice.util.resetApiState());
-          return data;
-        } catch (err) {
-          console.log(err);
-        }
+        dispatch(apiSlice.util.resetApiState());
       },
-      invalidatesTags: ["Tweet"],
     }),
     deleteTweet: builder.mutation({
       query: (tweetId) => ({
@@ -57,12 +60,7 @@ export const tweetsApiSlice = apiSlice.injectEndpoints({
         method: "DELETE",
       }),
       onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
-        try {
-          await queryFulfilled;
-          dispatch(apiSlice.util.resetApiState());
-        } catch (err) {
-          console.log(err);
-        }
+        dispatch(apiSlice.util.resetApiState());
       },
     }),
   }),

@@ -2,7 +2,6 @@ import { Modal, Button, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faCircle } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { postComment } from "../../services/commentServices";
 import {
   faImage,
   faSquarePollHorizontal,
@@ -10,8 +9,8 @@ import {
   faCalendarDay,
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
-import { getOneTweet } from "../../services/tweetServices";
-import { useSelector } from "react-redux";
+import getTimeElapsed from "../../util/getTimeElapsed";
+import { usePostCommentMutation } from "../../app/api/commentsApiSlice";
 
 const TweetReplyModal = ({
   tweet,
@@ -21,9 +20,9 @@ const TweetReplyModal = ({
   user,
   windowWidth,
 }) => {
-  const token = useSelector((state) => state.auth.token);
   const [commentInput, setCommentInput] = useState("");
   const [invalidInput, setInvalidInput] = useState(false);
+  const [postComment, postCommentResult] = usePostCommentMutation();
 
   const handleChange = (e) => {
     setCommentInput(e.target.value);
@@ -34,10 +33,10 @@ const TweetReplyModal = ({
     if (!commentInput.length) {
       return setInvalidInput(true);
     }
-    await postComment(commentInput, user._id, tweet._id, token);
+    console.log({ commentInput, tweetId: tweet._id });
+    await postComment({ commentInput, tweetId: tweet._id });
     setCommentInput("");
-    const fetchResponse = await getOneTweet(tweet._id, token);
-    setUpdatedTweet(fetchResponse.data);
+
     handleCloseCommentModal();
   };
 
@@ -162,32 +161,6 @@ const TweetReplyModal = ({
       </form>
     </Modal>
   );
-  function getTimeElapsed(date) {
-    const second = 1000;
-    const minute = 1000 * 60;
-    const hour = 1000 * 60 * 60;
-    const day = 1000 * 60 * 60 * 24;
-    const month = 1000 * 60 * 60 * 24 * 30;
-    const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(new Date(date));
-
-    switch (difference) {
-      case difference < second:
-        return "Now";
-      case difference < minute:
-        return `${Math.floor(difference / second)} seconds ago`;
-      case difference < hour:
-        return `${Math.floor(difference / minute)} minutes ago`;
-      case difference < day:
-        return `${Math.floor(difference / hour)} hours ago`;
-      case difference < month:
-        return `${Math.floor(difference / day)} days ago`;
-      case difference < year:
-        return `${Math.floor(difference / month)} months ago`;
-      default:
-        return `${Math.floor(difference / year)} years ago`;
-    }
-  }
 };
 
 export default TweetReplyModal;

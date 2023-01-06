@@ -11,16 +11,12 @@ import {
   faEarthAmericas,
 } from "@fortawesome/free-solid-svg-icons";
 import "./mainpost.css";
-import { getAllTweets, postTweet } from "./../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
-  useFetchTweetsQuery,
   useLazyFetchTweetsQuery,
   usePostTweetMutation,
-  useResetCacheQuery,
-} from "../../redux/tweetsApiSlice";
-import { apiSlice } from "../../app/api/apiSlice";
+} from "../../app/api/tweetsApiSlice";
 import { useFormik } from "formik";
 import { selectPage } from "../../redux/appSlice";
 
@@ -32,7 +28,6 @@ const MainPost = ({
   setHasMore,
   setAllTweetsLength,
 }) => {
-  const token = useSelector((state) => state.auth.token);
   const page = useSelector(selectPage);
   const [focused, setFocused] = useState(false);
   const [tweetContent, setTweetContent] = useState("");
@@ -40,7 +35,7 @@ const MainPost = ({
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
   // console.log(useFetchTweetsQuery(page));
-  const [postTweet] = usePostTweetMutation();
+  const [postTweet, postTweetResult] = usePostTweetMutation();
   const [trigger] = useLazyFetchTweetsQuery(page);
 
   const handleFocus = () => {
@@ -61,26 +56,6 @@ const MainPost = ({
         setTweetContent("");
         await postTweet({ tweetContent, createdOn: new Date() });
         trigger(page);
-
-        // setIsLoading(true);
-        // await postTweet(token, tweetContent);
-        // setTweetContent("");
-        // const fetchTweets = async () => {
-        //   const response = await getAllTweets(user, token, page);
-        //   if (!response.data.tweetsToShow.length && !allTweets.length) {
-        //     setNoTweets(true);
-        //     setIsLoading(false);
-        //     return;
-        //   }
-        //   if (response.data.tweetsToShow.length === 0) {
-        //     setHasMore(false);
-        //   }
-        //   setNoTweets(false);
-        //   setAllTweetsLength(response.data.allTweetsLength);
-        //   setAllTweets(response.data.tweetsToShow);
-        //   setIsLoading(false);
-        // };
-        // fetchTweets();
       }
     } catch (error) {
       setErrorMsg("You need to be logged in to write something");
@@ -103,7 +78,7 @@ const MainPost = ({
 
   return (
     <>
-      {isLoading ? (
+      {postTweetResult.isLoading ? (
         <PuffLoader size={100} color="#1d9bf0" className="m-auto" />
       ) : (
         <Row className="p-2 border-bottom border-light">

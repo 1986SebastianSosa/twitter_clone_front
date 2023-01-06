@@ -17,7 +17,8 @@ import { setCredentials } from "../../redux/authSlice";
 import MyToast from "../../components/myToast/MyToast";
 import { PuffLoader } from "react-spinners";
 import { useState } from "react";
-import { useLoginMutation } from "../../redux/authApiSlice";
+import { useLoginMutation } from "../../app/api/authApiSlice";
+import { inputFields } from "../../util/loginModalInputFields";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
   const [showToast, setShowToast] = useState(false);
@@ -53,45 +54,8 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       if (response.isSuccess) {
         navigate("/home");
       }
-      //   setIsLoading(true);
-      //   try {
-      //     const response = await loginUser(values);
-      //     if (response.response?.status === 0) {
-      //       setIsLoading(false);
-      //       setErrMsg("No server response");
-      //       setError(true);
-      //     } else if (response.response?.status === 401) {
-      //       setErrMsg(response.response?.data?.msg);
-      //       setError(true);
-      //       setIsLoading(false);
-      //     } else if (response.status === 200) {
-      //       dispatch(setCredentials(response.data));
-      //       navigate("/home");
-      //       handleCloseLoginModal();
-      //       setIsLoading(false);
-      //     }
-      //   } catch (err) {
-      //     console.log(err);
-      //   }
     },
   });
-
-  const inputFields = [
-    {
-      id: 1,
-      name: "email",
-      type: "email",
-      placeholder: "Enter your email",
-      label: "Email:",
-    },
-    {
-      id: 2,
-      name: "password",
-      type: "password",
-      placeholder: "Enter your password",
-      label: "Password:",
-    },
-  ];
 
   return (
     <>

@@ -3,7 +3,6 @@ import { PuffLoader } from "react-spinners";
 
 const DeleteModal = ({
   isDeleteCommentLoading,
-  isDeleteLoading,
   showDeleteModal,
   handleCloseDeleteModal,
   handleDelete,
@@ -16,7 +15,7 @@ const DeleteModal = ({
       backdrop="static"
       keyboard={false}
     >
-      {isDeleteCommentLoading || isDeleteLoading ? (
+      {isDeleteCommentLoading ? (
         <div className="py-5">
           <PuffLoader className="m-auto" color="#1d9bf0" />
           <h6 className="m-auto text-center text-muted pt-3">

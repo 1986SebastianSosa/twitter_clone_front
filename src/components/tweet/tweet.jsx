@@ -10,9 +10,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DeleteModal from "./../deleteModal/DeleteModal";
-import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
 import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
@@ -20,10 +19,13 @@ import ReactTooltip from "react-tooltip";
 import {
   useDeleteTweetMutation,
   useLazyFetchTweetsQuery,
-} from "../../redux/tweetsApiSlice";
+} from "../../app/api/tweetsApiSlice";
 import { selectPage, selectWindowWidth } from "../../redux/appSlice";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { usePostTweetLikeMutation } from "../../app/api/tweetLikesApiSlice";
+import getTimeElapsed from "../../util/getTimeElapsed";
+import { isUserLiked } from "../../util/isUserLikedTweet";
 
 const Tweet = ({ tweet }) => {
   const user = useSelector((state) => state.auth.user);
@@ -36,8 +38,9 @@ const Tweet = ({ tweet }) => {
   const [tweetLikes, setTweetLikes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [deleteTweet, result] = useDeleteTweetMutation(tweet.id);
-  const [trigger] = useLazyFetchTweetsQuery();
+  const [deleteTweet, deleteTweetResult] = useDeleteTweetMutation(tweet.id);
+  const [trigger, lazyFetchTweetResult] = useLazyFetchTweetsQuery();
+  const [postTweetLike, tweetLikeResult] = usePostTweetLikeMutation();
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -60,42 +63,11 @@ const Tweet = ({ tweet }) => {
     await deleteTweet(tweet._id);
     setShowDeleteModal(false);
     trigger(page);
-    // dispatch(setTweets({ tweetsToShow: [], hasMore: true }));
-    // setIsDeleteLoading(true);
-    // if (location.pathname.split("/")[1] === "tweet") {
-    //   return navigate("/home");
-    // } else {
-    //   try {
-    //     const fetchTweets = async () => {
-    //       const response = await getAllTweets(user, token, page);
-    //       if (!response.data.tweetsToShow.length && !allTweets.length) {
-    //         setNoTweets(true);
-    //         setIsLoading(false);
-    //         return;
-    //       }
-    //       if (response.data.tweetsToShow.length === 0) {
-    //         setHasMore(false);
-    //       }
-
-    //       setAllTweets(response.data.tweetsToShow);
-    //       setIsLoading(false);
-    //       setIsDeleteLoading(false);
-    //       setShowDeleteModal(false);
-    //       setShowDeleteToast(true);
-    //     };
-    //     fetchTweets();
-    //   } catch (error) {
-    //     console.log(error);
-    //     navigate("/");
-    //   }
-    // }
   };
 
   const handleLike = async (e) => {
     e.stopPropagation();
-    await likeTweet(tweet._id, user._id);
-    const response = await fetchTweetLikes(tweet._id);
-    setTweetLikes(response.data);
+    await postTweetLike(tweet._id);
   };
 
   const handleClick = (tweetId) => {
@@ -106,20 +78,20 @@ const Tweet = ({ tweet }) => {
   //   setUpdatedTweet(tweet);
   // }, []);
 
-  useEffect(() => {
-    if (tweet._id) {
-      const fetch = async () => {
-        const response = await fetchTweetLikes(tweet._id);
-        setTweetLikes(response.data);
-        setIsLoading(false);
-      };
-      fetch();
-    }
-  }, [tweet]);
+  // useEffect(() => {
+  //   if (tweet._id) {
+  //     const fetch = async () => {
+  //       const response = await fetchTweetLikes(tweet._id);
+  //       setTweetLikes(response.data);
+  //       setIsLoading(false);
+  //     };
+  //     fetch();
+  //   }
+  // }, [tweet]);
 
   return (
     <>
-      {result.isLoading ? (
+      {lazyFetchTweetResult.isFetching ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <div
@@ -200,7 +172,7 @@ const Tweet = ({ tweet }) => {
                           className="rounded-circle tweetIcon me-3"
                           onClick={(e) => handleLike(e)}
                         >
-                          {userLiked() ? (
+                          {isUserLiked(tweet, user) ? (
                             <FontAwesomeIcon
                               icon={faSolidHeart}
                               className="text-danger"
@@ -209,11 +181,8 @@ const Tweet = ({ tweet }) => {
                             <FontAwesomeIcon icon={faHeart} />
                           )}
                         </div>
-                        {isLoading ? (
-                          <PuffLoader size={18} color="#1d9bf0" />
-                        ) : (
-                          <span>{tweetLikes.length}</span>
-                        )}
+
+                        <span>{tweet.likes.length}</span>
                       </div>
                     </Col>
                     <Col>
@@ -250,66 +219,35 @@ const Tweet = ({ tweet }) => {
           )}
         </div>
       )}
-      {isLoading ? (
+      {deleteTweetResult.isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <DeleteModal
-          isDeleteLoading={result.isLoading}
+          isDeleteLoading={deleteTweetResult.isLoading}
           title="Tweet"
           showDeleteModal={showDeleteModal}
           handleCloseDeleteModal={handleCloseDeleteModal}
           handleDelete={handleDeleteTweet}
         />
       )}
-      {isLoading ? (
+      {/* {isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />
-      ) : (
-        <TweetReplyModal
-          user={user}
-          // setUpdatedTweet={setUpdatedTweet}
-          tweet={tweet}
-          showCommentModal={showCommentModal}
-          handleCloseCommentModal={handleCloseCommentModal}
-          windowWidth={windowWidth}
-        />
-      )}
+      ) : ( */}
+      <TweetReplyModal
+        user={user}
+        // setUpdatedTweet={setUpdatedTweet}
+        tweet={tweet}
+        showCommentModal={showCommentModal}
+        handleCloseCommentModal={handleCloseCommentModal}
+        windowWidth={windowWidth}
+      />
+      {/* )} */}
     </>
   );
 
-  function getTimeElapsed(date) {
-    const second = 1000;
-    const minute = 1000 * 60;
-    const hour = 1000 * 60 * 60;
-    const day = 1000 * 60 * 60 * 24;
-    const month = 1000 * 60 * 60 * 24 * 30;
-    const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(date);
-
-    if (difference < second) {
-      return "Now";
-    }
-    if (difference < minute) {
-      return `${Math.floor(difference / second)} seconds ago`;
-    }
-    if (difference < hour) {
-      return `${Math.floor(difference / minute)} minutes ago`;
-    }
-    if (difference < day) {
-      return `${Math.floor(difference / hour)} hours ago`;
-    }
-    if (difference < month) {
-      return `${Math.floor(difference / day)} days ago`;
-    }
-    if (difference < year) {
-      return `${Math.floor(difference / month)} months ago`;
-    } else {
-      return `${Math.floor(difference / year)} years ago`;
-    }
-  }
-
-  function userLiked() {
-    return tweetLikes.filter((el) => el._id === user._id).length;
-  }
+  // function userLiked() {
+  //   return tweetLikes.filter((el) => el._id === user._id).length;
+  // }
 };
 
 export default Tweet;

@@ -11,20 +11,18 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { getOneTweet } from "../../services/tweetServices";
 import { useSelector } from "react-redux";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchCommentLikes, likeComment } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
-import { deleteComment } from "../../services/commentServices";
+import getTimeElapsed from "../../util/getTimeElapsed";
 import ReactTooltip from "react-tooltip";
+import { useDeleteCommentMutation } from "../../app/api/commentsApiSlice";
 
 const Comment = ({
   comment,
   setShowDeleteToast,
-  tweet,
-  setTweet,
-  setComments,
+
   windowWidth,
 }) => {
   const user = useSelector((state) => state.auth.user);
@@ -32,24 +30,16 @@ const Comment = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentLikes, setCommentLikes] = useState([]);
-  const [isDeleteCommentLoading, setIsDeleteCommentLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteComment, result] = useDeleteCommentMutation();
 
   const handleShowDeleteModal = () => setShowDeleteModal(true);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
   const handleDeleteComment = async () => {
-    setIsDeleteCommentLoading(true);
-    await deleteComment(comment._id, token, tweet._id);
-    const response = await getOneTweet(tweet._id, token);
-    setTweet(response.data);
-    setIsDeleteCommentLoading(false);
-    const sortedCommentsArr = tweet.comments.sort((a, b) => {
-      return Date.parse(b.createdOn) - Date.parse(a.createdOn);
-    });
-    setComments(sortedCommentsArr);
-    setShowDeleteModal(false);
-    setShowDeleteToast(true);
+    await deleteComment(comment._id, comment.tweet);
+    result.isSuccess && setShowDeleteModal(false);
+    result.isSuccess && setShowDeleteToast(true);
   };
 
   const handleLike = async () => {
@@ -192,40 +182,11 @@ const Comment = ({
         showDeleteModal={showDeleteModal}
         handleCloseDeleteModal={handleCloseDeleteModal}
         handleDelete={handleDeleteComment}
-        isDeleteCommentLoading={isDeleteCommentLoading}
+        isDeleteCommentLoading={result.isLoading}
       />
     </>
   );
-  function getTimeElapsed(date) {
-    const second = 1000;
-    const minute = 1000 * 60;
-    const hour = 1000 * 60 * 60;
-    const day = 1000 * 60 * 60 * 24;
-    const month = 1000 * 60 * 60 * 24 * 30;
-    const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(date);
 
-    if (difference < second) {
-      return "Now";
-    }
-    if (difference < minute) {
-      return `${Math.floor(difference / second)} seconds ago`;
-    }
-    if (difference < hour) {
-      return `${Math.floor(difference / minute)} minutes ago`;
-    }
-    if (difference < day) {
-      return `${Math.floor(difference / hour)} hours ago`;
-    }
-    if (difference < month) {
-      return `${Math.floor(difference / day)} days ago`;
-    }
-    if (difference < year) {
-      return `${Math.floor(difference / month)} months ago`;
-    } else {
-      return `${Math.floor(difference / year)} years ago`;
-    }
-  }
   function userLiked() {
     return commentLikes.filter((el) => el._id === user._id).length;
   }

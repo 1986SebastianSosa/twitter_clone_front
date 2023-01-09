@@ -23,7 +23,10 @@ import {
 import { selectPage, selectWindowWidth } from "../../redux/appSlice";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { usePostTweetLikeMutation } from "../../app/api/tweetLikesApiSlice";
+import {
+  useFetchTweetLikeQuery,
+  usePostTweetLikeMutation,
+} from "../../app/api/tweetLikesApiSlice";
 import getTimeElapsed from "../../util/getTimeElapsed";
 import { isUserLiked } from "../../util/isUserLikedTweet";
 
@@ -35,12 +38,16 @@ const Tweet = ({ tweet }) => {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
-  const [tweetLikes, setTweetLikes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
   const [deleteTweet, deleteTweetResult] = useDeleteTweetMutation(tweet.id);
   const [trigger, lazyFetchTweetResult] = useLazyFetchTweetsQuery();
   const [postTweetLike, tweetLikeResult] = usePostTweetLikeMutation();
+  const { data: tweetLikes, isSuccess } = useFetchTweetLikeQuery(tweet._id);
+
+  // if (isSuccess) {
+  //   console.log("tweetLikes: ", tweetLikes);
+  // }
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -182,7 +189,7 @@ const Tweet = ({ tweet }) => {
                           )}
                         </div>
 
-                        <span>{tweet.likes.length}</span>
+                        <span>{isSuccess && tweetLikes.length}</span>
                       </div>
                     </Col>
                     <Col>

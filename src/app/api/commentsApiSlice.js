@@ -3,14 +3,14 @@ import { apiSlice } from "./apiSlice";
 export const commentApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     postComment: builder.mutation({
-      query: (body) => ({
-        url: `/comment/${body.tweetId}`,
+      query: ({ commentInput, tweetId }) => ({
+        url: `/comment/${tweetId}`,
         method: "POST",
-        body,
+        body: { commentInput },
       }),
-      // invalidatesTags: (result, error, body) => {
-      //   return [{ type: "Tweet", id: body.tweetId }];
-      // },
+      invalidatesTags: (result, error, body) => {
+        return [{ type: "Tweet", id: body.tweetId }];
+      },
     }),
     deleteComment: builder.mutation({
       query: (commentId) => ({

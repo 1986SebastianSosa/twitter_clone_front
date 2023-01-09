@@ -13,13 +13,13 @@ const TweetsList = () => {
   const toggleDeleteToast = () => setShowDeleteToast(!showDeleteToast);
   const page = useSelector(selectPage);
   const dispatch = useDispatch();
-  const { data, isLoading, isFetching, isSuccess } = useFetchTweetsQuery(page);
+  const { data, isFetching, isSuccess } = useFetchTweetsQuery(page);
 
   const handleNextPage = () => {
     dispatch(setPage({ page: page + 1 }));
   };
 
-  if (isLoading) {
+  if (isFetching) {
     return (
       <div className="loading">
         <PuffLoader size={200} color="#1d9bf0" />

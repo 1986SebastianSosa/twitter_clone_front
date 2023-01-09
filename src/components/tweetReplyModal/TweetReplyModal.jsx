@@ -33,7 +33,6 @@ const TweetReplyModal = ({
     if (!commentInput.length) {
       return setInvalidInput(true);
     }
-    console.log({ commentInput, tweetId: tweet._id });
     await postComment({ commentInput, tweetId: tweet._id });
     setCommentInput("");
 

@@ -7,18 +7,31 @@ export const tweetLikesApiSlice = apiSlice.injectEndpoints({
         url: `/tweetlike/${tweetId}`,
         method: "POST",
       }),
+      invalidatesTags: (tweetId, api, extraOptions) => [
+        { type: "TweetLike", id: tweetId },
+      ],
+    }),
+    fetchTweetLike: builder.query({
+      query: (tweetId) => ({
+        url: `/tweetlike/${tweetId}`,
+        method: "GET",
+      }),
+      queryFn: (result, api, extraOptions) => {
+        // console.log("result: ", result);
+        for (const tweetLike of result) {
+          console.log(tweetLike._id);
+        }
+      },
+      providesTags: (result, error, tweetId) => {
+        console.log("result: ", result);
+        const tags = result.map((tweetLike) => {
+          return { type: "TweetLike", id: tweetLike._id };
+        });
+        return tags;
+      },
     }),
   }),
 });
 
-const enhancedTweetLikesApiSlice = apiSlice.enhanceEndpoints({
-  endpoints: {
-    postTweetLike: {
-      invalidatesTags: (result, error, tweetId) => {
-        return [{ type: "Tweet", id: tweetId }];
-      },
-    },
-  },
-});
-
-export const { usePostTweetLikeMutation } = tweetLikesApiSlice;
+export const { usePostTweetLikeMutation, useFetchTweetLikeQuery } =
+  tweetLikesApiSlice;

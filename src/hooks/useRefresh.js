@@ -1,7 +1,5 @@
 import axios from "axios";
-import { response } from "express";
 import { useDispatch } from "react-redux";
-import { updateToken } from "../redux/authSlice";
 
 const useRefresh = () => {
   const dispatch = useDispatch();

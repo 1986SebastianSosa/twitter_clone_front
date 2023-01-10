@@ -3,32 +3,30 @@ import { PuffLoader } from "react-spinners";
 import InfiniteScroll from "react-infinite-scroll-component";
 import MyToast from "../myToast/MyToast";
 import Tweet from "../tweet/tweet";
+import { useDispatch, useSelector } from "react-redux";
+import { selectHasMore, selectTweetsToShow } from "../../redux/tweetsSlice";
+import { selectPage, setPage } from "../../redux/appSlice";
 import "./tweetList.css";
 
-const TweetsList = ({
-  allTweets,
-  setAllTweets,
-  hasMore,
-  windowWidth,
-  setPage,
-  page,
-  setNoTweets,
-  setHasMore,
-  setAllTweetsLength,
-}) => {
+const TweetsList = () => {
+  const allTweets = useSelector(selectTweetsToShow);
+  const hasMore = useSelector(selectHasMore);
+  const page = useSelector(selectPage);
+  const dispatch = useDispatch();
+  console.log(allTweets);
+
   const [showDeleteToast, setShowDeleteToast] = useState(false);
-  const toggleDeleteToast = () => setShowDeleteToast(!showDeleteToast);
 
   return (
     <>
       <MyToast
         show={showDeleteToast}
-        onClose={toggleDeleteToast}
+        onClose={() => setShowDeleteToast(!showDeleteToast)}
         content="Your tweet has been deleted"
       />
       <InfiniteScroll
         dataLength={allTweets.length} //This is important field to render the next data
-        next={() => setPage((prev) => prev + 1)}
+        // next={dispatch(setPage(page + 1))}
         hasMore={hasMore}
         loader={<PuffLoader color="#1d9bf0" />}
         endMessage={
@@ -43,13 +41,7 @@ const TweetsList = ({
             <Tweet
               key={tweet._id}
               tweet={tweet}
-              setAllTweets={setAllTweets}
-              page={page}
-              setNoTweets={setNoTweets}
-              setHasMore={setHasMore}
-              setAllTweetsLength={setAllTweetsLength}
               setShowDeleteToast={setShowDeleteToast}
-              windowWidth={windowWidth}
             />
           );
         })}

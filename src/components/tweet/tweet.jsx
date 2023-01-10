@@ -20,19 +20,18 @@ import { PuffLoader } from "react-spinners";
 import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
 import ReactTooltip from "react-tooltip";
+import { selectCurrentToken, selectCurrentUser } from "../../redux/authSlice";
+import { selectPage } from "../../redux/appSlice";
+import { selectWindowWidth } from "./../../redux/appSlice";
+import { selectHasMore, selectTweetsToShow } from "../../redux/tweetsSlice";
 
-const Tweet = ({
-  tweet,
-  setAllTweets,
-  page,
-  allTweets,
-  setNoTweets,
-  setHasMore,
-  setShowDeleteToast,
-  windowWidth,
-}) => {
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
+const Tweet = ({ tweet, setShowDeleteToast }) => {
+  const user = useSelector(selectCurrentUser);
+  const token = useSelector(selectCurrentToken);
+  const page = useSelector(selectPage);
+  const windowWidth = useSelector(selectWindowWidth);
+  const allTweets = useSelector(selectTweetsToShow);
+  const hasMore = useSelector(selectHasMore);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -71,15 +70,10 @@ const Tweet = ({
         const fetchTweets = async () => {
           const response = await getAllTweets(user, token, page);
           if (!response.data.tweetsToShow.length && !allTweets.length) {
-            setNoTweets(true);
             setIsLoading(false);
             return;
           }
-          if (response.data.tweetsToShow.length === 0) {
-            setHasMore(false);
-          }
-
-          setAllTweets(response.data.tweetsToShow);
+          // setAllTweets(response.data.tweetsToShow);
           setIsLoading(false);
           setIsDeleteLoading(false);
           setShowDeleteModal(false);

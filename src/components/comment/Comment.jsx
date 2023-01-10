@@ -17,7 +17,7 @@ import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchCommentLikes, likeComment } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
 import { deleteComment } from "../../services/commentServices";
-import ReactTooltip from "react-tooltip";
+import {Tooltip} from "react-tooltip";
 
 const Comment = ({
   comment,
@@ -175,7 +175,7 @@ const Comment = ({
         </Col>
       </Row>
       {showTooltip && (
-        <ReactTooltip
+        <Tooltip
           id="outOfScope"
           getContent={() => {
             return;
@@ -185,7 +185,7 @@ const Comment = ({
         >
           <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
           the scope of this project
-        </ReactTooltip>
+        </Tooltip>
       )}
       <DeleteModal
         title={"Comment"}

@@ -13,9 +13,12 @@ const TweetsList = () => {
   const hasMore = useSelector(selectHasMore);
   const page = useSelector(selectPage);
   const dispatch = useDispatch();
-  console.log(allTweets);
 
   const [showDeleteToast, setShowDeleteToast] = useState(false);
+
+  const handleNextPage = () => {
+    dispatch(setPage(page + 1));
+  };
 
   return (
     <>
@@ -26,7 +29,7 @@ const TweetsList = () => {
       />
       <InfiniteScroll
         dataLength={allTweets.length} //This is important field to render the next data
-        // next={dispatch(setPage(page + 1))}
+        next={handleNextPage}
         hasMore={hasMore}
         loader={<PuffLoader color="#1d9bf0" />}
         endMessage={

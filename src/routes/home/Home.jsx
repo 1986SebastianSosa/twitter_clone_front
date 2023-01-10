@@ -16,24 +16,28 @@ import BotNav from "../../components/botNav/BotNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import PostModal from "../../components/postModal/PostModal";
-import { selectCurrentUser } from "../../redux/authSlice";
 import { selectTweetsToShow, setTweetsToShow } from "../../redux/tweetsSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
-  selectisLoading,
+  selectIsLoading,
+  selectIsSuccess,
   selectPage,
   selectWindowWidth,
+  setIsError,
   setIsLoading,
+  setIsSuccess,
   setWindowWidth,
 } from "../../redux/appSlice";
+import { selectUser } from "../../redux/authSlice";
 
 const Home = () => {
-  const user = useSelector(selectCurrentUser);
+  const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const allTweets = useSelector(selectTweetsToShow);
   const page = useSelector(selectPage);
   const windowWidth = useSelector(selectWindowWidth);
-  const isLoading = useSelector(selectisLoading);
+  const isLoading = useSelector(selectIsLoading);
+  const isSuccess = useSelector(selectIsSuccess);
 
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
@@ -47,8 +51,7 @@ const Home = () => {
       dispatch(setWindowWidth(window.innerWidth));
     };
     window.addEventListener("resize", handleWindowResize);
-  }, [windowWidth]);
-
+  }, []);
   // const handleShowGoFollowModal = () => {
   //   setShowGoFollowModal(true);
   // };
@@ -65,53 +68,26 @@ const Home = () => {
   // };
 
   useEffect(() => {
-    console.log(page);
-    if (!user) {
-      return navigate("/");
-    }
     const fetchTweets = async () => {
       dispatch(setIsLoading(true));
-      const response = await axiosPrivate.get(`/tweet?page=${page}`);
-      console.log(response.data);
-      dispatch(setTweetsToShow(response.data));
+      try {
+        const response = await axiosPrivate.get(`/tweet?page=${page}`);
+        dispatch(setTweetsToShow(response.data));
+        dispatch(setIsLoading(false));
+        dispatch(setIsSuccess(true));
+      } catch (error) {
+        dispatch(setIsError(true));
+        console.log(error);
+      }
     };
-    if (page) {
+    if (page && user) {
       fetchTweets();
     }
-
-    // const fetchUser = async (userId) => {
-    //   const response = await getUser(userId);
-    //   if (response?.data?.following?.length <= 1) {
-    //     handleShowGoFollowModal();
-    //   }
-    // };
-
-    // fetchUser(user._id);
-
-    // const fetchTweets = async () => {
-    //   const response = await getAllTweets(user, token, page);
-    //   if (!response?.data?.tweetsToShow?.length && !allTweets.length) {
-    //     setNoTweets(true);
-    //     setIsLoading(false);
-    //     return;
-    //   }
-    //   if (response.data.tweetsToShow.length === 0) {
-    //     setHasMore(false);
-    //   }
-    //   setNoTweets(false);
-    //   setAllTweetsLength(response.data.allTweetsLength);
-    //   setAllTweets((prevTweets) => [
-    //     ...prevTweets,
-    //     ...response.data.tweetsToShow,
-    //   ]);
-    //   setIsLoading(false);
-    // };
-    // fetchTweets();
-  }, [page]);
+  }, [page, user]);
 
   return (
     <>
-      {user && (
+      {isSuccess && (
         <Container>
           <Row>
             <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>

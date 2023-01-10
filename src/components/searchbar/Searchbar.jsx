@@ -6,7 +6,7 @@ import {
   faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import "./searchbar.css";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 
 const Searchbar = () => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -57,7 +57,7 @@ const Searchbar = () => {
         </Col>
       </Row>
       {showTooltip && (
-        <ReactTooltip
+        <Tooltip
           id="outOfScope"
           getContent={() => {
             return;
@@ -67,7 +67,7 @@ const Searchbar = () => {
         >
           <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
           the scope of this project
-        </ReactTooltip>
+        </Tooltip>
       )}
     </Container>
   );

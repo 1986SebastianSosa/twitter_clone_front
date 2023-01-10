@@ -24,7 +24,7 @@ import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import { postComment } from "../../services/commentServices";
 import DeleteModal from "../../components/deleteModal/DeleteModal";
 import BotNav from "../../components/botNav/BotNav";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import "./tweetPage.css";
 
 const TweetPage = () => {
@@ -368,7 +368,7 @@ const TweetPage = () => {
         />
       )}
       {showTooltip && (
-        <ReactTooltip
+        <Tooltip
           id="outOfScope"
           getContent={() => {
             return;
@@ -378,7 +378,7 @@ const TweetPage = () => {
         >
           <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
           the scope of this project
-        </ReactTooltip>
+        </Tooltip>
       )}
       {/* {isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />

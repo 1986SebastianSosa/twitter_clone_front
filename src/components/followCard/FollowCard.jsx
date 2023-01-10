@@ -5,10 +5,11 @@ import { useSelector } from "react-redux";
 import { followUser, unfollowUser } from "../../services/followServices";
 import { useEffect, useState } from "react";
 import "./followCard.css";
+import { selectToken, selectUser } from "../../redux/authSlice";
 
 const FollowCard = ({ suggestion }) => {
-  const loggedUser = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
+  const loggedUser = useSelector(selectUser);
+  const token = useSelector(selectToken);
   const [isFollowed, setIsFollowed] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
 

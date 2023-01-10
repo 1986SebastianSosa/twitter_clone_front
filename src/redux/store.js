@@ -12,6 +12,8 @@ import storage from "redux-persist/lib/storage";
 import { rootReducer } from "./rootReducer";
 import { configureStore } from "@reduxjs/toolkit";
 import thunk from "redux-thunk";
+import appReducer from "./appSlice";
+import tweetsReducer from "./tweetsSlice";
 
 const persistConfig = {
   key: "root",
@@ -22,7 +24,7 @@ const persistConfig = {
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const store = configureStore({
-  reducer: persistedReducer,
+  reducer: { persistedReducer, app: appReducer, tweets: tweetsReducer },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

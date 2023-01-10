@@ -12,36 +12,66 @@ import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { deleteTweet, getAllTweets } from "../../services/tweetServices";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
 import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
-import ReactTooltip from "react-tooltip";
-import { selectCurrentToken, selectCurrentUser } from "../../redux/authSlice";
-import { selectPage } from "../../redux/appSlice";
+import { Tooltip } from "react-tooltip";
+import { selectToken, selectUser } from "../../redux/authSlice";
+import {
+  selectError,
+  selectIsError,
+  selectIsLoading,
+  selectIsSuccess,
+  selectPage,
+  setIsLoading,
+} from "../../redux/appSlice";
 import { selectWindowWidth } from "./../../redux/appSlice";
 import { selectHasMore, selectTweetsToShow } from "../../redux/tweetsSlice";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const Tweet = ({ tweet, setShowDeleteToast }) => {
-  const user = useSelector(selectCurrentUser);
-  const token = useSelector(selectCurrentToken);
+  const user = useSelector(selectUser);
+  const token = useSelector(selectToken);
   const page = useSelector(selectPage);
   const windowWidth = useSelector(selectWindowWidth);
   const allTweets = useSelector(selectTweetsToShow);
   const hasMore = useSelector(selectHasMore);
+  const isLoading = useSelector(selectIsLoading);
+  const isSuccess = useSelector(selectIsSuccess);
+  const isError = useSelector(selectIsError);
+  const Error = useSelector(selectError);
   const location = useLocation();
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
-  const [updatedTweet, setUpdatedTweet] = useState({});
   const [tweetLikes, setTweetLikes] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [userLiked, setUserLiked] = useState(false);
+
+  useEffect(() => {
+    const fetchTweetLikes = async () => {
+      try {
+        const response = await axiosPrivate.get(`/tweetLike/${tweet._id}`);
+        setTweetLikes(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchTweetLikes();
+  }, []);
+
+  useEffect(() => {
+    if (tweetLikes.includes(user._id)) {
+      setUserLiked(true);
+    }
+  }, [tweetLikes]);
 
   const handleShowDeleteModal = (e) => {
     e.stopPropagation();
@@ -62,7 +92,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
 
   const handleDeleteTweet = async () => {
     setIsDeleteLoading(true);
-    await deleteTweet(updatedTweet._id, token);
+    await deleteTweet(tweet._id, token);
     if (location.pathname.split("/")[1] === "tweet") {
       return navigate("/home");
     } else {
@@ -70,7 +100,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
         const fetchTweets = async () => {
           const response = await getAllTweets(user, token, page);
           if (!response.data.tweetsToShow.length && !allTweets.length) {
-            setIsLoading(false);
+            // setIsLoading(false);
             return;
           }
           // setAllTweets(response.data.tweetsToShow);
@@ -89,37 +119,39 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
 
   const handleLike = async (e) => {
     e.stopPropagation();
-    await likeTweet(updatedTweet._id, user._id, token);
-    const response = await fetchTweetLikes(updatedTweet._id, token);
-    setTweetLikes(response.data);
+    if (tweetLikes.includes(user._id)) {
+      setTweetLikes(tweetLikes.filter((el) => el !== user._id));
+      setUserLiked(false);
+    } else {
+      setTweetLikes([...tweetLikes, user._id]);
+      setUserLiked(true);
+    }
+    try {
+      const response = await axiosPrivate({
+        url: `/tweetLike/${tweet._id}`,
+        method: "post",
+      });
+      console.log(response);
+    } catch (error) {}
+    // await likeTweet(tweet._id, user._id, token);
+    // const response = await fetchTweetLikes(tweet._id, token);
+    // setTweetLikes(response.data);
   };
 
   const handleClick = (tweetId) => {
     navigate(`/tweet/${tweetId}`);
   };
 
-  useEffect(() => {
-    setUpdatedTweet(tweet);
-  }, []);
-
-  useEffect(() => {
-    if (updatedTweet._id) {
-      const fetch = async () => {
-        const response = await fetchTweetLikes(updatedTweet._id, token);
-        setTweetLikes(response.data);
-        setIsLoading(false);
-      };
-      fetch();
-    }
-  }, [updatedTweet]);
+  // useEffect(() => {
+  //   setUpdatedTweet(tweet);
+  // }, []);
 
   return (
     <>
-      {isLoading ? (
-        <PuffLoader color="#1d9bf0" className="m-auto" />
-      ) : (
+      {isLoading && <PuffLoader color="#1d9bf0" className="m-auto" />}
+      {isSuccess && (
         <div
-          onClick={(e) => handleClick(updatedTweet._id)}
+          onClick={(e) => handleClick(tweet._id)}
           className="tweet py-2 border-bottom"
         >
           <Row className="p-2">
@@ -143,19 +175,17 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
                   <div>
                     <div>
                       <b>
-                        {updatedTweet.author.firstname +
-                          " " +
-                          updatedTweet.author.lastname}
+                        {tweet.author.firstname + " " + tweet.author.lastname}
                       </b>{" "}
-                      {" @" + updatedTweet.author.username + " "}
+                      {" @" + tweet.author.username + " "}
                       <FontAwesomeIcon
                         icon={faCircle}
                         className="dot text-muted mx-1"
                       />
-                      <span>{getTimeElapsed(updatedTweet.createdOn)}</span>
+                      <span>{getTimeElapsed(tweet.createdOn)}</span>
                     </div>
                   </div>
-                  {updatedTweet.author._id === user._id ? (
+                  {tweet.author._id === user._id ? (
                     <div className="deleteIcon">
                       <FontAwesomeIcon
                         icon={faTrashCan}
@@ -164,7 +194,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
                     </div>
                   ) : null}
                 </Col>
-                <Col>{updatedTweet.content}</Col>
+                <Col>{tweet.content}</Col>
                 <Col>
                   <Row className="text-muted">
                     <Col>
@@ -175,7 +205,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
                         >
                           <FontAwesomeIcon icon={faMessage} />
                         </div>
-                        <span>{updatedTweet.comments.length}</span>
+                        <span>{tweet.comments.length}</span>
                       </div>
                     </Col>
                     <Col>
@@ -198,7 +228,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
                           className="rounded-circle tweetIcon me-3"
                           onClick={(e) => handleLike(e)}
                         >
-                          {userLiked() ? (
+                          {userLiked ? (
                             <FontAwesomeIcon
                               icon={faSolidHeart}
                               className="text-danger"
@@ -207,11 +237,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
                             <FontAwesomeIcon icon={faHeart} />
                           )}
                         </div>
-                        {isLoading ? (
-                          <PuffLoader size={18} color="#1d9bf0" />
-                        ) : (
-                          <span>{tweetLikes.length}</span>
-                        )}
+                        <span>{tweetLikes.length}</span>
                       </div>
                     </Col>
                     <Col>
@@ -234,7 +260,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
             </Col>
           </Row>
           {showTooltip && (
-            <ReactTooltip
+            <Tooltip
               id="outOfScope"
               getContent={() => {
                 return;
@@ -244,7 +270,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
             >
               <FontAwesomeIcon icon={faCircleInfo} /> This functionality is
               beyond the scope of this project
-            </ReactTooltip>
+            </Tooltip>
           )}
         </div>
       )}
@@ -264,8 +290,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
       ) : (
         <TweetReplyModal
           user={user}
-          setUpdatedTweet={setUpdatedTweet}
-          updatedTweet={updatedTweet}
+          tweet={tweet}
           showCommentModal={showCommentModal}
           handleCloseCommentModal={handleCloseCommentModal}
           windowWidth={windowWidth}
@@ -303,10 +328,6 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
     } else {
       return `${Math.floor(difference / year)} years ago`;
     }
-  }
-
-  function userLiked() {
-    return tweetLikes.filter((el) => el._id === user._id).length;
   }
 };
 

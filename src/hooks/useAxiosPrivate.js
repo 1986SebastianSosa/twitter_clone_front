@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { selectCurrentToken, selectCurrentUser } from "../redux/authSlice";
+import { selectToken, selectUser } from "../redux/authSlice";
 import { axiosPrivate } from "../api/axiosPrivate";
 import useRefresh from "./useRefresh";
 
-const UseAxiosPrivate = () => {
-  const user = useSelector(selectCurrentUser);
-  const token = useSelector(selectCurrentToken);
+const useAxiosPrivate = () => {
+  const user = useSelector(selectUser);
+  const token = useSelector(selectToken);
   const refresh = useRefresh();
 
   useEffect(() => {
@@ -42,4 +42,4 @@ const UseAxiosPrivate = () => {
   return axiosPrivate;
 };
 
-export default UseAxiosPrivate;
+export default useAxiosPrivate;

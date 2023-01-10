@@ -19,7 +19,7 @@ import { Button } from "react-bootstrap";
 import UserMenu from "./../userMenu/UserMenu";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 
 const Sidenav = ({ windowWidth }) => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -111,7 +111,7 @@ const Sidenav = ({ windowWidth }) => {
 
         <UserMenu windowWidth={windowWidth} />
         {showTooltip && (
-          <ReactTooltip
+          <Tooltip
             id="outOfScope"
             getContent={() => {
               return;
@@ -121,7 +121,7 @@ const Sidenav = ({ windowWidth }) => {
           >
             <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
             the scope of this project
-          </ReactTooltip>
+          </Tooltip>
         )}
       </nav>
     </>

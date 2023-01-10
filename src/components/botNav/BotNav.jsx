@@ -9,9 +9,10 @@ import { Button, Col, Container, Row } from "react-bootstrap";
 import "./botnav.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { selectUser } from "../../redux/authSlice";
 
 const BotNav = () => {
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector(selectUser);
   const navigate = useNavigate();
   return (
     <>

@@ -3,7 +3,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import "./trendingSidenav.css";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 
 const trending = [
   {
@@ -95,7 +95,7 @@ const TrendingSidenav = () => {
           </Col>
         </Row>
         {showTooltip && (
-          <ReactTooltip
+          <Tooltip
             id="outOfScope"
             getContent={() => {
               return;
@@ -105,7 +105,7 @@ const TrendingSidenav = () => {
           >
             <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
             the scope of this project
-          </ReactTooltip>
+          </Tooltip>
         )}
       </Container>
     </>

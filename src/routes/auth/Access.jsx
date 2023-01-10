@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter, faApple } from "@fortawesome/free-brands-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import GoogleIcon from "../../img/google_icon.png";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from "react-tooltip";
 import RegisterModal from "./RegisterModal";
 import LoginModal from "./LoginModal";
 
@@ -20,22 +20,22 @@ const Access = () => {
 
   return (
     <Container fluid className="m-0 p-0">
-      <ReactTooltip
+      <Tooltip
         id="google"
         getContent={() => {
           return;
         }}
       >
         <FontAwesomeIcon icon={faCircleInfo} /> Comming soon!
-      </ReactTooltip>
-      <ReactTooltip
+      </Tooltip>
+      <Tooltip
         id="apple"
         getContent={() => {
           return;
         }}
       >
         <FontAwesomeIcon icon={faCircleInfo} /> Comming soon!
-      </ReactTooltip>
+      </Tooltip>
       <Row className="accessMain m-0">
         <Col xs={12} lg={7} className="m-0 p-0">
           <div className="accessImgDiv">

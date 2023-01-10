@@ -4,14 +4,14 @@ import { faUser, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "./../../services/authServices";
-import { logOut } from "../../redux/authSlice";
+import { logOut, selectUser } from "../../redux/authSlice";
 import "./userMenu.css";
 
 const UserMenu = ({ windowWidth }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector(selectUser);
   const { firstname, lastname, username } = user;
 
   const logoutHandler = async () => {

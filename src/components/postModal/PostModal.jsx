@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { Button, Col, Modal, Row } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { PuffLoader } from "react-spinners";
+import { selectToken, selectUser } from "../../redux/authSlice";
 import { getAllTweets, postTweet } from "../../services/tweetServices";
 import "./postModal.css";
 
@@ -25,8 +26,8 @@ const PostModal = ({
   setHasMore,
   setAllTweetsLength,
 }) => {
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
+  const user = useSelector(selectUser);
+  const token = useSelector(selectToken);
   const [focused, setFocused] = useState(false);
   const [tweetInput, setTweetInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

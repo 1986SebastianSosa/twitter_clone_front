@@ -1,9 +1,10 @@
 import { Modal, Button } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { selectUser } from "../../redux/authSlice";
 
 const GoFollowModal = ({ handleCloseGoFollowModal, showGoFollowModal }) => {
-  const user = useSelector((state) => state.auth.user);
+  const user = useSelector(selectUser);
   const navigate = useNavigate();
   const clickHandler = () => {
     navigate("/follow/" + user._id);

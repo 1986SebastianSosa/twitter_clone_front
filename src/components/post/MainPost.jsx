@@ -14,6 +14,7 @@ import "./mainpost.css";
 import { getAllTweets, postTweet } from "./../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
 import { useSelector } from "react-redux";
+import { selectToken } from "../../redux/authSlice";
 
 const MainPost = ({
   user,
@@ -24,7 +25,7 @@ const MainPost = ({
   setHasMore,
   setAllTweetsLength,
 }) => {
-  const token = useSelector((state) => state.auth.token);
+  const token = useSelector(selectToken);
   const [focused, setFocused] = useState(false);
   const [tweetInput, setTweetInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);

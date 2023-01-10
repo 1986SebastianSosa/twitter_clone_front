@@ -3,13 +3,14 @@ import { useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { selectToken, selectUser } from "../../redux/authSlice";
 import { showFollowSuggestions } from "../../services/followServices";
 import FollowCard from "../followCard/FollowCard";
 import "./whoToFollow.css";
 
 const WhoToFollow = () => {
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
+  const user = useSelector(selectUser);
+  const token = useSelector(selectToken);
   const [followSuggestions, setFollowSuggestions] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {

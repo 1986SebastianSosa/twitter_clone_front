@@ -19,13 +19,8 @@ import PostModal from "../../components/postModal/PostModal";
 import { selectTweetsToShow, setTweetsToShow } from "../../redux/tweetsSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
-  selectIsLoading,
-  selectIsSuccess,
   selectPage,
   selectWindowWidth,
-  setIsError,
-  setIsLoading,
-  setIsSuccess,
   setWindowWidth,
 } from "../../redux/appSlice";
 import { selectUser } from "../../redux/authSlice";
@@ -36,9 +31,9 @@ const Home = () => {
   const allTweets = useSelector(selectTweetsToShow);
   const page = useSelector(selectPage);
   const windowWidth = useSelector(selectWindowWidth);
-  const isLoading = useSelector(selectIsLoading);
-  const isSuccess = useSelector(selectIsSuccess);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
 
@@ -52,6 +47,24 @@ const Home = () => {
     };
     window.addEventListener("resize", handleWindowResize);
   }, []);
+
+  useEffect(() => {
+    const fetchTweets = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axiosPrivate.get(`/tweet?page=${page}`);
+        dispatch(setTweetsToShow(response.data));
+        setIsLoading(false);
+      } catch (error) {
+        setIsError(true);
+        console.log(error);
+      }
+    };
+    if (page && user) {
+      fetchTweets();
+    }
+  }, [page, user]);
+
   // const handleShowGoFollowModal = () => {
   //   setShowGoFollowModal(true);
   // };
@@ -67,77 +80,57 @@ const Home = () => {
   //   setShowPostModal(false);
   // };
 
-  useEffect(() => {
-    const fetchTweets = async () => {
-      dispatch(setIsLoading(true));
-      try {
-        const response = await axiosPrivate.get(`/tweet?page=${page}`);
-        dispatch(setTweetsToShow(response.data));
-        dispatch(setIsLoading(false));
-        dispatch(setIsSuccess(true));
-      } catch (error) {
-        dispatch(setIsError(true));
-        console.log(error);
-      }
-    };
-    if (page && user) {
-      fetchTweets();
-    }
-  }, [page, user]);
-
   return (
     <>
-      {isSuccess && (
-        <Container>
-          <Row>
-            <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
-              <Sidenav windowWidth={windowWidth} />
-            </Col>
-            <Col
-              xs={12}
-              sm={10}
-              md={9}
-              lg={6}
-              className="border-start border-end border-light p-0"
-            >
-              {windowWidth > 576 && (
-                <>
-                  <Topnav title="Home" />
-                  <MainPost />
-                </>
-              )}
-
-              {isLoading ? (
-                <div className="loading">
-                  <PuffLoader size={200} color="#1d9bf0" />
-                </div>
-              ) : !allTweets.length ? (
-                <h4 className="p-2 mt-5 text-muted">
-                  Sorry, there are no tweets to show at this moment :({" "}
-                </h4>
-              ) : (
-                <TweetsList />
-              )}
-            </Col>
-            {windowWidth >= 992 && (
-              <Col xs={3}>
-                <Searchbar />
-                <TrendingSidenav />
-                <WhoToFollow />
-              </Col>
+      <Container>
+        <Row>
+          <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
+            <Sidenav windowWidth={windowWidth} />
+          </Col>
+          <Col
+            xs={12}
+            sm={10}
+            md={9}
+            lg={6}
+            className="border-start border-end border-light p-0"
+          >
+            {windowWidth > 576 && (
+              <>
+                <Topnav title="Home" />
+                <MainPost />
+              </>
             )}
-          </Row>
-          {windowWidth < 576 && (
-            <Button
-              className="tweetMobileBtn tweetBtn rounded-circle text-white fw-bold fs-5"
-              onClick={() => setShowPostModal}
-            >
-              <FontAwesomeIcon icon={faFeather} />
-            </Button>
+
+            {isLoading ? (
+              <div className="loading">
+                <PuffLoader size={200} color="#1d9bf0" />
+              </div>
+            ) : !allTweets.length ? (
+              <h4 className="p-2 mt-5 text-muted">
+                Sorry, there are no tweets to show at this moment :({" "}
+              </h4>
+            ) : (
+              <TweetsList />
+            )}
+          </Col>
+          {windowWidth >= 992 && (
+            <Col xs={3}>
+              <Searchbar />
+              <TrendingSidenav />
+              <WhoToFollow />
+            </Col>
           )}
-          {windowWidth < 576 && <BotNav />}
-        </Container>
-      )}
+        </Row>
+        {windowWidth < 576 && (
+          <Button
+            className="tweetMobileBtn tweetBtn rounded-circle text-white fw-bold fs-5"
+            onClick={() => setShowPostModal}
+          >
+            <FontAwesomeIcon icon={faFeather} />
+          </Button>
+        )}
+        {windowWidth < 576 && <BotNav />}
+      </Container>
       <GoFollowModal
         handleCloseGoFollowModal={() => setShowGoFollowModal(false)}
         showGoFollowModal={showGoFollowModal}

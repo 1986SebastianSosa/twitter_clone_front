@@ -11,80 +11,102 @@ import {
   faEarthAmericas,
 } from "@fortawesome/free-solid-svg-icons";
 import "./mainpost.css";
-import { getAllTweets, postTweet } from "./../../services/tweetServices";
 import { PuffLoader } from "react-spinners";
-import { useSelector } from "react-redux";
-import { selectToken } from "../../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const MainPost = ({
-  user,
-  allTweets,
-  setAllTweets,
-  page,
-  setNoTweets,
-  setHasMore,
-  setAllTweetsLength,
-}) => {
-  const token = useSelector(selectToken);
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import {
+  selectTweetsToShow,
+  selectHasMore,
+  setTweetsToShow,
+} from "./../../redux/tweetsSlice";
+
+const MainPost = () => {
+  const axiosPrivate = useAxiosPrivate();
+  const dispatch = useDispatch();
+  const hasMore = useSelector(selectHasMore);
+  const allTweets = useSelector(selectTweetsToShow);
   const [focused, setFocused] = useState(false);
-  const [tweetInput, setTweetInput] = useState("");
+  const [tweetContent, setTweetContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [showErrorMsg, setShowErrorMsg] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (tweetContent.length) {
+      setIsError(false);
+    }
+  }, [tweetContent]);
 
   const handleFocus = () => {
     setFocused(true);
   };
 
   const handleChange = (e) => {
-    setTweetInput(e.target.value);
+    setTweetContent(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
+  const handlePostTweet = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    if (!tweetContent.length) {
+      setError("* You need to write something");
+      return setIsError(true);
+    }
     try {
-      if (!tweetInput.length) {
-        setErrorMsg("* You need to write something");
-        setShowErrorMsg(true);
-      } else {
-        setIsLoading(true);
-        await postTweet(token, tweetInput);
-        setTweetInput("");
-        const fetchTweets = async () => {
-          const response = await getAllTweets(user, token, page);
-          if (!response.data.tweetsToShow.length && !allTweets.length) {
-            setNoTweets(true);
-            setIsLoading(false);
-            return;
-          }
-          if (response.data.tweetsToShow.length === 0) {
-            setHasMore(false);
-          }
-          setNoTweets(false);
-          setAllTweetsLength(response.data.allTweetsLength);
-          setAllTweets(response.data.tweetsToShow);
-          setIsLoading(false);
-        };
-        fetchTweets();
-      }
+      const postResponse = await axiosPrivate({
+        url: "/tweet",
+        method: "post",
+        data: {
+          tweetContent,
+          createdOn: new Date(),
+        },
+      });
+      const fetchResponse = await axiosPrivate.get(
+        `/tweet/${postResponse.data._id}`
+      );
+      dispatch(
+        setTweetsToShow({
+          hasMore,
+          tweetsToShow: [fetchResponse.data, ...allTweets],
+        })
+      );
+      setTweetContent("");
     } catch (error) {
-      setErrorMsg("You need to be logged in to write something");
-      setShowErrorMsg(true);
-      // setTimeout(() => {
-      //   navigate("/");
-      // }, 5000);
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
+    // try {
+    //
+    //   } else {
+    //     setIsLoading(true);
+    //     await postTweet(token, tweetContent);
+    //     setTweetContent("");
+    //     const fetchTweets = async () => {
+    //       const response = await getAllTweets(user, token, page);
+    //       if (!response.data.tweetsToShow.length && !allTweets.length) {
+    //         setIsLoading(false);
+    //         return;
+    //       }
+    //       if (response.data.tweetsToShow.length === 0) {
+    //         setHasMore(false);
+    //       }
+    //       setNoTweets(false);
+    //       setAllTweetsLength(response.data.allTweetsLength);
+    //       setAllTweets(response.data.tweetsToShow);
+    //       setIsLoading(false);
+    //     };
+    //     fetchTweets();
+    //   }
+    // } catch (error) {
+    //   setError("You need to be logged in to write something");
+    //   setIsError(true);
+    //   // setTimeout(() => {
+    //   //   navigate("/");
+    //   // }, 5000);
+    // }
   };
-
-  useEffect(() => {
-    setIsLoading(false);
-  }, [allTweets]);
-
-  useEffect(() => {
-    if (tweetInput.length) {
-      setShowErrorMsg(false);
-    }
-  }, [tweetInput]);
 
   return (
     <>
@@ -99,7 +121,7 @@ const MainPost = ({
           </Col>
           <Col xs={10}>
             <Row className="flex-column">
-              <form onSubmit={(e) => handleSubmit(e)}>
+              <form onSubmit={(e) => handlePostTweet(e)}>
                 <Col className="p-2">
                   <input
                     name="tweetContent"
@@ -108,13 +130,11 @@ const MainPost = ({
                     placeholder="What's happening?"
                     onFocus={handleFocus}
                     onChange={handleChange}
-                    value={tweetInput}
+                    value={tweetContent}
                   />
 
                   <Col>
-                    {showErrorMsg && (
-                      <span className="text-danger">{errorMsg}</span>
-                    )}
+                    {isError && <span className="text-danger">{error}</span>}
                     {focused && (
                       <div className="border-bottom border-light">
                         <Button className="bg-white border-0 text-primary reply-btn rounded-pill py-0 mt-3 mb-2">

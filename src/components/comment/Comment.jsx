@@ -11,61 +11,70 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { getOneTweet } from "../../services/tweetServices";
 import { useSelector } from "react-redux";
 import DeleteModal from "./../deleteModal/DeleteModal";
-import { fetchCommentLikes, likeComment } from "../../services/likeServices";
 import { PuffLoader } from "react-spinners";
-import { deleteComment } from "../../services/commentServices";
-import {Tooltip} from "react-tooltip";
+import { Tooltip } from "react-tooltip";
+import { selectUser } from "../../redux/authSlice";
+import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
+import { getTimeElapsed } from "./../../util/getTimeElapsed";
 
 const Comment = ({
   comment,
   setShowDeleteToast,
   tweet,
   setTweet,
+  comments,
   setComments,
   windowWidth,
 }) => {
-  const user = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
+  const user = useSelector(selectUser);
+  const axiosPrivate = useAxiosPrivate();
+  const [isLoading, setIsLoading] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentLikes, setCommentLikes] = useState([]);
-  const [isDeleteCommentLoading, setIsDeleteCommentLoading] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [userLiked, setUserLiked] = useState(false);
 
   const handleShowDeleteModal = () => setShowDeleteModal(true);
   const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
-  const handleDeleteComment = async () => {
-    setIsDeleteCommentLoading(true);
-    await deleteComment(comment._id, token, tweet._id);
-    const response = await getOneTweet(tweet._id, token);
-    setTweet(response.data);
-    setIsDeleteCommentLoading(false);
-    const sortedCommentsArr = tweet.comments.sort((a, b) => {
-      return Date.parse(b.createdOn) - Date.parse(a.createdOn);
-    });
-    setComments(sortedCommentsArr);
-    setShowDeleteModal(false);
-    setShowDeleteToast(true);
-  };
-
-  const handleLike = async () => {
-    await likeComment(comment._id, user._id, token);
-    const response = await fetchCommentLikes(comment._id, user._id, token);
-    setCommentLikes(response.data);
-  };
+  useEffect(() => {
+    setCommentLikes(comment.likes);
+  }, []);
 
   useEffect(() => {
-    const fetch = async () => {
-      const response = await fetchCommentLikes(comment._id, user._id, token);
-      setCommentLikes(response.data);
+    if (commentLikes.includes(user._id)) {
+      setUserLiked(true);
+    } else {
+      setUserLiked(false);
+    }
+  }, [commentLikes]);
+
+  const handleDeleteComment = async () => {
+    setIsLoading(true);
+    try {
+      await axiosPrivate.delete(`/comment/${comment._id}`);
+      setComments(comments.filter((el) => el._id !== comment._id));
+    } catch (error) {
+      console.log(error);
+    } finally {
       setIsLoading(false);
-    };
-    fetch();
-  }, []);
+    }
+  };
+
+  const handleLikeComment = async () => {
+    if (commentLikes.includes(user._id)) {
+      setCommentLikes(commentLikes.filter((el) => el !== user._id));
+    } else {
+      setCommentLikes([user._id, ...commentLikes]);
+    }
+    try {
+      await axiosPrivate.post(`/commentLike/${comment._id}`);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -140,9 +149,9 @@ const Comment = ({
                   <div className="d-flex align-items-center">
                     <div
                       className="rounded-circle tweetIcon me-3"
-                      onClick={handleLike}
+                      onClick={handleLikeComment}
                     >
-                      {userLiked() ? (
+                      {userLiked ? (
                         <FontAwesomeIcon
                           icon={faSolidHeart}
                           className="text-danger"
@@ -174,6 +183,7 @@ const Comment = ({
           </Row>
         </Col>
       </Row>
+
       {showTooltip && (
         <Tooltip
           id="outOfScope"
@@ -188,47 +198,14 @@ const Comment = ({
         </Tooltip>
       )}
       <DeleteModal
+        isLoading={isLoading}
         title={"Comment"}
         showDeleteModal={showDeleteModal}
         handleCloseDeleteModal={handleCloseDeleteModal}
         handleDelete={handleDeleteComment}
-        isDeleteCommentLoading={isDeleteCommentLoading}
       />
     </>
   );
-  function getTimeElapsed(date) {
-    const second = 1000;
-    const minute = 1000 * 60;
-    const hour = 1000 * 60 * 60;
-    const day = 1000 * 60 * 60 * 24;
-    const month = 1000 * 60 * 60 * 24 * 30;
-    const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(date);
-
-    if (difference < second) {
-      return "Now";
-    }
-    if (difference < minute) {
-      return `${Math.floor(difference / second)} seconds ago`;
-    }
-    if (difference < hour) {
-      return `${Math.floor(difference / minute)} minutes ago`;
-    }
-    if (difference < day) {
-      return `${Math.floor(difference / hour)} hours ago`;
-    }
-    if (difference < month) {
-      return `${Math.floor(difference / day)} days ago`;
-    }
-    if (difference < year) {
-      return `${Math.floor(difference / month)} months ago`;
-    } else {
-      return `${Math.floor(difference / year)} years ago`;
-    }
-  }
-  function userLiked() {
-    return commentLikes.filter((el) => el._id === user._id).length;
-  }
 };
 
 export default Comment;

@@ -2,7 +2,6 @@ import { Modal, Button, Row, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faCircle } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { postComment } from "../../services/commentServices";
 import {
   faImage,
   faSquarePollHorizontal,
@@ -10,21 +9,36 @@ import {
   faCalendarDay,
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
-import { getOneTweet } from "../../services/tweetServices";
-import { useSelector } from "react-redux";
-import { selectToken } from "../../redux/authSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectToken, selectUser } from "../../redux/authSlice";
+import { selectWindowWidth } from "../../redux/appSlice";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { getTimeElapsed } from "./../../util/getTimeElapsed";
+import { PuffLoader } from "react-spinners";
 
 const TweetReplyModal = ({
   tweet,
-  setUpdatedTweet,
+  comments,
+  setComments,
   showCommentModal,
   handleCloseCommentModal,
-  user,
-  windowWidth,
 }) => {
   const token = useSelector(selectToken);
+  const user = useSelector(selectUser);
+  const windowWidth = useSelector(selectWindowWidth);
+  const axiosPrivate = useAxiosPrivate();
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [commentInput, setCommentInput] = useState("");
   const [invalidInput, setInvalidInput] = useState(false);
+
+  useEffect(() => {
+    if (commentInput.length) {
+      setIsError(false);
+    }
+  }, [commentInput]);
 
   const handleChange = (e) => {
     setCommentInput(e.target.value);
@@ -33,20 +47,23 @@ const TweetReplyModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!commentInput.length) {
-      return setInvalidInput(true);
+      return dispatch(setIsError(false));
     }
-    await postComment(commentInput, user._id, tweet._id, token);
-    setCommentInput("");
-    const fetchResponse = await getOneTweet(tweet._id, token);
-    setUpdatedTweet(fetchResponse.data);
-    handleCloseCommentModal();
+    try {
+      const response = await axiosPrivate({
+        url: `/comment/${tweet._id}`,
+        method: "post",
+        data: {
+          commentInput,
+        },
+      });
+      setComments([...comments, response.data.comment._id]);
+      handleCloseCommentModal();
+    } catch (error) {
+      setIsError(true);
+      console.log(error);
+    }
   };
-
-  useEffect(() => {
-    if (commentInput.length) {
-      setInvalidInput(false);
-    }
-  }, [commentInput]);
 
   return (
     <Modal
@@ -95,39 +112,43 @@ const TweetReplyModal = ({
               </Row>
             </Col>
           </Row>
-          <Row>
-            <Col xs={2} className="p-0">
-              <div
-                className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
-                  windowWidth < 576 && "avatar"
-                }`}
-              >
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className={`${
-                    windowWidth > 576 ? "fa-3x" : "fa-2x"
-                  } text-secondary`}
-                />
-              </div>
-            </Col>
-            <Col xs={10}>
-              <input
-                name="tweetContent"
-                type="text"
-                className="border-0 main-input text-muted fs-5"
-                placeholder="Tweet your reply"
-                onChange={handleChange}
-                value={commentInput}
-              />
-              {invalidInput && (
-                <div>
-                  <span className="text-danger">
-                    * You need to write something!
-                  </span>
+          {isLoading ? (
+            <PuffLoader size={100} color="#1d9bf0" className="m-auto" />
+          ) : (
+            <Row>
+              <Col xs={2} className="p-0">
+                <div
+                  className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                    windowWidth < 576 && "avatar"
+                  }`}
+                >
+                  <FontAwesomeIcon
+                    icon={faUser}
+                    className={`${
+                      windowWidth > 576 ? "fa-3x" : "fa-2x"
+                    } text-secondary`}
+                  />
                 </div>
-              )}
-            </Col>
-          </Row>
+              </Col>
+              <Col xs={10}>
+                <input
+                  name="tweetContent"
+                  type="text"
+                  className="border-0 main-input text-muted fs-5"
+                  placeholder="Tweet your reply"
+                  onChange={handleChange}
+                  value={commentInput}
+                />
+                {error && (
+                  <div>
+                    <span className="text-danger">
+                      * You need to write something!
+                    </span>
+                  </div>
+                )}
+              </Col>
+            </Row>
+          )}
         </Modal.Body>
 
         <div className="p-2 d-flex justify-content-between">
@@ -163,32 +184,6 @@ const TweetReplyModal = ({
       </form>
     </Modal>
   );
-  function getTimeElapsed(date) {
-    const second = 1000;
-    const minute = 1000 * 60;
-    const hour = 1000 * 60 * 60;
-    const day = 1000 * 60 * 60 * 24;
-    const month = 1000 * 60 * 60 * 24 * 30;
-    const year = 1000 * 60 * 60 * 24 * 30 * 12;
-    let difference = Date.now() - Date.parse(new Date(date));
-
-    switch (difference) {
-      case difference < second:
-        return "Now";
-      case difference < minute:
-        return `${Math.floor(difference / second)} seconds ago`;
-      case difference < hour:
-        return `${Math.floor(difference / minute)} minutes ago`;
-      case difference < day:
-        return `${Math.floor(difference / hour)} hours ago`;
-      case difference < month:
-        return `${Math.floor(difference / day)} days ago`;
-      case difference < year:
-        return `${Math.floor(difference / month)} months ago`;
-      default:
-        return `${Math.floor(difference / year)} years ago`;
-    }
-  }
 };
 
 export default TweetReplyModal;

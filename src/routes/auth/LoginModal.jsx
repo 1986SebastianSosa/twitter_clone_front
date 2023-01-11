@@ -58,8 +58,8 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
           handleCloseLoginModal();
           setIsLoading(false);
         }
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        console.log(error);
       }
     },
   });

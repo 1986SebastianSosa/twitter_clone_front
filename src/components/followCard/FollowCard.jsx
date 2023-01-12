@@ -16,18 +16,6 @@ const FollowCard = ({ suggestion }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axiosPrivate.get("/user");
-        dispatch(updateUser(response.data));
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
     if (user.following.includes(suggestion._id)) {
       setIsFollowed(true);
     }

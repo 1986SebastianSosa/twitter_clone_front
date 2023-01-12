@@ -20,9 +20,11 @@ import UserMenu from "./../userMenu/UserMenu";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Tooltip } from "react-tooltip";
+import PostModal from "../postModal/PostModal";
 
 const Sidenav = ({ windowWidth }) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showPostModal, setShowPostModal] = useState(false);
   const navigate = useNavigate();
   const homeClickHandler = () => {
     navigate("/home");
@@ -100,7 +102,10 @@ const Sidenav = ({ windowWidth }) => {
           );
         })}
         {windowWidth >= 1260 ? (
-          <Button className="tweetBtn rounded-pill text-white fw-bold fs-5">
+          <Button
+            onClick={() => setShowPostModal(true)}
+            className="tweetBtn rounded-pill text-white fw-bold fs-5"
+          >
             Tweet
           </Button>
         ) : (
@@ -110,6 +115,10 @@ const Sidenav = ({ windowWidth }) => {
         )}
 
         <UserMenu windowWidth={windowWidth} />
+        <PostModal
+          showPostModal={showPostModal}
+          handleClosePostModal={() => setShowPostModal(false)}
+        />
         {showTooltip && (
           <Tooltip
             id="outOfScope"

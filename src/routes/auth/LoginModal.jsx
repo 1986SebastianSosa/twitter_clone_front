@@ -11,13 +11,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { faCircleExclamation } from "@fortawesome/free-solid-svg-icons";
 import * as Yup from "yup";
-import { loginUser } from "../../services/authServices";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setCredentials } from "../../redux/authSlice";
 import { useState } from "react";
 import MyToast from "../../components/myToast/MyToast";
 import { PuffLoader } from "react-spinners";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
   const [error, setError] = useState(false);
@@ -25,6 +25,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
 
   const LoginSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Required"),
@@ -42,7 +43,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     onSubmit: async (values) => {
       setIsLoading(true);
       try {
-        const response = await loginUser(values);
+        const response = await axiosPrivate.post("/login", { data: values });
 
         if (response.response?.status === 0) {
           setIsLoading(false);

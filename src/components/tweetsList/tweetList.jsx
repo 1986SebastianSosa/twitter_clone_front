@@ -5,8 +5,10 @@ import MyToast from "../myToast/MyToast";
 import Tweet from "../tweet/tweet";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  resetTweetsToShow,
   selectHasMore,
   selectTweetsToShow,
+  setHasMore,
   setTweetsToShow,
 } from "../../redux/tweetsSlice";
 import { selectPage, setPage } from "../../redux/appSlice";
@@ -17,11 +19,10 @@ const TweetsList = () => {
   const allTweets = useSelector(selectTweetsToShow);
   const hasMore = useSelector(selectHasMore);
   const page = useSelector(selectPage);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
   const dispatch = useDispatch();
   const axiosPrivate = useAxiosPrivate();
 
+  const [isError, setIsError] = useState(false);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
 
   useEffect(() => {
@@ -29,13 +30,11 @@ const TweetsList = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(setTweetsToShow({ hasMore, tweetsToShow: [] }));
     const fetchTweets = async () => {
-      setIsLoading(true);
       try {
         const response = await axiosPrivate.get(`/tweet?page=${page}`);
-        dispatch(setTweetsToShow(response.data));
-        setIsLoading(false);
+        dispatch(setTweetsToShow(response.data.tweetsToShow));
+        dispatch(setHasMore(response.data.hasMore));
       } catch (error) {
         setIsError(true);
         console.log(error);
@@ -56,8 +55,8 @@ const TweetsList = () => {
         content="Your tweet has been deleted"
       />
       {!allTweets.length ? (
-        <div className="loading">
-          <PuffLoader size={200} color="#1d9bf0" />
+        <div className="loading w-100">
+          <PuffLoader size={200} color="#1d9bf0" className="m-auto" />
         </div>
       ) : (
         <InfiniteScroll

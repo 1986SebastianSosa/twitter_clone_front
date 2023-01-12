@@ -19,6 +19,7 @@ import {
   selectTweetsToShow,
   selectHasMore,
   setTweetsToShow,
+  addTweet,
 } from "./../../redux/tweetsSlice";
 
 const MainPost = () => {
@@ -54,58 +55,20 @@ const MainPost = () => {
       return setIsError(true);
     }
     try {
-      const postResponse = await axiosPrivate({
-        url: "/tweet",
-        method: "post",
-        data: {
-          tweetContent,
-          createdOn: new Date(),
-        },
+      const postResponse = await axiosPrivate.post("/tweet", {
+        tweetContent,
+        createdOn: new Date(),
       });
       const fetchResponse = await axiosPrivate.get(
         `/tweet/${postResponse.data._id}`
       );
-      dispatch(
-        setTweetsToShow({
-          hasMore,
-          tweetsToShow: [fetchResponse.data, ...allTweets],
-        })
-      );
+      dispatch(addTweet(fetchResponse.data));
       setTweetContent("");
     } catch (error) {
       console.log(error);
     } finally {
       setIsLoading(false);
     }
-    // try {
-    //
-    //   } else {
-    //     setIsLoading(true);
-    //     await postTweet(token, tweetContent);
-    //     setTweetContent("");
-    //     const fetchTweets = async () => {
-    //       const response = await getAllTweets(user, token, page);
-    //       if (!response.data.tweetsToShow.length && !allTweets.length) {
-    //         setIsLoading(false);
-    //         return;
-    //       }
-    //       if (response.data.tweetsToShow.length === 0) {
-    //         setHasMore(false);
-    //       }
-    //       setNoTweets(false);
-    //       setAllTweetsLength(response.data.allTweetsLength);
-    //       setAllTweets(response.data.tweetsToShow);
-    //       setIsLoading(false);
-    //     };
-    //     fetchTweets();
-    //   }
-    // } catch (error) {
-    //   setError("You need to be logged in to write something");
-    //   setIsError(true);
-    //   // setTimeout(() => {
-    //   //   navigate("/");
-    //   // }, 5000);
-    // }
   };
 
   return (

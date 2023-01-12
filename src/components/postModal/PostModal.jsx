@@ -10,17 +10,17 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { Button, Col, Modal, Row } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PuffLoader } from "react-spinners";
-import { selectToken, selectUser } from "../../redux/authSlice";
-import { getAllTweets, postTweet } from "../../services/tweetServices";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { addTweet } from "../../redux/tweetsSlice";
 import "./postModal.css";
 
 const PostModal = ({ showPostModal, handleClosePostModal }) => {
-  const user = useSelector(selectUser);
-  const token = useSelector(selectToken);
+  const axiosPrivate = useAxiosPrivate();
+  const dispatch = useDispatch();
   const [focused, setFocused] = useState(false);
-  const [tweetInput, setTweetInput] = useState("");
+  const [tweetContent, setTweetContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
@@ -30,55 +30,35 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
   };
 
   const handleChange = (e) => {
-    setTweetInput(e.target.value);
+    setTweetContent(e.target.value);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     if (!tweetInput.length) {
-  //       setErrorMsg("* You need to write something");
-  //       setShowErrorMsg(true);
-  //     } else {
-  //       setIsLoading(true);
-  //       await postTweet(token, tweetInput);
-  //       setTweetInput("");
-  //       const fetchTweets = async () => {
-  //         const response = await getAllTweets(user, token, page);
-  //         if (!response.data.tweetsToShow.length && !allTweets.length) {
-  //           setNoTweets(true);
-  //           setIsLoading(false);
-  //           return;
-  //         }
-  //         if (response.data.tweetsToShow.length === 0) {
-  //           setHasMore(false);
-  //         }
-  //         setNoTweets(false);
-  //         setAllTweetsLength(response.data.allTweetsLength);
-  //         setAllTweets(response.data.tweetsToShow);
-  //         setIsLoading(false);
-  //         handleClosePostModal();
-  //       };
-  //       fetchTweets();
-  //     }
-  //   } catch (error) {
-  //     setErrorMsg("You need to be logged in to write something");
-  //     setShowErrorMsg(true);
-  //     // setTimeout(() => {
-  //     //   navigate("/");
-  //     // }, 5000);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   setIsLoading(false);
-  // }, [allTweets]);
+  const handlePostTweet = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const postResponse = await axiosPrivate.post("/tweet", {
+        tweetContent,
+      });
+      const fetchResponse = await axiosPrivate.get(
+        `/tweet/${postResponse.data._id}`
+      );
+      console.log(fetchResponse.data);
+      dispatch(addTweet(fetchResponse.data));
+      setTweetContent("");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+      handleClosePostModal();
+    }
+  };
 
   useEffect(() => {
-    if (tweetInput.length) {
+    if (tweetContent.length) {
       setShowErrorMsg(false);
     }
-  }, [tweetInput]);
+  }, [tweetContent]);
 
   return (
     <>
@@ -102,7 +82,7 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
             </Col>
             <Col xs={10}>
               <Row className="flex-column">
-                <form>
+                <form onSubmit={handlePostTweet}>
                   <Col className="p-2">
                     <input
                       name="tweetContent"
@@ -111,7 +91,7 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
                       placeholder="What's happening?"
                       onFocus={handleFocus}
                       onChange={handleChange}
-                      value={tweetInput}
+                      value={tweetContent}
                     />
 
                     <Col>

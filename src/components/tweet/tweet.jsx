@@ -11,7 +11,6 @@ import {
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { deleteTweet, getAllTweets } from "../../services/tweetServices";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import DeleteModal from "./../deleteModal/DeleteModal";
@@ -22,6 +21,7 @@ import { Tooltip } from "react-tooltip";
 import { selectToken, selectUser } from "../../redux/authSlice";
 import { selectPage, selectWindowWidth } from "../../redux/appSlice";
 import {
+  deleteTweet,
   selectHasMore,
   selectTweetsToShow,
   setTweetsToShow,
@@ -82,17 +82,15 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
     setIsDeleteLoading(true);
     try {
       await axiosPrivate.delete(`/tweet/${tweet._id}`);
-      dispatch(
-        setTweetsToShow({
-          hasMore,
-          tweetsToShow: allTweets.filter((el) => el._id !== tweet._id),
-        })
-      );
+      dispatch(deleteTweet(tweet._id));
       if (location.pathname.split("/")[1] === "tweet") {
         return navigate("/home");
       }
+      setShowDeleteModal(false);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsDeleteLoading(false);
     }
   };
 

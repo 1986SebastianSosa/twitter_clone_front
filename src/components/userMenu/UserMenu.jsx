@@ -3,19 +3,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "./../../services/authServices";
 import { logOut, selectUser } from "../../redux/authSlice";
 import "./userMenu.css";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const UserMenu = ({ windowWidth }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
 
   const user = useSelector(selectUser);
   const { firstname, lastname, username } = user;
 
   const logoutHandler = async () => {
-    const response = await logoutUser();
+    await axiosPrivate("/logout");
     dispatch(logOut());
     navigate("/");
   };

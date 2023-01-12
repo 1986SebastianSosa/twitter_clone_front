@@ -1,27 +1,39 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { selectToken, selectUser } from "../../redux/authSlice";
-import { showFollowSuggestions } from "../../services/followServices";
+import { selectUser, updateUser } from "../../redux/authSlice";
 import FollowCard from "../followCard/FollowCard";
 import "./whoToFollow.css";
 import { PuffLoader } from "react-spinners";
 
 const WhoToFollow = () => {
   const user = useSelector(selectUser);
-  const [followSuggestions, setFollowSuggestions] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
+  const dispatch = useDispatch();
+  const [followSuggestions, setFollowSuggestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosPrivate.get("/user");
+        dispatch(updateUser(response.data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const response = await axiosPrivate.get("/follower");
-        setFollowSuggestions(response.data.slice(0, 3));
+        setFollowSuggestions(response.data.slice(-3));
       } catch (error) {
         console.log(error);
       } finally {

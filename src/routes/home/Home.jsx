@@ -16,18 +16,11 @@ import BotNav from "../../components/botNav/BotNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import PostModal from "../../components/postModal/PostModal";
-import { selectTweetsToShow, setTweetsToShow } from "../../redux/tweetsSlice";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import {
-  selectPage,
-  selectWindowWidth,
-  setWindowWidth,
-} from "../../redux/appSlice";
-import { selectUser } from "../../redux/authSlice";
+import { selectTweetsToShow } from "../../redux/tweetsSlice";
+import { selectWindowWidth, setWindowWidth } from "../../redux/appSlice";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const allTweets = useSelector(selectTweetsToShow);
   const windowWidth = useSelector(selectWindowWidth);
 
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);

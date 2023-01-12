@@ -114,14 +114,13 @@ const TweetPage = () => {
     }
     setIsLoading(true);
     try {
-      const response = await axiosPrivate({
-        url: `/comment/${tweet._id}`,
-        method: "post",
-        data: {
-          commentInput,
-        },
+      const postResponse = await axiosPrivate.post(`/comment/${tweet._id}`, {
+        commentInput,
       });
-      setComments([response.data.comment, ...comments]);
+      const fetchResponse = await axiosPrivate.get(
+        `/comment/${postResponse.data._id}`
+      );
+      setComments([fetchResponse.data, ...comments]);
       setCommentInput("");
     } catch (error) {
       setIsError(true);

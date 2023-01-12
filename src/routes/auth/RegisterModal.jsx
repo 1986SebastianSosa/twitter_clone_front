@@ -11,13 +11,13 @@ import {
   FormControl,
 } from "react-bootstrap";
 import * as Yup from "yup";
-import { registerUser } from "../../services/authServices";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/authSlice";
 import { useState } from "react";
 import { PuffLoader } from "react-spinners";
 import MyToast from "./../../components/myToast/MyToast";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +25,7 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
   const [errorMsg, setErrorMsg] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
 
   const SignupSchema = Yup.object().shape({
     firstname: Yup.string()
@@ -62,7 +63,7 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     onSubmit: async (values) => {
       try {
         setIsLoading(true);
-        const response = await registerUser(values);
+        const response = await axiosPrivate.post("/register", { data: values });
         if (!response.status) {
           setIsLoading(false);
           setErrorMsg("No server response");

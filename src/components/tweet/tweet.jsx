@@ -106,10 +106,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
       setUserLiked(true);
     }
     try {
-      await axiosPrivate({
-        url: `/tweetLike/${tweet._id}`,
-        method: "post",
-      });
+      await axiosPrivate.post(`/tweetLike/${tweet._id}`);
     } catch (error) {
       console.log(error);
     }

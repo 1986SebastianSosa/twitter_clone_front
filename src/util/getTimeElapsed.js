@@ -11,20 +11,20 @@ export const getTimeElapsed = (date) => {
     return "Now";
   }
   if (difference < minute) {
-    return `${Math.floor(difference / second)} seconds ago`;
+    return `${Math.floor(difference / second)}s`;
   }
   if (difference < hour) {
-    return `${Math.floor(difference / minute)} minutes ago`;
+    return `${Math.floor(difference / minute)}min`;
   }
   if (difference < day) {
-    return `${Math.floor(difference / hour)} hours ago`;
+    return `${Math.floor(difference / hour)}hr`;
   }
   if (difference < month) {
-    return `${Math.floor(difference / day)} days ago`;
+    return `${Math.floor(difference / day)}d`;
   }
   if (difference < year) {
-    return `${Math.floor(difference / month)} months ago`;
+    return `${Math.floor(difference / month)}mth`;
   } else {
-    return `${Math.floor(difference / year)} years ago`;
+    return `${Math.floor(difference / year)}y`;
   }
 };

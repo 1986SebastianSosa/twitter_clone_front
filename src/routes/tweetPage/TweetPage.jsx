@@ -50,7 +50,8 @@ const TweetPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [tweet, setTweet] = useState({});
-  const [userLiked, setUserLiked] = useState(false);
+  const [userLikedComment, setUserLikedComment] = useState(false);
+  const [userLikedTweet, setUserLikedTweet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -85,6 +86,13 @@ const TweetPage = () => {
       }
     };
     fetchTweet();
+  }, []);
+
+  useEffect(() => {
+    setTweetLikes(tweet.likes);
+    if (tweet?.likes?.includes(user._id)) {
+      setUserLikedTweet(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -167,10 +175,10 @@ const TweetPage = () => {
   const handleLikeTweet = async () => {
     if (tweetLikes.includes(user._id)) {
       setTweetLikes(tweetLikes.filter((el) => el !== user._id));
-      setUserLiked(false);
+      setUserLikedTweet(false);
     } else {
       setTweetLikes([user._id, ...tweetLikes]);
-      setUserLiked(true);
+      setUserLikedTweet(true);
     }
     try {
       await axiosPrivate({
@@ -290,7 +298,7 @@ const TweetPage = () => {
                           className="rounded-circle tweetIcon me-3"
                           onClick={() => handleLikeTweet()}
                         >
-                          {userLiked ? (
+                          {userLikedTweet ? (
                             <FontAwesomeIcon
                               icon={faSolidHeart}
                               className="text-danger"
@@ -302,7 +310,7 @@ const TweetPage = () => {
                         {isLoading ? (
                           <PuffLoader size={18} color="#1d9bf0" />
                         ) : (
-                          <span>{tweetLikes.length}</span>
+                          <span>{tweetLikes?.length}</span>
                         )}
                       </div>
                     </Col>

@@ -4,7 +4,7 @@ export const appSlice = createSlice({
   name: "app",
   initialState: {
     windowWidth: window.innerWidth,
-    page: "1",
+    page: 1,
   },
   reducers: {
     setWindowWidth: (state, action) => {

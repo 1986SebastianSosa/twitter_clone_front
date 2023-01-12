@@ -6,7 +6,16 @@ export const tweetsSlice = createSlice({
   reducers: {
     setTweetsToShow: (state, action) => {
       const { tweetsToShow, hasMore } = action.payload;
-      state.tweetsToShow = tweetsToShow;
+      for (const tweet of tweetsToShow) {
+        // console.log(tweet);
+        if (!state.tweetsToShow.find((el) => el._id === tweet._id)) {
+          state.tweetsToShow.push(...tweetsToShow);
+        }
+      }
+
+      state.tweetsToShow = state.tweetsToShow.sort(
+        (a, b) => Date.parse(b.createdOn) - Date.parse(b.createdOn)
+      );
       state.hasMore = hasMore;
     },
   },

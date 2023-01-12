@@ -16,16 +16,7 @@ import { selectToken, selectUser } from "../../redux/authSlice";
 import { getAllTweets, postTweet } from "../../services/tweetServices";
 import "./postModal.css";
 
-const PostModal = ({
-  showPostModal,
-  handleClosePostModal,
-  page,
-  allTweets,
-  setAllTweets,
-  setNoTweets,
-  setHasMore,
-  setAllTweetsLength,
-}) => {
+const PostModal = ({ showPostModal, handleClosePostModal }) => {
   const user = useSelector(selectUser);
   const token = useSelector(selectToken);
   const [focused, setFocused] = useState(false);
@@ -42,46 +33,46 @@ const PostModal = ({
     setTweetInput(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (!tweetInput.length) {
-        setErrorMsg("* You need to write something");
-        setShowErrorMsg(true);
-      } else {
-        setIsLoading(true);
-        await postTweet(token, tweetInput);
-        setTweetInput("");
-        const fetchTweets = async () => {
-          const response = await getAllTweets(user, token, page);
-          if (!response.data.tweetsToShow.length && !allTweets.length) {
-            setNoTweets(true);
-            setIsLoading(false);
-            return;
-          }
-          if (response.data.tweetsToShow.length === 0) {
-            setHasMore(false);
-          }
-          setNoTweets(false);
-          setAllTweetsLength(response.data.allTweetsLength);
-          setAllTweets(response.data.tweetsToShow);
-          setIsLoading(false);
-          handleClosePostModal();
-        };
-        fetchTweets();
-      }
-    } catch (error) {
-      setErrorMsg("You need to be logged in to write something");
-      setShowErrorMsg(true);
-      // setTimeout(() => {
-      //   navigate("/");
-      // }, 5000);
-    }
-  };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     if (!tweetInput.length) {
+  //       setErrorMsg("* You need to write something");
+  //       setShowErrorMsg(true);
+  //     } else {
+  //       setIsLoading(true);
+  //       await postTweet(token, tweetInput);
+  //       setTweetInput("");
+  //       const fetchTweets = async () => {
+  //         const response = await getAllTweets(user, token, page);
+  //         if (!response.data.tweetsToShow.length && !allTweets.length) {
+  //           setNoTweets(true);
+  //           setIsLoading(false);
+  //           return;
+  //         }
+  //         if (response.data.tweetsToShow.length === 0) {
+  //           setHasMore(false);
+  //         }
+  //         setNoTweets(false);
+  //         setAllTweetsLength(response.data.allTweetsLength);
+  //         setAllTweets(response.data.tweetsToShow);
+  //         setIsLoading(false);
+  //         handleClosePostModal();
+  //       };
+  //       fetchTweets();
+  //     }
+  //   } catch (error) {
+  //     setErrorMsg("You need to be logged in to write something");
+  //     setShowErrorMsg(true);
+  //     // setTimeout(() => {
+  //     //   navigate("/");
+  //     // }, 5000);
+  //   }
+  // };
 
-  useEffect(() => {
-    setIsLoading(false);
-  }, [allTweets]);
+  // useEffect(() => {
+  //   setIsLoading(false);
+  // }, [allTweets]);
 
   useEffect(() => {
     if (tweetInput.length) {
@@ -98,6 +89,7 @@ const PostModal = ({
           show={showPostModal}
           onHide={handleClosePostModal}
           keyboard={false}
+          centered
         >
           <Row className="postModal p-2 border-bottom border-light">
             <Col xs={2}>
@@ -110,7 +102,7 @@ const PostModal = ({
             </Col>
             <Col xs={10}>
               <Row className="flex-column">
-                <form onSubmit={(e) => handleSubmit(e)}>
+                <form>
                   <Col className="p-2">
                     <input
                       name="tweetContent"

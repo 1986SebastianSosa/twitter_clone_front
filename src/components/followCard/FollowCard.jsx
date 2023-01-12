@@ -1,32 +1,61 @@
 import { Row, Col, Button } from "react-bootstrap";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useSelector } from "react-redux";
-import { followUser, unfollowUser } from "../../services/followServices";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import "./followCard.css";
-import { selectToken, selectUser } from "../../redux/authSlice";
+import { selectUser, updateUser } from "../../redux/authSlice";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const FollowCard = ({ suggestion }) => {
-  const loggedUser = useSelector(selectUser);
-  const token = useSelector(selectToken);
+  const axiosPrivate = useAxiosPrivate();
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
   const [isFollowed, setIsFollowed] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (loggedUser.following.includes(suggestion._id)) {
-      setIsFollowed(true);
-    }
+    const fetchUser = async () => {
+      try {
+        const response = await axiosPrivate.get("/user");
+        dispatch(updateUser(response.data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUser();
   }, []);
 
-  const followHandler = async () => {
+  useEffect(() => {
+    if (user.following.includes(suggestion._id)) {
+      setIsFollowed(true);
+    }
+    setIsLoading(false);
+  }, [user]);
+
+  const handleFollow = async () => {
     setIsFollowed(true);
-    const response = await followUser(loggedUser, suggestion, token);
+    try {
+      const response = await axiosPrivate.post("/follower/follow", {
+        userToFollowId: suggestion._id,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const unfollowHandler = async () => {
+  const handleUnfollow = async () => {
     setIsFollowed(false);
-    const response = await unfollowUser(loggedUser, suggestion, token);
+    try {
+      const response = await axiosPrivate.post("/follower/unfollow", {
+        userToUnfollowId: suggestion._id,
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const setFollowBtn = (following) => {
@@ -35,7 +64,7 @@ const FollowCard = ({ suggestion }) => {
         return (
           <Button
             className="follow-btn bg-dark text-white rounded-pill px-3 py-1"
-            onClick={followHandler}
+            onClick={handleFollow}
           >
             <span>Follow</span>
           </Button>
@@ -44,7 +73,7 @@ const FollowCard = ({ suggestion }) => {
         return (
           <Button
             className="unfollow-btn bg-light text-dark rounded-pill px-3 py-1"
-            onClick={unfollowHandler}
+            onClick={handleUnfollow}
             onMouseOver={handleMouseOver}
             onMouseOut={handleMouseOut}
           >
@@ -55,7 +84,7 @@ const FollowCard = ({ suggestion }) => {
   };
 
   return (
-    <>
+    !isLoading && (
       <Row className="follow-suggestion py-3 px-2">
         <Col xs={2} xl={1} className="px-0 mx-2 d-flex justify-content-center">
           <div className="avatar border rounded-circle d-flex justify-content-center align-items-center bg-light">
@@ -76,8 +105,9 @@ const FollowCard = ({ suggestion }) => {
           </div>
         </Col>
       </Row>
-    </>
+    )
   );
+
   function handleMouseOver() {
     setIsMouseOver(true);
   }

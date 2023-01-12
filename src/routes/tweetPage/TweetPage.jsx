@@ -5,7 +5,6 @@ import Searchbar from "../../components/searchbar/Searchbar";
 import Topnav from "../../components/topnav/Topnav";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { deleteTweet } from "../../services/tweetServices";
 import { useState } from "react";
 import Comment from "../../components/comment/Comment";
 import { PuffLoader } from "react-spinners";
@@ -16,17 +15,15 @@ import {
   faCircleInfo,
   faRepeat,
   faTrashCan,
-  faTruckMedical,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { fetchTweetLikes, likeTweet } from "../../services/likeServices";
 import DeleteModal from "../../components/deleteModal/DeleteModal";
 import BotNav from "../../components/botNav/BotNav";
 import { Tooltip } from "react-tooltip";
 import "./tweetPage.css";
-import { selectToken, selectUser } from "../../redux/authSlice";
+import { selectUser } from "../../redux/authSlice";
 import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
 import { getTimeElapsed } from "../../util/getTimeElapsed";
 import { selectWindowWidth, setWindowWidth } from "../../redux/appSlice";
@@ -38,7 +35,6 @@ import {
 
 const TweetPage = () => {
   const user = useSelector(selectUser);
-  const token = useSelector(selectToken);
   const windowWidth = useSelector(selectWindowWidth);
 
   const axiosPrivate = useAxiosPrivate();
@@ -97,9 +93,9 @@ const TweetPage = () => {
 
   useEffect(() => {
     if (tweet.comments) {
-      const sortedCommentsArr = tweet.comments.sort((a, b) => {
-        return Date.parse(b.createdOn) - Date.parse(a.createdOn);
-      });
+      const sortedCommentsArr = tweet.comments.sort(
+        (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
+      );
       setComments(sortedCommentsArr);
     }
   }, [tweet]);

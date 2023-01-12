@@ -68,6 +68,7 @@ const TrendingSidenav = () => {
             {trending.map((trend, index) => {
               return (
                 <OverlayTrigger
+                  key={index}
                   placement="left"
                   overlay={
                     <Tooltip id="trending">
@@ -80,7 +81,6 @@ const TrendingSidenav = () => {
                 >
                   <div
                     className="trend"
-                    key={index}
                     data-for="outOfScope"
                     data-tip={showTooltip && ""}
                     onMouseEnter={() => setShowTooltip(true)}

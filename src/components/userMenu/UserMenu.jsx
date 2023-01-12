@@ -16,7 +16,7 @@ const UserMenu = ({ windowWidth }) => {
   const { firstname, lastname, username } = user;
 
   const logoutHandler = async () => {
-    await axiosPrivate("/logout");
+    await axiosPrivate.post("/auth/logout");
     dispatch(logOut());
     navigate("/");
   };

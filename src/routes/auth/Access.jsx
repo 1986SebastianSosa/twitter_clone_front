@@ -1,12 +1,18 @@
 import { useState } from "react";
-import { Container, Row, Col, Modal } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Modal,
+  OverlayTrigger,
+  Tooltip,
+} from "react-bootstrap";
 import accessImg from "../../img/lohp_en_1302x955.png";
 import "./access.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter, faApple } from "@fortawesome/free-brands-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import GoogleIcon from "../../img/google_icon.png";
-import { Tooltip } from "react-tooltip";
 import RegisterModal from "./RegisterModal";
 import LoginModal from "./LoginModal";
 
@@ -20,22 +26,8 @@ const Access = () => {
 
   return (
     <Container fluid className="m-0 p-0">
-      <Tooltip
-        id="google"
-        getContent={() => {
-          return;
-        }}
-      >
-        <FontAwesomeIcon icon={faCircleInfo} /> Comming soon!
-      </Tooltip>
-      <Tooltip
-        id="apple"
-        getContent={() => {
-          return;
-        }}
-      >
-        <FontAwesomeIcon icon={faCircleInfo} /> Comming soon!
-      </Tooltip>
+      {/* <FontAwesomeIcon icon={faCircleInfo} /> Comming soon! */}
+
       <Row className="accessMain m-0">
         <Col xs={12} lg={7} className="m-0 p-0">
           <div className="accessImgDiv">
@@ -55,17 +47,43 @@ const Access = () => {
               <h3>Join Twitter today</h3>
             </Col>
             <Col className="btnContainer mb-2">
-              <button className="button" data-tip="" data-for="google">
-                <img src={GoogleIcon} alt="" className="btnImg" />
-                Sign up with Google
-              </button>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={
+                  <Tooltip id="comming-soon">
+                    <div>
+                      <FontAwesomeIcon icon={faCircleInfo} />
+                      {"   "}
+                      <span>Comming soon!</span>
+                    </div>
+                  </Tooltip>
+                }
+              >
+                <button className="button" id="google">
+                  <img src={GoogleIcon} alt="" className="btnImg" />
+                  Sign up with Google
+                </button>
+              </OverlayTrigger>
             </Col>
             <Col className="mb-2">
-              <button className="button" data-for="apple" data-tip="">
-                {" "}
-                <FontAwesomeIcon icon={faApple} className="appleLogo fa-xl" />
-                Sign up with Apple
-              </button>
+              <OverlayTrigger
+                placement="bottom"
+                overlay={
+                  <Tooltip id="comming-soon">
+                    <div>
+                      <FontAwesomeIcon icon={faCircleInfo} />
+                      {"   "}
+                      <span>Comming soon!</span>
+                    </div>
+                  </Tooltip>
+                }
+              >
+                <button className="button" data-for="apple" data-tip="">
+                  {" "}
+                  <FontAwesomeIcon icon={faApple} className="appleLogo fa-xl" />
+                  Sign up with Apple
+                </button>
+              </OverlayTrigger>
             </Col>
             <Col className="mb-2" style={{ display: "flex", width: "300px" }}>
               <div className="divider">
@@ -90,9 +108,9 @@ const Access = () => {
             </Col>
             <Col className="mb-5">
               <p className="disclaimer">
-                By signing up, you agree to the <a href="">Terms of Service</a>{" "}
-                and <a href="">Privacy Policy</a> including{" "}
-                <a href="">Cookie Use</a>.
+                By signing up, you agree to the <a href="#">Terms of Service</a>{" "}
+                and <a href="#">Privacy Policy</a> including{" "}
+                <a href="#">Cookie Use</a>.
               </p>
             </Col>
             <Col className="mb-3">

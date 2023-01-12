@@ -1,4 +1,4 @@
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 import Sidenav from "../../components/sidenav/Sidenav";
 import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
 import Searchbar from "../../components/searchbar/Searchbar";
@@ -21,7 +21,6 @@ import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart, faMessage } from "@fortawesome/free-regular-svg-icons";
 import DeleteModal from "../../components/deleteModal/DeleteModal";
 import BotNav from "../../components/botNav/BotNav";
-import { Tooltip } from "react-tooltip";
 import "./tweetPage.css";
 import { selectUser } from "../../redux/authSlice";
 import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
@@ -44,9 +43,7 @@ const TweetPage = () => {
   const location = useLocation();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showCommentModal, setShowCommentModal] = useState(false);
   const [tweet, setTweet] = useState({});
-  const [userLikedComment, setUserLikedComment] = useState(false);
   const [userLikedTweet, setUserLikedTweet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
@@ -75,6 +72,7 @@ const TweetPage = () => {
       try {
         const response = await axiosPrivate.get(`tweet/${id}`);
         setTweet(response.data);
+        setTweetLikes(response.data.likes);
       } catch (error) {
         dispatch(setIsError(true));
       } finally {
@@ -158,15 +156,6 @@ const TweetPage = () => {
     }
   };
 
-  const handleShowCommentModal = (e) => {
-    e.stopPropagation();
-    setShowCommentModal(true);
-  };
-
-  const handleCloseCommentModal = () => {
-    setShowCommentModal(false);
-  };
-
   const handleLikeTweet = async () => {
     if (tweetLikes.includes(user._id)) {
       setTweetLikes(tweetLikes.filter((el) => el !== user._id));
@@ -209,7 +198,7 @@ const TweetPage = () => {
           >
             <Topnav title="Tweet" />
             {isLoading ? (
-              <PuffLoader color="#1d9bf0" />
+              <PuffLoader color="#1d9bf0" size={200} className="m-auto my-5" />
             ) : (
               <>
                 <Container>
@@ -265,33 +254,34 @@ const TweetPage = () => {
                     </Col>
                   </Row>
                   <Row className="text-muted">
+                    <Col xs={2}></Col>
                     <Col>
                       <div className="d-flex align-items-center">
-                        <div
-                          className="rounded-circle tweetIcon me-3"
-                          onClick={(e) => handleShowCommentModal(e)}
-                        >
+                        <div className="rounded-circle tweetIcon me-3">
                           <FontAwesomeIcon icon={faMessage} />
                         </div>
-                        <span>{tweet.comments.length}</span>
+                        <span>{comments.length}</span>
                       </div>
                     </Col>
                     <Col>
-                      <div
-                        className="rounded-circle tweetIcon"
-                        data-for="outOfScope"
-                        data-tip={showTooltip && ""}
-                        onMouseEnter={() => setShowTooltip(true)}
-                        onMouseLeave={() => setShowTooltip(false)}
+                      <OverlayTrigger
+                        placement="bottom"
+                        overlay={
+                          <Tooltip id="out-of-scope">
+                            This feature is out of the scope of this project
+                          </Tooltip>
+                        }
                       >
-                        <FontAwesomeIcon icon={faRepeat} />
-                      </div>
+                        <div className="rounded-circle tweetIcon">
+                          <FontAwesomeIcon icon={faRepeat} />
+                        </div>
+                      </OverlayTrigger>
                     </Col>
                     <Col>
                       <div className="d-flex align-items-center">
                         <div
                           className="rounded-circle tweetIcon me-3"
-                          onClick={() => handleLikeTweet()}
+                          onClick={handleLikeTweet}
                         >
                           {userLikedTweet ? (
                             <FontAwesomeIcon
@@ -302,23 +292,23 @@ const TweetPage = () => {
                             <FontAwesomeIcon icon={faHeart} />
                           )}
                         </div>
-                        {isLoading ? (
-                          <PuffLoader size={18} color="#1d9bf0" />
-                        ) : (
-                          <span>{tweetLikes?.length}</span>
-                        )}
+
+                        <span>{tweetLikes?.length}</span>
                       </div>
                     </Col>
                     <Col>
-                      <div
-                        className="rounded-circle tweetIcon"
-                        data-for="outOfScope"
-                        data-tip={showTooltip && ""}
-                        onMouseEnter={() => setShowTooltip(true)}
-                        onMouseLeave={() => setShowTooltip(false)}
+                      <OverlayTrigger
+                        placement="bottom"
+                        overlay={
+                          <Tooltip id="out-of-scope">
+                            This feature is out of the scope of this project
+                          </Tooltip>
+                        }
                       >
-                        <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                      </div>
+                        <div className="rounded-circle tweetIcon">
+                          <FontAwesomeIcon icon={faArrowUpFromBracket} />
+                        </div>
+                      </OverlayTrigger>
                     </Col>
                   </Row>
 
@@ -370,8 +360,6 @@ const TweetPage = () => {
                 <Container>
                   {comments.map((comment) => (
                     <Comment
-                      tweet={tweet}
-                      setTweet={setTweet}
                       key={comment._id}
                       comment={comment}
                       comments={comments}
@@ -402,19 +390,7 @@ const TweetPage = () => {
         isDeleteLoading={isDeleteLoading}
       />
 
-      {showTooltip && (
-        <Tooltip
-          id="outOfScope"
-          getContent={() => {
-            return;
-          }}
-          event="click"
-          type="info"
-        >
-          <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
-          the scope of this project
-        </Tooltip>
-      )}
+      {/* {showTooltip && <FontAwesomeIcon icon={faCircleInfo} />} */}
       {/* {isLoading ? (
         <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (

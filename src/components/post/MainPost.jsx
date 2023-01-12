@@ -1,4 +1,4 @@
-import { Row, Col, Button } from "react-bootstrap";
+import { Row, Col, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import {
@@ -100,12 +100,21 @@ const MainPost = () => {
                     {isError && <span className="text-danger">{error}</span>}
                     {focused && (
                       <div className="border-bottom border-light">
-                        <Button className="bg-white border-0 text-primary reply-btn rounded-pill py-0 mt-3 mb-2">
-                          <FontAwesomeIcon icon={faEarthAmericas} />
-                          <span className="ms-1 fs-6 fw-semibold">
-                            Everyone can reply
-                          </span>
-                        </Button>
+                        <OverlayTrigger
+                          placement="bottom"
+                          overlay={
+                            <Tooltip id="out-of-scope">
+                              This feature is out of the scope of this project
+                            </Tooltip>
+                          }
+                        >
+                          <Button className="bg-white border-0 text-primary reply-btn rounded-pill py-0 mt-3 mb-2">
+                            <FontAwesomeIcon icon={faEarthAmericas} />
+                            <span className="ms-1 fs-6 fw-semibold">
+                              Everyone can reply
+                            </span>
+                          </Button>
+                        </OverlayTrigger>
                       </div>
                     )}
                   </Col>

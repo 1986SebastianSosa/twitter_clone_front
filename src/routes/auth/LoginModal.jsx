@@ -34,6 +34,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       .max(50, "Too Long!")
       .required("Required"),
   });
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -43,7 +44,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
     onSubmit: async (values) => {
       setIsLoading(true);
       try {
-        const response = await axiosPrivate.post("/login", { data: values });
+        const response = await axiosPrivate.post("/auth/login", values);
 
         if (response.response?.status === 0) {
           setIsLoading(false);

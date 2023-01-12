@@ -18,11 +18,14 @@ import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import PostModal from "../../components/postModal/PostModal";
 import { selectTweetsToShow } from "../../redux/tweetsSlice";
 import { selectWindowWidth, setWindowWidth } from "../../redux/appSlice";
+import { selectUser, updateUser } from "../../redux/authSlice";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const Home = () => {
   const dispatch = useDispatch();
+  const axiosPrivate = useAxiosPrivate();
   const windowWidth = useSelector(selectWindowWidth);
-
+  const user = useSelector(selectUser);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
 
@@ -36,13 +39,23 @@ const Home = () => {
     window.addEventListener("resize", handleWindowResize);
   }, []);
 
-  const handleShowGoFollowModal = () => {
-    setShowGoFollowModal(true);
-  };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosPrivate.get("/user");
+        dispatch(updateUser(response.data));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchUser();
+  }, []);
 
-  const handleCloseGoFollowModal = () => {
-    setShowGoFollowModal(false);
-  };
+  useEffect(() => {
+    if (user.following.length <= 1) {
+      setShowGoFollowModal(true);
+    }
+  }, []);
 
   return (
     <>

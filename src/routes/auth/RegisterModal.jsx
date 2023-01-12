@@ -63,15 +63,15 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     onSubmit: async (values) => {
       try {
         setIsLoading(true);
-        const response = await axiosPrivate.post("/register", { data: values });
+        const response = await axiosPrivate.post("/auth/register", values);
         if (!response.status) {
-          setIsLoading(false);
           setErrorMsg("No server response");
           setError(true);
-        } else if (response?.status === 409) {
           setIsLoading(false);
+        } else if (response?.status === 409) {
           setErrorMsg(response.response.data.msj);
           setError(true);
+          setIsLoading(false);
         }
 
         if (response.data) {

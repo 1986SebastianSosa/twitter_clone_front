@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import "./trendingSidenav.css";
-import { Tooltip } from "react-tooltip";
 
 const trending = [
   {
@@ -68,45 +67,49 @@ const TrendingSidenav = () => {
             <h4 className="fw-bold p-3">Trends for you</h4>
             {trending.map((trend, index) => {
               return (
-                <div
-                  className="trend"
-                  key={index}
-                  data-for="outOfScope"
-                  data-tip={showTooltip && ""}
-                  onMouseEnter={() => setShowTooltip(true)}
-                  onMouseLeave={() => setShowTooltip(false)}
+                <OverlayTrigger
+                  placement="left"
+                  overlay={
+                    <Tooltip id="trending">
+                      <FontAwesomeIcon icon={faCircleInfo} />{" "}
+                      <span>
+                        This feature is out of the scope of this project
+                      </span>
+                    </Tooltip>
+                  }
                 >
-                  <div className="px-3 py-2 d-flex justify-content-between">
-                    <div>
-                      <span className="d-block text-muted">{trend.topic}</span>
-                      <span className="fw-bold">{trend.title}</span>
-                      <span className="d-block text-muted">{trend.tweets}</span>
-                    </div>
-                    <div className="trendIconDiv">
-                      <FontAwesomeIcon
-                        icon={faEllipsis}
-                        className="trendIcon"
-                      />
+                  <div
+                    className="trend"
+                    key={index}
+                    data-for="outOfScope"
+                    data-tip={showTooltip && ""}
+                    onMouseEnter={() => setShowTooltip(true)}
+                    onMouseLeave={() => setShowTooltip(false)}
+                  >
+                    <div className="px-3 py-2 d-flex justify-content-between">
+                      <div>
+                        <span className="d-block text-muted">
+                          {trend.topic}
+                        </span>
+                        <span className="fw-bold">{trend.title}</span>
+                        <span className="d-block text-muted">
+                          {trend.tweets}
+                        </span>
+                      </div>
+                      <div className="trendIconDiv">
+                        <FontAwesomeIcon
+                          icon={faEllipsis}
+                          className="trendIcon"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                </OverlayTrigger>
               );
             })}
           </Col>
         </Row>
-        {showTooltip && (
-          <Tooltip
-            id="outOfScope"
-            getContent={() => {
-              return;
-            }}
-            event="click"
-            type="info"
-          >
-            <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
-            the scope of this project
-          </Tooltip>
-        )}
+        {/* {showTooltip && <FontAwesomeIcon icon={faCircleInfo} />} */}
       </Container>
     </>
   );

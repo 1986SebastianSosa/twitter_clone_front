@@ -52,7 +52,9 @@ const UserMenu = ({ windowWidth }) => {
           </div>
         </div>
         <div className="logout py-3" onClick={logoutHandler}>
-          <p className="text-lead m-0 px-2">{"Log out @" + username}</p>
+          <p className="text-lead m-0 px-2 fw-bold fs-6">
+            {"Log out @" + username}
+          </p>
         </div>
       </Popover.Body>
     </Popover>

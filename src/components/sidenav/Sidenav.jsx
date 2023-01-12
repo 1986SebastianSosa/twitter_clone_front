@@ -15,11 +15,10 @@ import {
   faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import "./sidenav.css";
-import { Button } from "react-bootstrap";
+import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 import UserMenu from "./../userMenu/UserMenu";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Tooltip } from "react-tooltip";
 import PostModal from "../postModal/PostModal";
 
 const Sidenav = ({ windowWidth }) => {
@@ -31,12 +30,6 @@ const Sidenav = ({ windowWidth }) => {
   };
 
   const sideNavItems = [
-    {
-      id: 1,
-      name: "Home",
-      icon: faHouse,
-      handler: homeClickHandler,
-    },
     {
       id: 2,
       name: "Explore",
@@ -80,25 +73,50 @@ const Sidenav = ({ windowWidth }) => {
         <div className="logoDiv" onClick={homeClickHandler}>
           <FontAwesomeIcon icon={faTwitter} className="fa-2xl logo" />
         </div>
-        {sideNavItems.map((item) => {
+        <div className="navItem" key={1} onClick={homeClickHandler}>
+          <div className="iconDiv">
+            <FontAwesomeIcon
+              color="#1d9bf0"
+              icon={faHouse}
+              className={`${windowWidth > 1260 ? "me-3" : "m-auto"} fa-xl`}
+            />
+          </div>
+          <h5 className="sidenavItemTitle">Home</h5>
+        </div>
+
+        {sideNavItems.map((item, i) => {
           return (
-            <div
-              className="navItem"
-              key={item.id}
-              onClick={item.handler && item.handler}
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
-              data-tip={!item.handler && ""}
-              data-for={!item.handler && "outOfScope"}
+            <OverlayTrigger
+              key={i}
+              placement="right"
+              overlay={
+                <Tooltip id="out-of-scope">
+                  <FontAwesomeIcon icon={faCircleInfo} />{" "}
+                  <span>This feature is out of the scope of this project</span>
+                </Tooltip>
+              }
             >
-              <div className="iconDiv">
-                <FontAwesomeIcon
-                  icon={item.icon}
-                  className={`${windowWidth > 1260 ? "me-3" : "m-auto"} fa-xl`}
-                />
+              <div
+                className="navItem"
+                key={item.id}
+                onClick={item.handler && item.handler}
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+                data-tip={!item.handler && ""}
+                data-for={!item.handler && "outOfScope"}
+              >
+                <div className="iconDiv">
+                  <FontAwesomeIcon
+                    color={item.color}
+                    icon={item.icon}
+                    className={`${
+                      windowWidth > 1260 ? "me-3" : "m-auto"
+                    } fa-xl`}
+                  />
+                </div>
+                <h5 className="sidenavItemTitle">{item.name}</h5>
               </div>
-              <h5 className="sidenavItemTitle">{item.name}</h5>
-            </div>
+            </OverlayTrigger>
           );
         })}
         {windowWidth >= 1260 ? (
@@ -119,19 +137,7 @@ const Sidenav = ({ windowWidth }) => {
           showPostModal={showPostModal}
           handleClosePostModal={() => setShowPostModal(false)}
         />
-        {showTooltip && (
-          <Tooltip
-            id="outOfScope"
-            getContent={() => {
-              return;
-            }}
-            event="click"
-            type="info"
-          >
-            <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
-            the scope of this project
-          </Tooltip>
-        )}
+        {/* {showTooltip && <FontAwesomeIcon icon={faCircleInfo} />} */}
       </nav>
     </>
   );

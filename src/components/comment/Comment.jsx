@@ -9,12 +9,11 @@ import {
   faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import DeleteModal from "./../deleteModal/DeleteModal";
 import { PuffLoader } from "react-spinners";
-import { Tooltip } from "react-tooltip";
 import { selectUser } from "../../redux/authSlice";
 import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
 import { getTimeElapsed } from "./../../util/getTimeElapsed";
@@ -22,8 +21,6 @@ import { getTimeElapsed } from "./../../util/getTimeElapsed";
 const Comment = ({
   comment,
   setShowDeleteToast,
-  tweet,
-  setTweet,
   comments,
   setComments,
   windowWidth,
@@ -123,27 +120,33 @@ const Comment = ({
               <Row className="text-muted mt-1">
                 <Col>
                   <div className="d-flex align-items-center">
-                    <div
-                      className="rounded-circle tweetIcon me-3"
-                      data-for="outOfScope"
-                      data-tip={showTooltip && ""}
-                      onMouseEnter={() => setShowTooltip(true)}
-                      onMouseLeave={() => setShowTooltip(false)}
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="out-of-scope">
+                          This feature is out of the scope of this project
+                        </Tooltip>
+                      }
                     >
-                      <FontAwesomeIcon icon={faMessage} />
-                    </div>
+                      <div className="rounded-circle tweetIcon me-3">
+                        <FontAwesomeIcon icon={faMessage} />
+                      </div>
+                    </OverlayTrigger>
                   </div>
                 </Col>
                 <Col>
-                  <div
-                    className="rounded-circle tweetIcon"
-                    data-for="outOfScope"
-                    data-tip={showTooltip && ""}
-                    onMouseEnter={() => setShowTooltip(true)}
-                    onMouseLeave={() => setShowTooltip(false)}
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                      <Tooltip id="out-of-scope">
+                        This feature is out of the scope of this project
+                      </Tooltip>
+                    }
                   >
-                    <FontAwesomeIcon icon={faRepeat} />
-                  </div>
+                    <div className="rounded-circle tweetIcon">
+                      <FontAwesomeIcon icon={faRepeat} />
+                    </div>
+                  </OverlayTrigger>
                 </Col>
                 <Col>
                   <div className="d-flex align-items-center">
@@ -168,15 +171,18 @@ const Comment = ({
                   </div>
                 </Col>
                 <Col>
-                  <div
-                    className="rounded-circle tweetIcon"
-                    data-for="outOfScope"
-                    data-tip={showTooltip && ""}
-                    onMouseEnter={() => setShowTooltip(true)}
-                    onMouseLeave={() => setShowTooltip(false)}
+                  <OverlayTrigger
+                    placement="bottom"
+                    overlay={
+                      <Tooltip id="out-of-scope">
+                        This feature is out of the scope of this project
+                      </Tooltip>
+                    }
                   >
-                    <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                  </div>
+                    <div className="rounded-circle tweetIcon">
+                      <FontAwesomeIcon icon={faArrowUpFromBracket} />
+                    </div>
+                  </OverlayTrigger>
                 </Col>
               </Row>
             </Col>
@@ -184,21 +190,8 @@ const Comment = ({
         </Col>
       </Row>
 
-      {showTooltip && (
-        <Tooltip
-          id="outOfScope"
-          getContent={() => {
-            return;
-          }}
-          event="click"
-          type="info"
-        >
-          <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
-          the scope of this project
-        </Tooltip>
-      )}
       <DeleteModal
-        isLoading={isLoading}
+        isDeleteLoading={isLoading}
         title={"Comment"}
         showDeleteModal={showDeleteModal}
         handleCloseDeleteModal={handleCloseDeleteModal}

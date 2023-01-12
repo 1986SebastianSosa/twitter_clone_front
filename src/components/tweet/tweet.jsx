@@ -9,7 +9,7 @@ import {
   faCircleInfo,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faSolidHeart } from "@fortawesome/free-solid-svg-icons";
-import { Row, Col } from "react-bootstrap";
+import { Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -17,7 +17,6 @@ import DeleteModal from "./../deleteModal/DeleteModal";
 import { PuffLoader } from "react-spinners";
 import "./tweet.css";
 import TweetReplyModal from "../tweetReplyModal/TweetReplyModal";
-import { Tooltip } from "react-tooltip";
 import { selectToken, selectUser } from "../../redux/authSlice";
 import { selectPage, selectWindowWidth } from "../../redux/appSlice";
 import {
@@ -175,18 +174,27 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
                     </div>
                   </Col>
                   <Col>
-                    <div
-                      className="rounded-circle tweetIcon"
-                      onClick={(e) => {
-                        return e.stopPropagation;
-                      }}
-                      data-for="outOfScope"
-                      data-tip={showTooltip && ""}
-                      onMouseEnter={() => setShowTooltip(true)}
-                      onMouseLeave={() => setShowTooltip(false)}
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="out-of-scope">
+                          This feature is out of the scope of this project
+                        </Tooltip>
+                      }
                     >
-                      <FontAwesomeIcon icon={faRepeat} />
-                    </div>
+                      <div
+                        className="rounded-circle tweetIcon"
+                        onClick={(e) => {
+                          return e.stopPropagation();
+                        }}
+                        data-for="outOfScope"
+                        data-tip={showTooltip && ""}
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      >
+                        <FontAwesomeIcon icon={faRepeat} />
+                      </div>
+                    </OverlayTrigger>
                   </Col>
                   <Col>
                     <div className="d-flex align-items-center">
@@ -207,37 +215,29 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
                     </div>
                   </Col>
                   <Col>
-                    <div
-                      className="rounded-circle tweetIcon"
-                      onClick={(e) => {
-                        return e.stopPropagation;
-                      }}
-                      data-for="outOfScope"
-                      data-tip={showTooltip && ""}
-                      onMouseEnter={() => setShowTooltip(true)}
-                      onMouseLeave={() => setShowTooltip(false)}
+                    <OverlayTrigger
+                      placement="bottom"
+                      overlay={
+                        <Tooltip id="out-of-scope">
+                          This feature is out of the scope of this project
+                        </Tooltip>
+                      }
                     >
-                      <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                    </div>
+                      <div
+                        className="rounded-circle tweetIcon"
+                        onClick={(e) => {
+                          return e.stopPropagation();
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faArrowUpFromBracket} />
+                      </div>
+                    </OverlayTrigger>
                   </Col>
                 </Row>
               </Col>
             </Row>
           </Col>
         </Row>
-        {showTooltip && (
-          <Tooltip
-            id="outOfScope"
-            getContent={() => {
-              return;
-            }}
-            event="click"
-            type="info"
-          >
-            <FontAwesomeIcon icon={faCircleInfo} /> This functionality is beyond
-            the scope of this project
-          </Tooltip>
-        )}
       </div>
 
       {isLoading ? (

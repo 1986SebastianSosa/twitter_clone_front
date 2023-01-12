@@ -25,10 +25,12 @@ const FollowCard = ({ suggestion }) => {
   const handleFollow = async () => {
     setIsFollowed(true);
     try {
-      const response = await axiosPrivate.post("/follower/follow", {
+      await axiosPrivate.post("/follower/follow", {
         userToFollowId: suggestion._id,
       });
-      console.log(response.data);
+
+      const response = await axiosPrivate.get("/user");
+      dispatch(updateUser(response.data));
     } catch (error) {
       console.log(error);
     }
@@ -37,10 +39,11 @@ const FollowCard = ({ suggestion }) => {
   const handleUnfollow = async () => {
     setIsFollowed(false);
     try {
-      const response = await axiosPrivate.post("/follower/unfollow", {
+      await axiosPrivate.post("/follower/unfollow", {
         userToUnfollowId: suggestion._id,
       });
-      console.log(response.data);
+      const response = await axiosPrivate.get("/user");
+      dispatch(updateUser(response.data));
     } catch (error) {
       console.log(error);
     }

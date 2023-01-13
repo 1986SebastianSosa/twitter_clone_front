@@ -18,11 +18,13 @@ import { useState } from "react";
 import MyToast from "../../components/myToast/MyToast";
 import { PuffLoader } from "react-spinners";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { loginInputFields } from "./util/authUtils";
 
 const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
-  const [error, setError] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
@@ -45,55 +47,30 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
       setIsLoading(true);
       try {
         const response = await axiosPrivate.post("/auth/login", values);
-
-        if (response.response?.status === 0) {
-          setIsLoading(false);
-          setErrMsg("No server response");
-          setError(true);
-        } else if (response.response?.status === 401) {
-          setErrMsg(response.response?.data?.msg);
-          setError(true);
-          setIsLoading(false);
-        } else if (response.status === 200) {
-          dispatch(setCredentials(response.data));
-          navigate("/home");
-          handleCloseLoginModal();
-          setIsLoading(false);
-        }
+        dispatch(setCredentials(response.data));
+        navigate("/home");
+        handleCloseLoginModal();
       } catch (error) {
+        setIsError(true);
+        setError(error?.response?.data?.msg);
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     },
   });
-
-  const inputFields = [
-    {
-      id: 1,
-      name: "email",
-      type: "email",
-      placeholder: "Enter your email",
-      label: "Email:",
-    },
-    {
-      id: 2,
-      name: "password",
-      type: "password",
-      placeholder: "Enter your password",
-      label: "Password:",
-    },
-  ];
 
   return (
     <>
       <Modal show={showLoginModal} onHide={handleCloseLoginModal}>
         {isLoading ? (
           <PuffLoader size={200} color="#1d9bf0" className="m-auto my-5" />
-        ) : error ? (
+        ) : isError ? (
           <div className="m-auto my-5">
             <MyToast
-              show={error}
-              content={errMsg}
-              onClose={() => setError(false)}
+              show={isError}
+              content={error}
+              onClose={() => setIsError(false)}
             />
           </div>
         ) : (
@@ -111,7 +88,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
 
             <Form noValidate onSubmit={formik.handleSubmit}>
               <Modal.Body>
-                {inputFields.map((field) => {
+                {loginInputFields.map((field) => {
                   return (
                     <FormGroup
                       key={field.id}
@@ -122,7 +99,7 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
                       <FormControl
                         type={field.type}
                         placeholder={field.placeholder}
-                        value={formik.values[field.name]}
+                        value={formik.values[field.name].toLowerCase()}
                         onChange={formik.handleChange}
                       />
                       {formik.errors[field.name] &&

@@ -10,7 +10,9 @@ function MyToast({ show, onClose, content }) {
           alt=""
         />
       </Toast.Header>
-      <Toast.Body>{content}</Toast.Body>
+      <Toast.Body>
+        <h6 className="fw-bold text-center">{content}</h6>
+      </Toast.Body>
     </Toast>
   );
 }

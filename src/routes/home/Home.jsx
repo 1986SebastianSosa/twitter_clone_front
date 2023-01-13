@@ -58,7 +58,7 @@ const Home = () => {
       <Container>
         <Row>
           <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
-            <Sidenav windowWidth={windowWidth} />
+            <Sidenav />
           </Col>
           <Col
             xs={12}

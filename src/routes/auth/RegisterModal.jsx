@@ -18,11 +18,13 @@ import { useState } from "react";
 import { PuffLoader } from "react-spinners";
 import MyToast from "./../../components/myToast/MyToast";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { registerInputFields } from "./util/authUtils";
 
 function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
@@ -64,84 +66,32 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
       try {
         setIsLoading(true);
         const response = await axiosPrivate.post("/auth/register", values);
-        if (!response.status) {
-          setErrorMsg("No server response");
-          setError(true);
-          setIsLoading(false);
-        } else if (response?.status === 409) {
-          setErrorMsg(response.response.data.msj);
-          setError(true);
-          setIsLoading(false);
-        }
 
-        if (response.data) {
-          dispatch(setCredentials(response.data));
-          handleCloseRegisterModal();
-          setIsLoading(false);
-          navigate("/home");
-        }
+        dispatch(setCredentials(response.data));
+        handleCloseRegisterModal();
+        setIsLoading(false);
+        navigate("/home");
       } catch (error) {
         console.log(error);
+        setIsError(true);
+        setError(error?.response?.data?.msg);
+      } finally {
+        setIsLoading(false);
       }
     },
   });
-
-  const inputFields = [
-    {
-      id: 1,
-      name: "firstname",
-      type: "text",
-      placeholder: "Enter your firstname",
-      label: "Firstname:",
-    },
-    {
-      id: 2,
-      name: "lastname",
-      type: "text",
-      placeholder: "Enter your lastname",
-      label: "Lastname:",
-    },
-    {
-      id: 3,
-      name: "username",
-      type: "text",
-      placeholder: "Enter your username",
-      label: "Username:",
-    },
-    {
-      id: 4,
-      name: "password",
-      type: "password",
-      placeholder: "Enter your password",
-      label: "Password:",
-    },
-    {
-      id: 5,
-      name: "confirmPassword",
-      type: "password",
-      placeholder: "Confirm your password",
-      label: "Password confirmation:",
-    },
-    {
-      id: 6,
-      name: "email",
-      type: "email",
-      placeholder: "Enter your email",
-      label: "Email:",
-    },
-  ];
 
   return (
     <>
       <Modal show={showRegisterModal} onHide={handleCloseRegisterModal}>
         {isLoading ? (
-          <PuffLoader size={200} color="#1d9bf0" className="m-auto" />
-        ) : error ? (
+          <PuffLoader size={200} color="#1d9bf0" className="m-auto my-5" />
+        ) : isError ? (
           <div className="m-auto py-5">
             <MyToast
-              show={error}
-              onClose={() => setError(false)}
-              content={errorMsg}
+              show={isError}
+              onClose={() => setIsError(false)}
+              content={error}
             />
           </div>
         ) : (
@@ -159,7 +109,7 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
 
             <Form noValidate onSubmit={formik.handleSubmit}>
               <Modal.Body>
-                {inputFields.map((field) => {
+                {registerInputFields.map((field) => {
                   return (
                     <FormGroup
                       key={field.id}
@@ -170,7 +120,7 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
                       <FormControl
                         type={field.type}
                         placeholder={field.placeholder}
-                        value={formik.values[field.name]}
+                        value={formik.values[field.name].toLocaleLowerCase()}
                         onChange={formik.handleChange}
                       />
                       {formik.errors[field.name] &&

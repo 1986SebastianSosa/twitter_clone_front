@@ -9,7 +9,6 @@ import Layout from "./components/Layout/Layout";
 import ErrorPage from "./components/error/ErrorPage";
 
 function App() {
-  console.log("app");
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

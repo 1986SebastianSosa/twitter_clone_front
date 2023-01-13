@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -15,16 +15,16 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import GoogleIcon from "../../img/google_icon.png";
 import RegisterModal from "./RegisterModal";
 import LoginModal from "./LoginModal";
+import { useDispatch } from "react-redux";
 
 const Access = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const handleCloseRegisterModal = () => setShowRegisterModal(false);
-  const handleShowRegisterModal = () => setShowRegisterModal(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const handleCloseLoginModal = () => setShowLoginModal(false);
-  const handleShowLoginModal = () => setShowLoginModal(true);
+  const dispatch = useDispatch();
 
-  console.log("access");
+  useEffect(() => {
+    dispatch(setWindowWidth(window.innerWidth));
+  }, []);
 
   return (
     <Container fluid className="m-0 p-0">
@@ -97,13 +97,13 @@ const Access = () => {
             <Col className="mb-2">
               <button
                 className="button phoneOrEmail"
-                onClick={handleShowRegisterModal}
+                onClick={() => setShowRegisterModal(true)}
               >
                 Sign up with phone or email
               </button>
               <RegisterModal
                 showRegisterModal={showRegisterModal}
-                handleCloseRegisterModal={handleCloseRegisterModal}
+                handleCloseRegisterModal={() => setShowRegisterModal(false)}
               />
             </Col>
             <Col className="mb-5">
@@ -119,14 +119,14 @@ const Access = () => {
             <Col>
               <button
                 className="button signInBtn"
-                onClick={handleShowLoginModal}
+                onClick={() => setShowLoginModal(true)}
               >
                 Sign in
               </button>
             </Col>
             <LoginModal
               showLoginModal={showLoginModal}
-              handleCloseLoginModal={handleCloseLoginModal}
+              handleCloseLoginModal={() => setShowLoginModal(false)}
             />
           </Row>
         </Col>

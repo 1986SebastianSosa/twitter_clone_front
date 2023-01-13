@@ -74,7 +74,9 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
       } catch (error) {
         console.log(error);
         setIsError(true);
-        setError(error?.response?.data?.msg);
+        error?.response
+          ? setError(error?.response?.data?.msg)
+          : setError("The server seems to be offline. Try again later.");
       } finally {
         setIsLoading(false);
       }

@@ -52,7 +52,9 @@ const LoginModal = ({ showLoginModal, handleCloseLoginModal }) => {
         handleCloseLoginModal();
       } catch (error) {
         setIsError(true);
-        setError(error?.response?.data?.msg);
+        error?.response
+          ? setError(error?.response?.data?.msg)
+          : setError("The server seems to be offline. Try again later.");
         console.log(error);
       } finally {
         setIsLoading(false);

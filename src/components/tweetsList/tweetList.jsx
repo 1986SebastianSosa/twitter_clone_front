@@ -27,11 +27,15 @@ const TweetsList = () => {
   const axiosPrivate = useAxiosPrivate();
 
   const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [showDeleteToast, setShowDeleteToast] = useState(false);
 
   useEffect(() => {
-    setPage(1);
+    dispatch(resetTweetsToShow());
+    return () => {
+      dispatch(setPage(1));
+    };
   }, []);
 
   useEffect(() => {
@@ -58,6 +62,10 @@ const TweetsList = () => {
         dispatch(setHasMore(response.data.hasMore));
       } catch (error) {
         setIsError(true);
+        error.response
+          ? setError(error?.response?.data?.msg)
+          : setError("The server seems to be offline. Try again later.");
+
         console.log(error);
       }
     };
@@ -100,12 +108,20 @@ const TweetsList = () => {
             );
           })}
         </InfiniteScroll>
+      ) : isError ? (
+        <Container>
+          <Row>
+            <Col className="message d-flex align-items-center">
+              <h4>The server seems to be offline. Try again later.</h4>
+            </Col>
+          </Row>
+        </Container>
       ) : (
         !isLoading &&
         !allTweets.length && (
           <Container>
             <Row>
-              <Col>
+              <Col className="message d-flex align-items-center">
                 <h4>You don't seem to have any Tweets :(</h4>
                 <Link to={`/follow/${user._id}`}>
                   <h6>Try following some people</h6>

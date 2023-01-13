@@ -7,8 +7,8 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
+import { setWindowWidth } from "../../redux/appSlice";
 import accessImg from "../../img/lohp_en_1302x955.png";
-import "./access.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter, faApple } from "@fortawesome/free-brands-svg-icons";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +16,7 @@ import GoogleIcon from "../../img/google_icon.png";
 import RegisterModal from "./RegisterModal";
 import LoginModal from "./LoginModal";
 import { useDispatch } from "react-redux";
+import "./access.css";
 
 const Access = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false);

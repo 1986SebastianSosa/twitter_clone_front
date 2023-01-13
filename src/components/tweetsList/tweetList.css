@@ -2,3 +2,7 @@
   cursor: pointer;
   background-color: rgb(236, 240, 240);
 }
+
+.message {
+  height: 50vh;
+}

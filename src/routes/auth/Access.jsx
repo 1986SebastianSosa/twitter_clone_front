@@ -24,10 +24,10 @@ const Access = () => {
   const handleCloseLoginModal = () => setShowLoginModal(false);
   const handleShowLoginModal = () => setShowLoginModal(true);
 
+  console.log("access");
+
   return (
     <Container fluid className="m-0 p-0">
-      {/* <FontAwesomeIcon icon={faCircleInfo} /> Comming soon! */}
-
       <Row className="accessMain m-0">
         <Col xs={12} lg={7} className="m-0 p-0">
           <div className="accessImgDiv">

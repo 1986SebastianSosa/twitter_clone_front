@@ -20,8 +20,11 @@ import UserMenu from "./../userMenu/UserMenu";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import PostModal from "../postModal/PostModal";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../redux/authSlice";
 
 const Sidenav = ({ windowWidth }) => {
+  const user = useSelector(selectUser);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
   const navigate = useNavigate();
@@ -131,13 +134,12 @@ const Sidenav = ({ windowWidth }) => {
             <FontAwesomeIcon icon={faFeather} />
           </Button>
         )}
+        {user && <UserMenu windowWidth={windowWidth} />}
 
-        <UserMenu windowWidth={windowWidth} />
         <PostModal
           showPostModal={showPostModal}
           handleClosePostModal={() => setShowPostModal(false)}
         />
-        {/* {showTooltip && <FontAwesomeIcon icon={faCircleInfo} />} */}
       </nav>
     </>
   );

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { PuffLoader } from "react-spinners";
 import Topnav from "../../components/topnav/Topnav";
 import Searchbar from "../../components/searchbar/Searchbar";
 import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
@@ -16,7 +15,6 @@ import BotNav from "../../components/botNav/BotNav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFeather } from "@fortawesome/free-solid-svg-icons";
 import PostModal from "../../components/postModal/PostModal";
-import { selectTweetsToShow } from "../../redux/tweetsSlice";
 import { selectWindowWidth, setWindowWidth } from "../../redux/appSlice";
 import { selectUser, updateUser } from "../../redux/authSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -28,8 +26,6 @@ const Home = () => {
   const user = useSelector(selectUser);
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);

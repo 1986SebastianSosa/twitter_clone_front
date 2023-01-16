@@ -15,7 +15,7 @@ import { selectPage, setPage } from "../../redux/appSlice";
 import "./tweetList.css";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Col, Container, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { selectUser } from "../../redux/authSlice";
 
 const TweetsList = () => {
@@ -25,6 +25,7 @@ const TweetsList = () => {
   const page = useSelector(selectPage);
   const dispatch = useDispatch();
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
 
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState("");
@@ -62,9 +63,11 @@ const TweetsList = () => {
         dispatch(setHasMore(response.data.hasMore));
       } catch (error) {
         setIsError(true);
-        error.response
+        error.response?.status === 401 || error.response?.status === 403
+          ? navigate("/")
+          : error.response?.data?.msg
           ? setError(error?.response?.data?.msg)
-          : setError("The server seems to be offline. Try again later.");
+          : setError("Something went wrong. Try again later.");
 
         console.log(error);
       }
@@ -112,7 +115,7 @@ const TweetsList = () => {
         <Container>
           <Row>
             <Col className="message d-flex align-items-center">
-              <h4>The server seems to be offline. Try again later.</h4>
+              <h4>{error}</h4>
             </Col>
           </Row>
         </Container>

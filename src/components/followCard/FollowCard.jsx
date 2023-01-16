@@ -7,16 +7,19 @@ import "./followCard.css";
 import { selectUser, updateUser } from "../../redux/authSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { selectWindowWidth } from "./../../redux/appSlice";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const FollowCard = ({ suggestion, windowWidth }) => {
   const axiosPrivate = useAxiosPrivate();
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isFollowed, setIsFollowed] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (user.following.includes(suggestion._id)) {
@@ -35,7 +38,12 @@ const FollowCard = ({ suggestion, windowWidth }) => {
       const response = await axiosPrivate.get("/user");
       dispatch(updateUser(response.data));
     } catch (error) {
-      console.log(error);
+      setIsError(true);
+      error.response?.status === 401 || error.response?.status === 403
+        ? navigate("/")
+        : error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("*Something went wrong. Try again later.");
     }
   };
 
@@ -48,7 +56,12 @@ const FollowCard = ({ suggestion, windowWidth }) => {
       const response = await axiosPrivate.get("/user");
       dispatch(updateUser(response.data));
     } catch (error) {
-      console.log(error);
+      setIsError(true);
+      error.response?.status === 401 || error.response?.status === 403
+        ? navigate("/")
+        : error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("*Something went wrong. Try again later.");
     }
   };
 
@@ -113,7 +126,11 @@ const FollowCard = ({ suggestion, windowWidth }) => {
                 location.pathname.split("/")[1] === "follow" ? "end" : "center"
               }`}
             >
-              {setFollowBtn(isFollowed)}
+              {isError ? (
+                <span className="text-danger">{error}</span>
+              ) : (
+                setFollowBtn(isFollowed)
+              )}
             </div>
           </Col>
         </Row>

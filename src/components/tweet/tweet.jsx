@@ -41,6 +41,8 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [comments, setComments] = useState([]);
@@ -88,6 +90,12 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
       setShowDeleteModal(false);
     } catch (error) {
       console.log(error);
+      setIsError(true);
+      error.response?.status === 401 || error.response?.status === 403
+        ? navigate("/")
+        : error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("*Something went wrong. Try again later.");
     } finally {
       setIsDeleteLoading(false);
     }
@@ -244,6 +252,9 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
         <PuffLoader color="#1d9bf0" className="m-auto" />
       ) : (
         <DeleteModal
+          isError={isError}
+          setIsError={setIsError}
+          error={error}
           isDeleteLoading={isDeleteLoading}
           title="Tweet"
           showDeleteModal={showDeleteModal}

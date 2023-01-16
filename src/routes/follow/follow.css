@@ -1,0 +1,5 @@
+.message {
+  height: 50vh;
+  display: flex;
+  align-items: center;
+}

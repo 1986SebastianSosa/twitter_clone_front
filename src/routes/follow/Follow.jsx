@@ -12,12 +12,15 @@ import TrendingSidenav from "../../components/trendingSidenav/TrendingSidenav";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { selectUser, updateUser } from "../../redux/authSlice";
 import { PuffLoader } from "react-spinners";
+import "./follow.css";
 
 const Follow = () => {
   const user = useSelector(selectUser);
   const [followSuggestions, setFollowSuggestions] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const axiosPrivate = useAxiosPrivate();
@@ -49,7 +52,12 @@ const Follow = () => {
         );
         setFollowSuggestions(sortedFollowSuggestions);
       } catch (error) {
-        console.log(error);
+        setIsError(true);
+        error.response?.status === 401 || error.response?.status === 403
+          ? navigate("/")
+          : error.response?.data?.msg
+          ? setError(error?.response?.data?.msg)
+          : setError("*Something went wrong. Try again later.");
       } finally {
         setIsLoading(false);
       }
@@ -82,6 +90,10 @@ const Follow = () => {
           {isLoading ? (
             <div className="loading">
               <PuffLoader size={200} color="#1d9bf0" />
+            </div>
+          ) : isError ? (
+            <div className="message">
+              <h4>{error}</h4>
             </div>
           ) : (
             followSuggestions.map((suggestion, index) => {

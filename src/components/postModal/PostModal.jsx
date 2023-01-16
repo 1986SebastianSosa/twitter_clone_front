@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { PuffLoader } from "react-spinners";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { addTweet } from "../../redux/tweetsSlice";
+import MyToast from "../myToast/MyToast";
 import "./postModal.css";
 
 const PostModal = ({ showPostModal, handleClosePostModal }) => {
@@ -23,12 +24,12 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
   const [focused, setFocused] = useState(false);
   const [tweetContent, setTweetContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [showErrorMsg, setShowErrorMsg] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (tweetContent.length) {
-      setShowErrorMsg(false);
+      setIsError(false);
     }
   }, [tweetContent]);
 
@@ -45,25 +46,37 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
       console.log(fetchResponse.data);
       dispatch(addTweet(fetchResponse.data));
       setTweetContent("");
+      handleClosePostModal();
     } catch (error) {
+      setIsError(true);
+      error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("The server seems to be offline. Try again later.");
       console.log(error);
     } finally {
       setIsLoading(false);
-      handleClosePostModal();
     }
   };
 
   return (
     <>
-      {isLoading ? (
-        <PuffLoader size={100} color="#1d9bf0" className="m-auto" />
-      ) : (
-        <Modal
-          show={showPostModal}
-          onHide={handleClosePostModal}
-          keyboard={false}
-          centered
-        >
+      <Modal
+        show={showPostModal}
+        onHide={handleClosePostModal}
+        keyboard={false}
+        centered
+      >
+        {isLoading ? (
+          <PuffLoader size={100} color="#1d9bf0" className="m-auto my-5" />
+        ) : isError ? (
+          <div className="m-auto my-5">
+            <MyToast
+              show={isError}
+              content={error}
+              onClose={() => setIsError(false)}
+            />
+          </div>
+        ) : (
           <Row className="px-2 py-5 border-bottom border-light">
             <Col xs={2}>
               <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
@@ -88,9 +101,6 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
                     />
 
                     <Col>
-                      {showErrorMsg && (
-                        <span className="text-danger">{errorMsg}</span>
-                      )}
                       {focused && (
                         <div className="border-bottom border-light">
                           <Button className="bg-white border-0 text-primary reply-btn rounded-pill py-0 mt-3 mb-2">
@@ -139,8 +149,8 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
               </Row>
             </Col>
           </Row>
-        </Modal>
-      )}
+        )}
+      </Modal>
     </>
   );
 };

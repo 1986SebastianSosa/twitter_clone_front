@@ -26,11 +26,7 @@ import { selectUser } from "../../redux/authSlice";
 import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
 import { getTimeElapsed } from "../../util/getTimeElapsed";
 import { selectWindowWidth, setWindowWidth } from "../../redux/appSlice";
-import {
-  selectHasMore,
-  selectTweetsToShow,
-  setTweetsToShow,
-} from "../../redux/tweetsSlice";
+import { selectTweetsToShow, setTweetsToShow } from "../../redux/tweetsSlice";
 
 const TweetPage = () => {
   const user = useSelector(selectUser);
@@ -119,6 +115,11 @@ const TweetPage = () => {
       setCommentInput("");
     } catch (error) {
       setIsError(true);
+      error.response?.status === 401 || error.response?.status === 403
+        ? navigate("/")
+        : error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("*Something went wrong. Try again later.");
       console.log(error);
     } finally {
       setIsLoading(false);
@@ -142,6 +143,12 @@ const TweetPage = () => {
         return navigate("/home");
       }
     } catch (error) {
+      setIsError(true);
+      error.response?.status === 401 || error.response?.status === 403
+        ? navigate("/")
+        : error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("*Something went wrong. Try again later.");
       console.log(error);
     } finally {
       setIsDeleteLoading(false);

@@ -1,8 +1,11 @@
-import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { PuffLoader } from "react-spinners";
+import MyToast from "../myToast/MyToast";
 
 const DeleteModal = ({
+  isError,
+  setIsError,
+  error,
   showDeleteModal,
   isDeleteLoading,
   handleCloseDeleteModal,
@@ -23,6 +26,14 @@ const DeleteModal = ({
           <h6 className="m-auto text-center text-muted pt-3">
             Just a moment...
           </h6>
+        </div>
+      ) : isError ? (
+        <div className="m-auto my-5">
+          <MyToast
+            show={isError}
+            content={error}
+            onClose={() => setIsError(false)}
+          />
         </div>
       ) : (
         <>

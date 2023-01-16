@@ -17,24 +17,18 @@ import { PuffLoader } from "react-spinners";
 import { selectUser } from "../../redux/authSlice";
 import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
 import { getTimeElapsed } from "./../../util/getTimeElapsed";
+import { useNavigate } from "react-router-dom";
 
-const Comment = ({
-  comment,
-  setShowDeleteToast,
-  comments,
-  setComments,
-  windowWidth,
-}) => {
+const Comment = ({ comment, comments, setComments, windowWidth }) => {
   const user = useSelector(selectUser);
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [commentLikes, setCommentLikes] = useState([]);
   const [userLiked, setUserLiked] = useState(false);
-
-  const handleShowDeleteModal = () => setShowDeleteModal(true);
-  const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
   useEffect(() => {
     setCommentLikes(comment.likes);
@@ -54,6 +48,12 @@ const Comment = ({
       await axiosPrivate.delete(`/comment/${comment._id}`);
       setComments(comments.filter((el) => el._id !== comment._id));
     } catch (error) {
+      setIsError(true);
+      error.response?.status === 401 || error.response?.status === 403
+        ? navigate("/")
+        : error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("*Something went wrong. Try again later.");
       console.log(error);
     } finally {
       setIsLoading(false);
@@ -72,6 +72,9 @@ const Comment = ({
       console.log(error);
     }
   };
+
+  const handleShowDeleteModal = () => setShowDeleteModal(true);
+  const handleCloseDeleteModal = () => setShowDeleteModal(false);
 
   return (
     <>
@@ -192,6 +195,9 @@ const Comment = ({
 
       <DeleteModal
         isDeleteLoading={isLoading}
+        isError={isError}
+        setIsError={setIsError}
+        error={error}
         title={"Comment"}
         showDeleteModal={showDeleteModal}
         handleCloseDeleteModal={handleCloseDeleteModal}

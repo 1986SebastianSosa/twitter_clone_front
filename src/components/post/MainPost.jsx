@@ -12,21 +12,16 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import "./mainpost.css";
 import { PuffLoader } from "react-spinners";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import {
-  selectTweetsToShow,
-  selectHasMore,
-  setTweetsToShow,
-  addTweet,
-} from "./../../redux/tweetsSlice";
+import { addTweet } from "./../../redux/tweetsSlice";
+import { useNavigate } from "react-router-dom";
 
 const MainPost = () => {
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
-  const hasMore = useSelector(selectHasMore);
-  const allTweets = useSelector(selectTweetsToShow);
+  const navigate = useNavigate();
   const [focused, setFocused] = useState(false);
   const [tweetContent, setTweetContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +47,7 @@ const MainPost = () => {
     setIsLoading(true);
     if (!tweetContent.length) {
       setError("* You need to write something");
+      setIsLoading(false);
       return setIsError(true);
     }
     try {
@@ -65,6 +61,13 @@ const MainPost = () => {
       dispatch(addTweet(fetchResponse.data));
       setTweetContent("");
     } catch (error) {
+      setIsError(true);
+      error.response?.status === 401 || error.response?.status === 403
+        ? navigate("/")
+        : error.response?.data?.msg
+        ? setError(error?.response?.data?.msg)
+        : setError("*Something went wrong. Try again later.");
+
       console.log(error);
     } finally {
       setIsLoading(false);

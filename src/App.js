@@ -7,12 +7,14 @@ import TweetPage from "./routes/tweetPage/TweetPage";
 import RequireAuth from "./components/requireAuth/RequireAuth";
 import Layout from "./components/Layout/Layout";
 import ErrorPage from "./components/error/ErrorPage";
+import About from "./routes/about/About";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route path="/" element={<Access />} />
+        <Route path="about" element={<About />} />
         <Route element={<RequireAuth />}>
           <Route path="home" element={<Home />} />
         </Route>

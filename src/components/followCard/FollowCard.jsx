@@ -6,11 +6,14 @@ import { useEffect, useState } from "react";
 import "./followCard.css";
 import { selectUser, updateUser } from "../../redux/authSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { selectWindowWidth } from "./../../redux/appSlice";
+import { useLocation } from "react-router-dom";
 
-const FollowCard = ({ suggestion }) => {
+const FollowCard = ({ suggestion, windowWidth }) => {
   const axiosPrivate = useAxiosPrivate();
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
+  const location = useLocation();
   const [isFollowed, setIsFollowed] = useState(false);
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -71,31 +74,50 @@ const FollowCard = ({ suggestion }) => {
             <span>{isMouseOver ? "Unfollow" : "Following"}</span>
           </Button>
         );
+      default:
+        return;
     }
   };
 
   return (
     !isLoading && (
-      <Row className="follow-suggestion py-3 px-2">
-        <Col xs={2} xl={1} className="px-0 mx-2 d-flex justify-content-center">
-          <div className="avatar border rounded-circle d-flex justify-content-center align-items-center bg-light">
-            <FontAwesomeIcon icon={faUser} className="fa-2x text-secondary" />
-          </div>
-        </Col>
-        <Col className="p-0">
-          <h6 className="fw-bold m-0">
-            {suggestion.firstname + " " + suggestion.lastname}
-          </h6>
-          <div>
-            <span className="text-muted">{"@" + suggestion.username}</span>
-          </div>
-        </Col>
-        <Col xs={3}>
-          <div className="d-flex justify-content-end">
-            {setFollowBtn(isFollowed)}
-          </div>
-        </Col>
-      </Row>
+      <div className="border-bottom border-light">
+        <Row className="follow-suggestion py-4 px-2 ">
+          <Col
+            xs={3}
+            // sm={2}
+            // lg={1}
+            className="px-0 mx-2 d-flex justify-content-center"
+          >
+            <div className="avatar border rounded-circle d-flex justify-content-center align-items-center bg-light">
+              <FontAwesomeIcon icon={faUser} className="fa-2x text-secondary" />
+            </div>
+          </Col>
+          <Col className="p-0">
+            <h6 className="fw-bold m-0">
+              {suggestion.firstname + " " + suggestion.lastname}
+            </h6>
+            <div>
+              <span className="text-muted">{"@" + suggestion.username}</span>
+            </div>
+          </Col>
+          <Col
+            xs={
+              location.pathname.split("/")[1] === "follow" && windowWidth > 400
+                ? 4
+                : 12
+            }
+          >
+            <div
+              className={`d-flex justify-content-${
+                location.pathname.split("/")[1] === "follow" ? "end" : "center"
+              }`}
+            >
+              {setFollowBtn(isFollowed)}
+            </div>
+          </Col>
+        </Row>
+      </div>
     )
   );
 

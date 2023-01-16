@@ -64,7 +64,7 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
           keyboard={false}
           centered
         >
-          <Row className="postModal p-2 border-bottom border-light">
+          <Row className="px-2 py-5 border-bottom border-light">
             <Col xs={2}>
               <div className="rounded-circle d-flex justify-content-center align-items-center user-icon bg-light">
                 <FontAwesomeIcon

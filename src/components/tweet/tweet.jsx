@@ -117,7 +117,7 @@ const Tweet = ({ tweet, setShowDeleteToast }) => {
     <>
       <div
         onClick={(e) => handleClick(tweet._id)}
-        className="tweet py-2 border-bottom"
+        className="tweet py-2 border-bottom border-light"
       >
         <Row className="p-2">
           <Col xs={2} className="d-flex justify-content-center p-0">

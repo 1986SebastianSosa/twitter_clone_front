@@ -58,14 +58,15 @@ const Follow = () => {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const handleWindowResize = () => {
-      setWindowWidth(window.innerWidth);
+      dispatch(setWindowWidth(window.innerWidth));
     };
     window.addEventListener("resize", handleWindowResize);
   }, []);
 
   return (
-    <Container className="followCard mb-5">
+    <Container className="mb-5">
       <Row>
         <Col sm={2} md={3} className={`${windowWidth < 576 && "d-none"}`}>
           <Sidenav windowWidth={windowWidth} />

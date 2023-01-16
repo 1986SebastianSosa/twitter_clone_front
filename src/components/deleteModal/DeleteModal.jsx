@@ -15,6 +15,7 @@ const DeleteModal = ({
       onHide={handleCloseDeleteModal}
       backdrop="static"
       keyboard={false}
+      centered
     >
       {isDeleteLoading ? (
         <div className="py-5">

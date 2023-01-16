@@ -1,0 +1,20 @@
+.header {
+  position: sticky;
+  background-color: white;
+  height: 4rem;
+  top: 0;
+}
+
+.header .userMenu {
+  position: fixed;
+  float: left;
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.header .logo {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

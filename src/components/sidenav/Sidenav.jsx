@@ -19,17 +19,19 @@ const Sidenav = ({ windowWidth }) => {
   const user = useSelector(selectUser);
   const [showPostModal, setShowPostModal] = useState(false);
   const navigate = useNavigate();
-  const homeClickHandler = () => {
+
+  const handleHomeClicked = () => {
+    window.scrollTo(0, 0);
     navigate("/home");
   };
 
   return (
     <>
       <nav className="sidenav px-2">
-        <div className="logoDiv" onClick={homeClickHandler}>
+        <div className="logoDiv" onClick={handleHomeClicked}>
           <FontAwesomeIcon icon={faTwitter} className="fa-2xl logo" />
         </div>
-        <div className="navItem" key={1} onClick={homeClickHandler}>
+        <div className="navItem" key={1} onClick={handleHomeClicked}>
           <div className="iconDiv">
             <FontAwesomeIcon
               color="#1d9bf0"

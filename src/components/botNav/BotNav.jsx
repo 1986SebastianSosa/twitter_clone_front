@@ -14,15 +14,18 @@ import { selectUser } from "../../redux/authSlice";
 const BotNav = () => {
   const user = useSelector(selectUser);
   const navigate = useNavigate();
+
+  const handleHomeClicked = () => {
+    window.scrollTo(0, 0);
+    navigate("/home");
+  };
+
   return (
     <>
       <Container className="botnav border-top">
         <Row className="d-flex justify-content-between">
           <Col>
-            <Button
-              className="bg-white border-0"
-              onClick={() => navigate("/home")}
-            >
+            <Button className="bg-white border-0" onClick={handleHomeClicked}>
               <FontAwesomeIcon icon={faHome} className="fs-2" color="#1d9bf0" />
             </Button>
           </Col>

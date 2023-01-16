@@ -57,10 +57,12 @@ const TweetReplyModal = ({
           commentInput,
         },
       });
-      setComments([...comments, response.data.comment._id]);
+      console.log(response.data);
+      setComments([...comments, response.data._id]);
       handleCloseCommentModal();
     } catch (error) {
       setIsError(true);
+      setError(error?.response?.data?.msg);
       console.log(error);
     }
   };

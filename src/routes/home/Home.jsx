@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import Topnav from "../../components/topnav/Topnav";
@@ -18,14 +18,19 @@ import PostModal from "../../components/postModal/PostModal";
 import { selectWindowWidth, setWindowWidth } from "../../redux/appSlice";
 import { selectUser, updateUser } from "../../redux/authSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import MobileHeader from "../../components/mobileHeader/MobileHeader";
 
 const Home = () => {
   const dispatch = useDispatch();
   const axiosPrivate = useAxiosPrivate();
+  const navigate = useNavigate();
   const windowWidth = useSelector(selectWindowWidth);
   const user = useSelector(selectUser);
+
   const [showGoFollowModal, setShowGoFollowModal] = useState(false);
   const [showPostModal, setShowPostModal] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -41,6 +46,10 @@ const Home = () => {
         const response = await axiosPrivate.get("/user");
         dispatch(updateUser(response.data));
       } catch (error) {
+        setIsError(true);
+        error?.response?.status === 401 || error?.response?.status === 403
+          ? navigate("/")
+          : setError("Something went wrong. Please try again later");
         console.log(error);
       }
     };
@@ -67,13 +76,14 @@ const Home = () => {
             lg={6}
             className="border-start border-end border-light p-0"
           >
-            {windowWidth > 576 && (
+            {windowWidth > 576 ? (
               <>
                 <Topnav title="Home" />
                 <MainPost />
               </>
+            ) : (
+              <MobileHeader />
             )}
-
             <TweetsList />
           </Col>
           {windowWidth >= 992 && (

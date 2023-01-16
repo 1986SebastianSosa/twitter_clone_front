@@ -1,0 +1,29 @@
+.userMenu {
+  width: 100%;
+}
+
+.userMenu:hover {
+  /* background-color: rgb(228, 232, 232); */
+}
+
+.popover {
+  width: 100%;
+}
+
+.popover .logout:hover {
+  cursor: pointer;
+  background-color: rgb(228, 232, 232);
+}
+
+.userMenu .menuDots span {
+  height: 30px;
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

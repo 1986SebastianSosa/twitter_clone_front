@@ -39,7 +39,6 @@ const TweetPage = () => {
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
   const allTweets = useSelector(selectTweetsToShow);
-  const hasMore = useSelector(selectHasMore);
   const location = useLocation();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -54,7 +53,6 @@ const TweetPage = () => {
   const [showDeleteToast, setShowDeleteToast] = useState(false);
   const [focused, setFocused] = useState(false);
   const [commentInput, setCommentInput] = useState("");
-  const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -68,13 +66,12 @@ const TweetPage = () => {
 
   useEffect(() => {
     const fetchTweet = async () => {
-      setIsLoading(true);
       try {
         const response = await axiosPrivate.get(`tweet/${id}`);
         setTweet(response.data);
         setTweetLikes(response.data.likes);
       } catch (error) {
-        dispatch(setIsError(true));
+        navigate("/error");
       } finally {
         setIsLoading(false);
       }
@@ -90,7 +87,7 @@ const TweetPage = () => {
   }, []);
 
   useEffect(() => {
-    if (tweet.comments) {
+    if (tweet?.comments) {
       const sortedCommentsArr = tweet.comments.sort(
         (a, b) => Date.parse(b.createdOn) - Date.parse(a.createdOn)
       );
@@ -140,12 +137,7 @@ const TweetPage = () => {
     setIsDeleteLoading(true);
     try {
       await axiosPrivate.delete(`/tweet/${tweet._id}`);
-      dispatch(
-        setTweetsToShow({
-          hasMore,
-          tweetsToShow: allTweets.filter((el) => el._id !== tweet._id),
-        })
-      );
+      dispatch(setTweetsToShow(allTweets.filter((el) => el._id !== tweet._id)));
       if (location.pathname.split("/")[1] === "tweet") {
         return navigate("/home");
       }
@@ -200,176 +192,178 @@ const TweetPage = () => {
             {isLoading ? (
               <PuffLoader color="#1d9bf0" size={200} className="m-auto my-5" />
             ) : (
-              <>
-                <Container>
-                  <Row className="p-2">
-                    <Col xs={2} className="d-flex justify-content-center p-0">
-                      <div
-                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
-                          windowWidth < 768 && "avatar"
-                        }`}
-                      >
-                        <FontAwesomeIcon
-                          icon={faUser}
-                          className={`${
-                            windowWidth < 768 ? "fa-2x" : "fa-3x"
-                          } text-secondary`}
-                        />
-                      </div>
-                    </Col>
-                    <Col xs={10}>
-                      <Row>
-                        <Col className="tweetHead" xs={10}>
-                          <div>
-                            <b>
-                              {tweet.author.firstname +
-                                " " +
-                                tweet.author.lastname}
-                            </b>{" "}
-                          </div>
-                          <div>{" @" + tweet.author.username + " "}</div>
-                          <div>
-                            <span>{getTimeElapsed(tweet.createdOn)}</span>
-                          </div>
-                        </Col>
-                        {tweet.author._id === user._id ? (
-                          <Col
-                            className="p-0 d-flex justify-content-end"
-                            xs={2}
-                          >
-                            <div className="deleteIcon me-2">
-                              <FontAwesomeIcon
-                                icon={faTrashCan}
-                                onClick={(e) => handleShowDeleteModal(e)}
-                              />
+              tweet?._id && (
+                <>
+                  <Container>
+                    <Row className="p-2">
+                      <Col xs={2} className="d-flex justify-content-center p-0">
+                        <div
+                          className={`rounded-circle d-flex justify-content-center align-items-center user-icon bg-light ${
+                            windowWidth < 768 && "avatar"
+                          }`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className={`${
+                              windowWidth < 768 ? "fa-2x" : "fa-3x"
+                            } text-secondary`}
+                          />
+                        </div>
+                      </Col>
+                      <Col xs={10}>
+                        <Row>
+                          <Col className="tweetHead" xs={10}>
+                            <div>
+                              <b>
+                                {tweet.author.firstname +
+                                  " " +
+                                  tweet.author.lastname}
+                              </b>{" "}
+                            </div>
+                            <div>{" @" + tweet.author.username + " "}</div>
+                            <div>
+                              <span>{getTimeElapsed(tweet.createdOn)}</span>
                             </div>
                           </Col>
-                        ) : null}
-                      </Row>
-                    </Col>
-                  </Row>
-                  <Row className="p-2">
-                    <Col xs={12} className="p-2">
-                      <p className="fs-5 my-0 ">{tweet.content}</p>
-                    </Col>
-                  </Row>
-                  <Row className="text-muted">
-                    <Col xs={2}></Col>
-                    <Col>
-                      <div className="d-flex align-items-center">
-                        <div className="rounded-circle tweetIcon me-3">
-                          <FontAwesomeIcon icon={faMessage} />
+                          {tweet.author._id === user._id ? (
+                            <Col
+                              className="p-0 d-flex justify-content-end"
+                              xs={2}
+                            >
+                              <div className="deleteIcon me-2">
+                                <FontAwesomeIcon
+                                  icon={faTrashCan}
+                                  onClick={(e) => handleShowDeleteModal(e)}
+                                />
+                              </div>
+                            </Col>
+                          ) : null}
+                        </Row>
+                      </Col>
+                    </Row>
+                    <Row className="p-2">
+                      <Col xs={12} className="p-2">
+                        <p className="fs-5 my-0 ">{tweet.content}</p>
+                      </Col>
+                    </Row>
+                    <Row className="text-muted">
+                      <Col xs={2}></Col>
+                      <Col>
+                        <div className="d-flex align-items-center">
+                          <div className="rounded-circle tweetIcon me-3">
+                            <FontAwesomeIcon icon={faMessage} />
+                          </div>
+                          <span>{comments.length}</span>
                         </div>
-                        <span>{comments.length}</span>
-                      </div>
-                    </Col>
-                    <Col>
-                      <OverlayTrigger
-                        placement="bottom"
-                        overlay={
-                          <Tooltip id="out-of-scope">
-                            This feature is out of the scope of this project
-                          </Tooltip>
-                        }
-                      >
-                        <div className="rounded-circle tweetIcon">
-                          <FontAwesomeIcon icon={faRepeat} />
-                        </div>
-                      </OverlayTrigger>
-                    </Col>
-                    <Col>
-                      <div className="d-flex align-items-center">
-                        <div
-                          className="rounded-circle tweetIcon me-3"
-                          onClick={handleLikeTweet}
+                      </Col>
+                      <Col>
+                        <OverlayTrigger
+                          placement="bottom"
+                          overlay={
+                            <Tooltip id="out-of-scope">
+                              This feature is out of the scope of this project
+                            </Tooltip>
+                          }
                         >
-                          {userLikedTweet ? (
-                            <FontAwesomeIcon
-                              icon={faSolidHeart}
-                              className="text-danger"
+                          <div className="rounded-circle tweetIcon">
+                            <FontAwesomeIcon icon={faRepeat} />
+                          </div>
+                        </OverlayTrigger>
+                      </Col>
+                      <Col>
+                        <div className="d-flex align-items-center">
+                          <div
+                            className="rounded-circle tweetIcon me-3"
+                            onClick={handleLikeTweet}
+                          >
+                            {userLikedTweet ? (
+                              <FontAwesomeIcon
+                                icon={faSolidHeart}
+                                className="text-danger"
+                              />
+                            ) : (
+                              <FontAwesomeIcon icon={faHeart} />
+                            )}
+                          </div>
+
+                          <span>{tweetLikes?.length}</span>
+                        </div>
+                      </Col>
+                      <Col>
+                        <OverlayTrigger
+                          placement="bottom"
+                          overlay={
+                            <Tooltip id="out-of-scope">
+                              This feature is out of the scope of this project
+                            </Tooltip>
+                          }
+                        >
+                          <div className="rounded-circle tweetIcon">
+                            <FontAwesomeIcon icon={faArrowUpFromBracket} />
+                          </div>
+                        </OverlayTrigger>
+                      </Col>
+                    </Row>
+
+                    <Row className="p-2 my-2 border-top border-bottom">
+                      <Col
+                        xs={2}
+                        className="d-flex justify-content-center align-items-center p-0"
+                      >
+                        <div
+                          className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
+                            windowWidth < 768 && "avatar"
+                          }`}
+                        >
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className={`${
+                              windowWidth < 768 ? "fa-2x" : "fa-3x"
+                            } text-secondary`}
+                          />
+                        </div>
+                      </Col>
+                      <Col xs={10} className="py-2 my-2">
+                        <div>
+                          <form
+                            onSubmit={handlePostComment}
+                            className="reply-input-form"
+                          >
+                            <input
+                              name="commentContent"
+                              type="text"
+                              className="border-0 main-input text-muted fs-5"
+                              placeholder="Tweet your reply"
+                              onFocus={handleFocus}
+                              onChange={handleChange}
+                              value={commentInput}
+                              width="100%"
                             />
-                          ) : (
-                            <FontAwesomeIcon icon={faHeart} />
+                          </form>
+                        </div>
+                        <div className="py-2">
+                          {isError && (
+                            <span className="text-danger">{error}</span>
                           )}
                         </div>
+                      </Col>
+                    </Row>
+                  </Container>
 
-                        <span>{tweetLikes?.length}</span>
-                      </div>
-                    </Col>
-                    <Col>
-                      <OverlayTrigger
-                        placement="bottom"
-                        overlay={
-                          <Tooltip id="out-of-scope">
-                            This feature is out of the scope of this project
-                          </Tooltip>
-                        }
-                      >
-                        <div className="rounded-circle tweetIcon">
-                          <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                        </div>
-                      </OverlayTrigger>
-                    </Col>
-                  </Row>
-
-                  <Row className="p-2 my-2 border-top border-bottom">
-                    <Col
-                      xs={2}
-                      className="d-flex justify-content-center align-items-center p-0"
-                    >
-                      <div
-                        className={`rounded-circle d-flex justify-content-center align-items-center user-icon user-icon-small bg-light m-0 ${
-                          windowWidth < 768 && "avatar"
-                        }`}
-                      >
-                        <FontAwesomeIcon
-                          icon={faUser}
-                          className={`${
-                            windowWidth < 768 ? "fa-2x" : "fa-3x"
-                          } text-secondary`}
-                        />
-                      </div>
-                    </Col>
-                    <Col xs={10} className="py-2 my-2">
-                      <div>
-                        <form
-                          onSubmit={handlePostComment}
-                          className="reply-input-form"
-                        >
-                          <input
-                            name="commentContent"
-                            type="text"
-                            className="border-0 main-input text-muted fs-5"
-                            placeholder="Tweet your reply"
-                            onFocus={handleFocus}
-                            onChange={handleChange}
-                            value={commentInput}
-                            width="100%"
-                          />
-                        </form>
-                      </div>
-                      <div className="py-2">
-                        {isError && (
-                          <span className="text-danger">{error}</span>
-                        )}
-                      </div>
-                    </Col>
-                  </Row>
-                </Container>
-
-                <Container>
-                  {comments.map((comment) => (
-                    <Comment
-                      key={comment._id}
-                      comment={comment}
-                      comments={comments}
-                      setComments={setComments}
-                      setShowDeleteToast={setShowDeleteToast}
-                      windowWidth={windowWidth}
-                    />
-                  ))}
-                </Container>
-              </>
+                  <Container>
+                    {comments.map((comment) => (
+                      <Comment
+                        key={comment._id}
+                        comment={comment}
+                        comments={comments}
+                        setComments={setComments}
+                        setShowDeleteToast={setShowDeleteToast}
+                        windowWidth={windowWidth}
+                      />
+                    ))}
+                  </Container>
+                </>
+              )
             )}
           </Col>
           {windowWidth >= 992 && (

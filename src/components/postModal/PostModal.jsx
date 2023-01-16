@@ -8,7 +8,7 @@ import {
   faSquarePollHorizontal,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Col, Modal, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { PuffLoader } from "react-spinners";
@@ -19,19 +19,18 @@ import "./postModal.css";
 const PostModal = ({ showPostModal, handleClosePostModal }) => {
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useDispatch();
+
   const [focused, setFocused] = useState(false);
   const [tweetContent, setTweetContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showErrorMsg, setShowErrorMsg] = useState(false);
 
-  const handleFocus = () => {
-    setFocused(true);
-  };
-
-  const handleChange = (e) => {
-    setTweetContent(e.target.value);
-  };
+  useEffect(() => {
+    if (tweetContent.length) {
+      setShowErrorMsg(false);
+    }
+  }, [tweetContent]);
 
   const handlePostTweet = async (e) => {
     e.preventDefault();
@@ -53,12 +52,6 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
       handleClosePostModal();
     }
   };
-
-  useEffect(() => {
-    if (tweetContent.length) {
-      setShowErrorMsg(false);
-    }
-  }, [tweetContent]);
 
   return (
     <>
@@ -89,8 +82,8 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
                       type="text"
                       className="border-0 main-input text-muted fs-5"
                       placeholder="What's happening?"
-                      onFocus={handleFocus}
-                      onChange={handleChange}
+                      onFocus={() => setFocused(true)}
+                      onChange={(e) => setTweetContent(e.target.value)}
                       value={tweetContent}
                     />
 

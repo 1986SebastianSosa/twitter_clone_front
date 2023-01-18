@@ -47,8 +47,9 @@ const TweetReplyModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!commentInput.length) {
-      return dispatch(setIsError(false));
+      return setIsError(false);
     }
+    setIsLoading(true);
     try {
       const response = await axiosPrivate({
         url: `/comment/${tweet._id}`,
@@ -57,13 +58,14 @@ const TweetReplyModal = ({
           commentInput,
         },
       });
-      console.log(response.data);
       setComments([...comments, response.data._id]);
       handleCloseCommentModal();
     } catch (error) {
       setIsError(true);
       setError(error?.response?.data?.msg);
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 

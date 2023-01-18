@@ -1,0 +1,15 @@
+.aboutButton {
+  position: fixed;
+  right: -90px;
+  bottom: 10rem;
+  background-color: #1d9bf0;
+  color: white;
+  padding: 10px 20px;
+  box-shadow: -5px 5px 7px rgb(193, 192, 192);
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+.aboutButton:hover {
+  transform: translateX(-90px);
+}

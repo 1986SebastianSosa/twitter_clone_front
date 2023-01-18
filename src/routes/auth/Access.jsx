@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Modal,
-  OverlayTrigger,
-  Tooltip,
-} from "react-bootstrap";
+import { Container, Row, Col, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { setWindowWidth } from "../../redux/appSlice";
 import accessImg from "../../img/lohp_en_1302x955.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

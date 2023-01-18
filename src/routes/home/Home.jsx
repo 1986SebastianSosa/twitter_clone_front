@@ -19,6 +19,7 @@ import { selectWindowWidth, setWindowWidth } from "../../redux/appSlice";
 import { selectUser, updateUser } from "../../redux/authSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import MobileHeader from "../../components/mobileHeader/MobileHeader";
+import AboutButton from "../../components/aboutButton/AboutButton";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -90,6 +91,7 @@ const Home = () => {
             <Col xs={3}>
               <Searchbar />
               <TrendingSidenav />
+
               <WhoToFollow />
             </Col>
           )}

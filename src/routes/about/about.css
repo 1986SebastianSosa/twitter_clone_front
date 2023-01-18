@@ -1,0 +1,28 @@
+h2 {
+  text-decoration: underline;
+  text-decoration-color: #1d9bf0;
+}
+
+.seba {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+}
+
+.tech {
+  height: 50px;
+  width: 50px;
+  filter: invert(65%) sepia(49%) saturate(6957%) hue-rotate(180deg)
+    brightness(101%) contrast(89%);
+}
+
+.erm {
+  width: 100%;
+}
+.erm:hover {
+  cursor: pointer;
+}
+
+.modalBody {
+  width: 100vw;
+}

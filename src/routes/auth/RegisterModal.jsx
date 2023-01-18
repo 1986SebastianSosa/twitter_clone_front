@@ -87,7 +87,12 @@ function RegisterModal({ showRegisterModal, handleCloseRegisterModal }) {
     <>
       <Modal show={showRegisterModal} onHide={handleCloseRegisterModal}>
         {isLoading ? (
-          <PuffLoader size={200} color="#1d9bf0" className="m-auto my-5" />
+          <>
+            <PuffLoader size={100} color="#1d9bf0" className="m-auto" />
+            <h6 className="m-auto text-center text-muted pt-3">
+              Just a moment...
+            </h6>
+          </>
         ) : isError ? (
           <div className="m-auto py-5">
             <MyToast

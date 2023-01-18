@@ -117,7 +117,12 @@ const TweetReplyModal = ({
             </Col>
           </Row>
           {isLoading ? (
-            <PuffLoader size={100} color="#1d9bf0" className="m-auto" />
+            <>
+              <PuffLoader size={100} color="#1d9bf0" className="m-auto" />
+              <h6 className="m-auto text-center text-muted pt-3">
+                Just a moment...
+              </h6>
+            </>
           ) : (
             <Row>
               <Col xs={2} className="p-0">

@@ -29,11 +29,7 @@ export const techList = [
     title: "JavaScript",
     icon: javascript,
   },
-  {
-    id: 4,
-    title: "HTML",
-    icon: html,
-  },
+
   {
     id: 5,
     title: "Node.js",

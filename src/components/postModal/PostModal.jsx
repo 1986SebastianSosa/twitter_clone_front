@@ -43,7 +43,6 @@ const PostModal = ({ showPostModal, handleClosePostModal }) => {
       const fetchResponse = await axiosPrivate.get(
         `/tweet/${postResponse.data._id}`
       );
-      console.log(fetchResponse.data);
       dispatch(addTweet(fetchResponse.data));
       setTweetContent("");
       handleClosePostModal();

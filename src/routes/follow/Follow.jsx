@@ -67,10 +67,11 @@ const Follow = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const handleWindowResize = () => {
-      dispatch(setWindowWidth(window.innerWidth));
-    };
-    window.addEventListener("resize", handleWindowResize);
+    // const handleWindowResize = () => {
+    //   console.log(setWindowWidth);
+    //   dispatch(setWindowWidth(window.innerWidth));
+    // };
+    // window.addEventListener("resize", handleWindowResize);
   }, []);
 
   return (
